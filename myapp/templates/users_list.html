@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  <title>Cinelist - User Profile</title>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="row g-4">
+
+    {% for user in users %}
+      {% if user not in profiles %}
+        <div class="col-md-4 col-sm-6">
+          <a href="{% url 'user_info' user.id %}" class="link-offset-2 link-underline link-underline-opacity-0">
+            <div class="card shadow-sm border-0 rounded-4 text-center h-100", style="background: linear-gradient(to right, hwb(0 75% 20%), rgb(88, 88, 88));">
+              <div class="card-body">
+                <!-- Profile Picture -->
+                <div class="rounded-circle text-white d-flex align-items-center justify-content-center mb-3 mx-auto"
+                     style="width: 80px; height: 80px; font-size: 30px;background-color: rgb(0, 0, 0);">
+                  {{ user.username|first|upper }}
+                </div>
+
+                <!-- Username -->
+                <h5 class="card-title mb-0 text-dark fw-bold">{{ user.username|upper }}</h5>
+                <p class="text-muted small mb-0 text-dark fw-bold" style="color: #f1f5f9;">{{ user.email }}</p>
+              </div>
+            </div>
+          </a>
+        </div>
+      {% endif %}
+    {% endfor %}
+
+  </div>
+</div>
+{% endblock %}
+

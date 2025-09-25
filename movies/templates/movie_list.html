@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  <title>Cinelist - Movie List</title>
+{% endblock %}
+
+
+{% block content %}
+
+<style>
+  body {
+    font-family: sans-serif;
+    background-color: rgb(36, 36, 36);
+  }
+
+  a {
+  text-decoration: none;
+  color: inherit; /* optional - keeps the text color unchanged */
+    }
+
+  /* Search bar styling */
+  .search-bar {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+  }
+
+  .search-bar form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .search-bar input[type="text"] {
+    padding: 8px 12px;
+    width: 750px;
+    height: 40px;
+    font-size: 16px;
+    background-color: black;
+    color: white;
+    border: 1px solid white;
+    border-radius: 5px;
+  }
+
+  /* Movie grid styling */
+  .movie-grid {
+    display: flex;
+    flex-wrap: wrap-reverse;
+    gap: 30px;
+    justify-content: center;
+  }
+
+  .movie-card {
+    flex: 0 0 250px;
+    height: 450px; 
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    box-sizing: border;
+    border-radius: 10px;
+    background-color: #cacaca;
+    transition: transform 0.2s;
+  }
+
+  .movie-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .movie-card img {
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+    margin-bottom: 10px;
+  }
+
+  .movie-card h2 {
+    font-size: 20px;
+    margin: 0 0 10px;
+  }
+
+  .movie-card p {
+    font-size: 15px;
+    color: #333;
+  }
+</style>
+
+<!-- Search Form -->
+<div class="search-bar mt-3">
+  <form method="get">
+    <input type="text" name="query" placeholder="Search movies...">
+    <button type="submit" class="btn btn-outline-light">Search</button>
+  </form>
+</div>
+
+<!-- Movie Grid -->
+<div class="movie-grid">
+  {% for movie in movies %}
+    <div class="movie-card">
+        <a href="{% url 'movie_detail' movie.id %}">
+      <h2><strong>{{ movie.title }}</strong></h2>
+      <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}">
+      <p><strong>Release:</strong> {{ movie.release_date }}</p>
+      </a>
+    </div>
+  {% endfor %}
+</div>
+
+{% endblock %}

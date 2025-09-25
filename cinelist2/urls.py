@@ -1,0 +1,48 @@
+"""
+URL configuration for cinelist2 project.
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/5.2/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+from django.contrib import admin
+from django.urls import path,include
+
+from myapp.views import *
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path("movies/",include("movies.urls")),
+    path("user/signup/",UserRegisterView.as_view(),name="signup"),
+    path("user/otpverify/",OtpVerifyView.as_view(),name="otpverify"),
+    path("user/login/",LoginView.as_view(),name="login"),
+    path('',CinelistHomeView.as_view()),
+    path('intro/', IntroView.as_view(), name="intro"),
+    path("user/forgot_password/",ForgetPasswordView.as_view(),name="forgotpswd"),
+    path("user/new_password/",NewPasswordView.as_view(),name="newpswd"),
+    path("user/password_otp_verify/",ForgotOtpVerifyView.as_view(),name="pswdotp"),
+    path("user_profile/",UserProfileView.as_view(),name="user_profile"),
+    path("user/logout/",LogoutView.as_view(), name="logout"),
+    path("user/update/",UserUpdateView.as_view(),name="update"),
+    path("user/current_password/",ResetPasswordView.as_view(), name="current_password"),
+    path("user/change_password/",ChangePasswordView.as_view(),name="change_password"),
+    path("users_list/",UsersListView.as_view(),name="users"),
+    path("user_info/<int:id>",UserInfoView.as_view(),name="user_info"),
+    path("follower/<int:id>",FollowingView.as_view(),name="follower"),
+    path("followers_remove/<int:id>",FollowingRemovalView.as_view(),name="following_removal"),
+    path("user_following_list/",UserFollowingView.as_view(),name="user_following_list"),
+    path("user_followers_list/",UserFollowersView.as_view(),name="user_followers_list"),
+    path("following_list_removal/<int:id>",FollowingListRemovalView.as_view(),name="following_list_removal"),
+    path("followers_list_removal/<int:id>",FollowersListRemovalView.as_view(),name="followers_list_removal"),
+    path("browse_follower/<int:id>",BrowseFollowersView.as_view(),name="browse_follower"),
+    path("browse_following/<int:id>",BrowseFollowingView.as_view(),name="browse_following")
+]

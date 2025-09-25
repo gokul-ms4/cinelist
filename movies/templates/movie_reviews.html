@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}
+<title>{{ movie.title }} - Reviews</title>
+{% endblock %}
+
+{% block content %}
+<style>
+  .review-box {
+    background-color: #1f1f2e;
+    border-radius: 12px;
+    padding: 20px;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease;
+    word-wrap: break-word;
+    overflow: hidden;
+  }
+
+  .review-box:hover {
+    transform: scale(1.01);
+  }
+
+  .review-user {
+    font-weight: 600;
+    color: #f8f9fa;
+  }
+
+  .review-date {
+    font-size: 0.85rem;
+    color: #aaaaaa;
+  }
+
+  .review-content {
+    margin-top: 10px;
+    font-size: 0.95rem;
+    color: #d0d0d0;
+    white-space: pre-wrap; /* Keep line breaks */
+    word-break: break-word; /* Break long words */
+  }
+
+  .review-stars i,
+  .review-stars span {
+    font-size: 1.1rem;
+  }
+  
+</style>
+
+{% if reviews %}
+
+<div class="container my-5">
+  <h2 class="text-white mb-4">Reviews for <strong>{{title}}</strong></h2>
+  {% for review in reviews %}
+      <div class="review-box mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            {% if review.review_id.user_id.username in users %}
+            <a href="{% url 'user_profile' %}" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
+            <span class="review-user">{{ review.review_id.user_id.username|capfirst }}</span>
+            </a>
+            {% else %}
+            <a href="{% url 'user_info' review.review_id.user_id.id %}" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
+            <span class="review-user">{{ review.review_id.user_id.username|capfirst }}</span>
+            </a>
+            {% endif %}
+            <div class="review-date">{{ review.created_date|date:"F j, Y" }}</div>
+          </div>
+          <div class="review-stars">
+            {% for i in range %}
+                  {% if i <= review.rating %}
+                    <span class="text-warning">★</span>
+                  {% else %}
+                    <span class="text-secondary">☆</span>           
+                  {% endif %}
+                {% endfor %}
+                <span class="ms-2">({{ review.rating }}/5)</span>
+          </div>
+        </div>
+        <div class="review-content">{{ review.content}}</div>
+      </div>
+    {% endfor %}
+{% else %}
+<div class="container my-5">
+  <h2 class="text-white mb-4">No reviews have been posted for this movie yet.</h2>
+{% endif %}
+</div>
+{% endblock %}

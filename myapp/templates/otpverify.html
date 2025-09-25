@@ -1,0 +1,105 @@
+{% extends 'home.html' %}
+
+{% block title %}
+  <title>Cinelist - otp verify</title>
+{% endblock %}
+
+  {% load static %}
+
+  {% block style %}
+  <style>
+  body {
+    background-image: url("{% static 'images/bg_blur.png' %}");
+    background-size: cover;
+    background-position: right;
+    background-repeat: no-repeat;
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; 
+    padding-left: 60px; 
+  }
+
+  .login-card {
+    width: 650px;
+    height: 450px;
+    display: flex;
+    background-color: #1e293b;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 0 30px rgba(0,0,0,0.4);
+  }
+
+  .poster {
+    width: 45%;
+    background: url("{% static 'images/min_up.jpeg' %}") no-repeat center center;
+    background-size: cover;
+  }
+
+  .form-section {
+    width: 55%;
+    padding: 10px;
+    margin-left: 10px;
+    color: #fff;
+  }
+
+  .form-control {
+    background-color: #0f172a;
+    border: 1px solid #334155;
+    color: white;
+  }
+
+  .form-control:focus {
+    border-color: #ef4444;
+    box-shadow: none;
+  }
+
+  .btn-danger {
+    background-color: #ef4444;
+    border: none;
+  }
+
+  .btn-danger:hover {
+    background-color: #dc2626;
+  }
+
+  .form-link {
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+
+  .form-link:hover {
+    color: #f87171;
+  }
+
+  .highlight {
+    color: #ef4444;
+  }
+</style>
+</head>
+<body>
+
+{% endblock %}
+
+{% block cards %}
+<div class="login-card">
+  <div class="poster d-none d-md-block"></div>
+  <div class="form-section">
+    <h2 class="fs-3">Enter OTP</h2>
+
+    <form method="POST" action="">
+      {% csrf_token %}
+
+       {{form}}
+
+      <button type="submit" class="btn btn-danger w-100 mt-3">Verify</button>
+    </form>
+  </div>
+</div>
+
+</body>
+</html>
+
+{% endblock %}

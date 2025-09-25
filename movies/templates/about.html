@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  <title>Cinelist - about</title>
+{% endblock %}
+
+{% block content %}
+<style>
+  .about-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px 30px;
+    line-height: 1.7;
+    color: #f5f5f5;  /* ✅ Add this line */
+  }
+
+  .about-container h1 {
+    font-size: 42px;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #444;
+    padding-bottom: 10px;
+    color: #ffffff;  /* ✅ Optional */
+  }
+
+  .about-container h2 {
+    font-size: 28px;
+    margin-top: 40px;
+    color: #f75c03;
+  }
+
+  .about-container ul {
+    list-style: disc;
+    padding-left: 20px;
+    margin-top: 10px;
+  }
+
+  .about-container p {
+    margin-top: 10px;
+  }
+
+  .about-container a {
+    color: #00bfff;
+    text-decoration: none;
+  }
+
+  .about-container a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<div class="about-container">
+  <h1>About Cinelist</h1>
+
+  <p>
+    <strong>Cinelist</strong> is a movie discovery and management platform developed using Django and the TMDB API. It allows users to browse trending and upcoming movies, explore cast and reviews, and maintain personalized Watchlists and Wishlists.
+  </p>
+
+  <h2>Features</h2>
+  <ul>
+    <li>Search for movies by title</li>
+    <li>Detailed movie pages with posters, genres, and ratings</li>
+    <li>Top cast and user reviews display</li>
+    <li>Watchlist and Wishlist management</li>
+    <li>Modern responsive design</li>
+  </ul>
+
+  <h2>Technologies Used</h2>
+  <ul>
+    <li>Python & Django</li>
+    <li>Django Templates, HTML5 & CSS3</li>
+    <li>Font Awesome for icons</li>
+    <li><a href="https://www.themoviedb.org/documentation/api" target="_blank">TMDB API</a></li>
+  </ul>
+
+  <h2>Credits</h2>
+  <p>This project uses the TMDB API but is not endorsed or certified by TMDB.</p>
+
+  <h2>Developer</h2>
+  <p>
+    Developed by <strong>Gokul</strong>, Python/Django full-stack developer from Kerala, India.
+    <br>
+    Connect with me on:
+    <a href="https://www.linkedin.com/in/YOUR-USERNAME" target="_blank">LinkedIn</a> |
+    <a href="https://github.com/YOUR-GITHUB" target="_blank">GitHub</a>
+  </p>
+</div>
+{% endblock %}
