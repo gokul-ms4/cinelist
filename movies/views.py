@@ -346,6 +346,7 @@ class ReviewDeleteView(View):
 
       return redirect("user_reviews")
    
+@method_decorator(login_required,name="dispatch")  
 class UserReviewsView(View):
 
    def get(self,request):
