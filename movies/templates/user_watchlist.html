@@ -6,152 +6,562 @@
 
 {% block content %}
 <style>
-  .watchlist-container {
-    background-color: #1e1e1e;
-    color: #fff;
-    font-family: 'Segoe UI', sans-serif;
-    padding: 40px 20px;
+  .watchlist-section {
+    padding: 48px 0 80px;
   }
 
-  .watchlist-container h1 {
-    text-align: center;
-    margin-bottom: 30px;
+  /* Page header */
+  .page-eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 6px;
   }
 
-  .watchlist-container table {
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 2rem;
+    color: var(--text);
+    margin: 0 0 6px;
+  }
+
+  .page-sub {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  .watchlist-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: rgba(201,162,75,0.08);
+    border: 1px solid rgba(201,162,75,0.2);
+    border-radius: 999px;
+    padding: 4px 14px;
+    margin-top: 12px;
+  }
+
+  /* Table card */
+  .table-card {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+  }
+
+  .table-card table {
     width: 100%;
     border-collapse: collapse;
-    background-color: #2a2a2a;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   }
 
-  .watchlist-container th,
-  .watchlist-container td {
-    padding: 15px;
-    text-align: left;
-    border-bottom: 1px solid #444;
+  .table-card thead tr {
+    border-bottom: 1px solid rgba(201,162,75,0.15);
+    background: rgba(201,162,75,0.04);
   }
 
-  .watchlist-container th {
-    background-color: #333;
-    font-weight: bold;
+  .table-card th {
+    padding: 14px 20px;
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    white-space: nowrap;
   }
 
-  .watchlist-container tr:hover {
-    background-color: #3a3a3a;
+  .table-card td {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: middle;
   }
 
-  .watchlist-container .poster-img {
-    width: 60px;
-    height: auto;
-    border-radius: 4px;
+  .table-card tbody tr:last-child td {
+    border-bottom: none;
   }
 
-  .watchlist-container .status {
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-weight: bold;
-    font-size: 14px;
+  .table-card tbody tr {
+    transition: background-color 160ms ease;
   }
 
-  .watchlist-container .watched {
-    background-color: #4caf50;
-    color: white;
+  .table-card tbody tr:hover {
+    background-color: rgba(201,162,75,0.03);
   }
 
-  .watchlist-container .not-watched {
-    background-color: #f44336;
-    color: white;
+  /* Poster */
+  .poster-img {
+    width: 52px;
+    height: 78px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    display: block;
   }
 
-  .watchlist-container .actions {
-    display: flex;
-    gap: 10px;
+  /* Movie title */
+.movie-link {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(201,162,75,0.4);
+  padding-bottom: 2px;
+  transition: color 160ms ease, border-color 160ms ease;
+}
+
+.movie-link:hover {
+  color: var(--gold-bright);
+  border-color: var(--gold-bright);
+}
+
+  /* Date */
+  .date-text {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    white-space: nowrap;
   }
 
-  .watchlist-container .btn {
-    padding: 6px 10px;
-    font-size: 14px;
-    border: none;
-    border-radius: 4px;
+  /* Status badges */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 5px 13px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .status-watched {
+    background: rgba(74,197,130,0.12);
+    border: 1px solid rgba(74,197,130,0.3);
+    color: #4ac582;
+  }
+
+  .status-pending {
+    background: rgba(201,162,75,0.1);
+    border: 1px solid rgba(201,162,75,0.25);
+    color: var(--gold);
+    text-decoration: none;
+    transition: background-color 160ms ease, border-color 160ms ease;
     cursor: pointer;
-    color: #fff;
   }
 
-  .watchlist-container .btn-edit {
-    background-color: #2196f3;
+  .status-pending:hover {
+    background: rgba(201,162,75,0.18);
+    border-color: var(--gold);
+    color: var(--gold-bright);
   }
 
-  .watchlist-container .btn-delete {
-    background-color: #e53935;
+  /* Action buttons */
+  .action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 1px solid;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: transform 160ms ease, background-color 160ms ease,
+                color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
   }
 
-  .watchlist-container .btn i {
-    margin-right: 4px;
+  .action-btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .btn-review {
+    background-color: transparent;
+    border-color: rgba(201,162,75,0.3);
+    color: var(--gold);
+  }
+
+  .btn-review:hover {
+    background-color: rgba(201,162,75,0.1);
+    border-color: var(--gold);
+    color: var(--gold-bright);
+  }
+
+  .btn-remove {
+    background-color: transparent;
+    border-color: rgba(224,122,122,0.3);
+    color: #e07a7a;
+  }
+
+  .btn-remove:hover {
+    background-color: rgba(224,122,122,0.1);
+    border-color: #e07a7a;
+    box-shadow: 0 4px 16px rgba(224,122,122,0.15);
+  }
+
+  .status-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  /* Empty state */
+  .empty-state {
+    padding: 80px 20px;
+    text-align: center;
+  }
+
+  .empty-icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: rgba(201,162,75,0.08);
+    border: 1px solid rgba(201,162,75,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--gold);
+    margin: 0 auto 20px;
+    opacity: 0.75;
+  }
+
+  .empty-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .empty-sub {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+
+  .btn-browse {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--gold);
+    border: none;
+    color: #16130c;
+    font-weight: 600;
+    font-size: 0.88rem;
+    padding: 10px 24px;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: background-color 180ms ease, transform 180ms ease;
+  }
+
+  .btn-browse:hover {
+    background-color: var(--gold-bright);
+    color: #16130c;
+    transform: translateY(-2px);
+  }
+
+  [title] {
+  position: relative;
+  cursor: pointer;
+}
+
+[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface-raised);
+  border: 1px solid rgba(201,162,75,0.25);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 8px;
+  white-space: nowrap;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  z-index: 10;
+  pointer-events: none;
+}
+</style>
+
+<div class="watchlist-section">
+  <div class="container">
+
+    <!-- Page header -->
+    <div class="mb-4">
+      <p class="page-eyebrow"><i class="fas fa-bookmark me-1"></i> My Collection</p>
+      <h1 class="page-title">Watchlist</h1>
+      <p class="page-sub">Track every film you plan to watch or have already seen.</p>
+      {% if movie_list %}
+        <span class="watchlist-count">
+          <i class="fas fa-film"></i>
+          {{ movie_list|length }} film{{ movie_list|length|pluralize }}
+        </span>
+      {% endif %}
+    </div>
+
+    <!-- Table card -->
+    <div class="table-card">
+      {% if movie_list %}
+      <table>
+        <thead>
+          <tr>
+            <th>Poster</th>
+            <th>Title</th>
+            <th>Added</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in movie_list %}
+          <tr>
+
+            <!-- Poster -->
+            <td>
+               <a href="{% url 'movie_detail' item.movie_id %}">
+    <img src="https://image.tmdb.org/t/p/w92{{ item.poster_path }}"
+         alt="{{ item.title }}" class="poster-img">
+  </a>
+            </td>
+
+            <!-- Title -->
+            <td>
+              <a href="{% url 'movie_detail' item.movie_id %}" class="movie-link">
+                {{ item.title }}
+              </a>
+            </td>
+
+            <!-- Date -->
+            <td>
+              <span class="date-text">
+                <i class="fas fa-calendar-alt me-1" style="color:var(--gold); opacity:0.6;"></i>
+                {{ item.created_date }}
+              </span>
+            </td>
+
+            <!-- Status -->
+            <td>
+              {% if item.watch_status %}
+                <div class="status-actions">
+                  <span class="status-badge status-watched">
+                    <i class="fas fa-check-circle"></i> Watched
+                  </span>
+                  {% if item.is_review %}
+                    <a href="{% url 'review_update' item.movie_id %}" class="action-btn btn-review">
+                      <i class="fas fa-pen"></i> Edit Review
+                    </a>
+                  {% else %}
+                    <a href="{% url 'review_form' item.movie_id %}" class="action-btn btn-review">
+                      <i class="fas fa-pen"></i> Add Review
+                    </a>
+                  {% endif %}
+                </div>
+              {% else %}
+                <a href="{% url 'watchlist_update' item.movie_id %}" class="status-badge status-pending"
+   title="Click to mark as Watched">
+  <i class="fas fa-clock"></i> Not Watched
+</a>
+              {% endif %}
+            </td>
+
+            <!-- Remove -->
+            <td>
+              <a href="#" class="action-btn btn-remove"
+   data-url="{% url 'watchlist_delete' item.movie_id %}"
+   data-title="{{ item.title }}"
+   onclick="openDeleteModal(this); return false;">
+  <i class="fas fa-trash-alt"></i> Remove
+</a>
+            </td>
+
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">
+            <i class="fas fa-bookmark"></i>
+          </div>
+          <p class="empty-title">Your watchlist is empty</p>
+          <p class="empty-sub">Add movies you want to watch and track them here.</p>
+          <a href="{% url 'movie_list' %}" class="btn-browse">
+            <i class="fas fa-film"></i> Browse Movies
+          </a>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<!-- Confirm Delete Modal -->
+<div id="delete-modal" style="
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+">
+  <!-- Backdrop -->
+  <div onclick="closeDeleteModal()" style="
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+  "></div>
+
+  <!-- Modal card -->
+  <div style="
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 420px;
+    margin: 0 16px;
+    background: var(--surface);
+    border: 1px solid rgba(201,162,75,0.2);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+    animation: modalRise 250ms ease-out both;
+  ">
+    <!-- Gold top accent -->
+    <div style="height:2px; background:linear-gradient(90deg, transparent, var(--gold), transparent); opacity:0.6;"></div>
+
+    <div style="padding: 32px 32px 28px;">
+
+      <!-- Icon -->
+      <div style="
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: rgba(224,122,122,0.1);
+        border: 1px solid rgba(224,122,122,0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        color: #e07a7a;
+        margin-bottom: 20px;
+      ">
+        <i class="fas fa-trash-alt"></i>
+      </div>
+
+      <!-- Text -->
+      <h5 style="
+        font-family: 'Playfair Display', serif;
+        font-weight: 600;
+        font-size: 1.25rem;
+        color: var(--text);
+        margin: 0 0 8px;
+      ">Remove from Watchlist?</h5>
+
+      <p style="
+        font-size: 0.88rem;
+        color: var(--text-muted);
+        margin: 0 0 6px;
+        line-height: 1.6;
+      ">You're about to remove</p>
+
+      <p id="modal-movie-title" style="
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text);
+        margin: 0 0 24px;
+        padding: 10px 14px;
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+      "></p>
+
+      <!-- Divider -->
+      <div style="height:1px; background:var(--border); margin-bottom:24px;"></div>
+
+      <!-- Buttons -->
+      <div style="display:flex; gap:12px;">
+        <button onclick="closeDeleteModal()" style="
+          flex: 1;
+          background: transparent;
+          border: 1px solid var(--border);
+          color: var(--text-muted);
+          font-weight: 600;
+          font-size: 0.88rem;
+          padding: 10px 0;
+          border-radius: 999px;
+          cursor: pointer;
+          transition: border-color 160ms ease, color 160ms ease;
+        "
+        onmouseover="this.style.borderColor='var(--gold)'; this.style.color='var(--gold-bright)';"
+        onmouseout="this.style.borderColor='var(--border)'; this.style.color='var(--text-muted)';">
+          <i class="fas fa-arrow-left me-2"></i>Cancel
+        </button>
+
+        <a id="modal-confirm-btn" href="#" style="
+          flex: 1;
+          background: rgba(224,122,122,0.15);
+          border: 1px solid rgba(224,122,122,0.35);
+          color: #e07a7a;
+          font-weight: 600;
+          font-size: 0.88rem;
+          padding: 10px 0;
+          border-radius: 999px;
+          cursor: pointer;
+          text-decoration: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          transition: background-color 160ms ease, border-color 160ms ease;
+        "
+        onmouseover="this.style.backgroundColor='rgba(224,122,122,0.25)'; this.style.borderColor='#e07a7a';"
+        onmouseout="this.style.backgroundColor='rgba(224,122,122,0.15)'; this.style.borderColor='rgba(224,122,122,0.35)';">
+          <i class="fas fa-trash-alt"></i> Remove
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+  @keyframes modalRise {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 </style>
 
-<div class="watchlist-container">
-  <h1>🎬 My Watchlist</h1>
+<script>
+  function openDeleteModal(el) {
+  const url = el.getAttribute('data-url');
+  const title = el.getAttribute('data-title');
+  document.getElementById('modal-movie-title').textContent = title;
+  document.getElementById('modal-confirm-btn').href = url;
+  const modal = document.getElementById('delete-modal');
+  modal.style.display = 'flex';
+}
 
-  <table>
-    <thead>
-      <tr>
-        <th>Poster</th>
-        <th>Title</th>
-        <th>Added Date</th>
-        <th>Status</th>
-        <th>Remove</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in movie_list %}
-      <tr>
-        <td><img src="https://image.tmdb.org/t/p/w92{{ item.poster_path }}" alt="{{ item.title }}"
-            class="poster-img"></td>
-        <td><a href="{% url 'movie_detail' item.movie_id %}" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
-          {{ item.title }}</a></td>
-        <td>{{ item.created_date }}</td>
-        <td>
-          {% if item.watch_status %}
+  function closeDeleteModal() {
+    document.getElementById('delete-modal').style.display = 'none';
+  }
 
-           {% if item.is_review %}
-           <div class="d-flex">
-            <span class="status watched"><i class="fas fa-check-circle"></i> Watched</span>
-            <a href="{% url 'review_update' item.movie_id %}" class="btn mx-2 link-underline-info">
-              <i class="fas fa-pen"></i> Edit Review
-            </a>
-          </div>
-           {% else %}
-          <div class="d-flex">
-            <span class="status watched"><i class="fas fa-check-circle"></i> Watched</span>
-            <a href="{% url 'review_form' item.movie_id %}" class="btn mx-2 link-underline-info">
-              <i class="fas fa-pen"></i> Add Review
-            </a>
-          </div>
-           {% endif %}
-          {% else %}
-          <a href="{% url 'watchlist_update' item.movie_id %}"
-            class="link-offset-2 link-underline link-underline-opacity-0">
-            <span class="status not-watched"><i class="fas fa-clock"></i> Not Watched</span>
-          </a>
-          {% endif %}
-        </td>
-        <td>
-          <div class="actions">
-            <a href="{% url 'watchlist_delete' item.movie_id %}" class="btn btn-delete"><i
-                class="fas fa-trash-alt"></i>Remove</a>
-          </div>
-        </td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="5" style="text-align: center;">No movies in your watchlist.</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
+  // Close on Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeDeleteModal();
+  });
+</script>
 {% endblock %}

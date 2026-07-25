@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-<title>Following - CineList</title>
+<title>Followers - CineList</title>
 {% endblock %}
 
 {% block navbar %}{% endblock %}
@@ -9,60 +9,198 @@
 {% block content %}
 <style>
   body {
-    background-color: #000;
-    color: white;
+    background-color: var(--ink);
+    color: var(--text);
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse 900px 700px at 50% 0%, rgba(201,162,75,0.07), transparent 60%),
+      var(--ink);
+    display: flex;
+    flex-direction: column;
   }
 
   .top-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1rem;
-    border-bottom: 1px solid #333;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .top-bar a {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 160ms ease, background-color 160ms ease;
+  }
+
+  .top-bar a:hover {
+    color: var(--gold-bright);
+    background-color: rgba(201,162,75,0.08);
   }
 
   .top-bar h5 {
     margin: 0 auto;
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 1.15rem;
+    letter-spacing: 0.02em;
     text-align: center;
-    font-weight: bold;
+  }
+
+  .top-bar .spacer {
+    width: 38px; /* balances the back-arrow width so the title stays visually centered */
+  }
+
+  .page-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-bottom: 60px;
+  }
+
+  .list-heading {
+    max-width: 640px;
+    margin: 0 auto 14px;
+    padding: 0 20px;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .follower-list {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 20px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .follower-row {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    transition: border-color 160ms ease;
+  }
+
+  .follower-row:hover {
+    border-color: rgba(201,162,75,0.3);
+  }
+
+  .follower-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    min-width: 0;
+  }
+
+  .follower-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #16130c;
+    background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+  }
+
+  .follower-name {
+    color: var(--text);
+    font-weight: 600;
+    font-size: 0.94rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .remove-btn {
+    flex-shrink: 0;
+    background-color: transparent;
+    border: 1px solid rgba(224,122,122,0.4);
+    color: #e07a7a;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 7px 16px;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+  }
+
+  .remove-btn:hover {
+    background-color: rgba(224,122,122,0.1);
+    border-color: #e07a7a;
+    color: #e07a7a;
+    transform: translateY(-1px);
   }
 
   .no-following {
     text-align: center;
-    margin-top: 100px;
-    font-size: 1.5rem;
-    color: #ccc;
+    padding: 0 20px;
+    color: var(--text-muted);
   }
 
-  .user-icon {
-    font-size: 1.3rem;
-    color: white;
+  .no-following i {
+    font-size: 2rem;
+    color: var(--gold);
+    display: block;
+    margin-bottom: 14px;
+  }
+
+  .no-following p {
+    font-size: 1.05rem;
+    margin: 0;
   }
 </style>
 
 <div class="top-bar">
-  <a href="{% url 'user_profile' %}" class="text-white"><i class="fas fa-arrow-left"></i></a>
+  <a href="{% url 'user_profile' %}" title="Back to profile"><i class="fas fa-arrow-left"></i></a>
   <h5>Followers</h5>
+  <span class="spacer"></span>
 </div>
 
-  <h6 class="mt-3">People Follows You</h6>
-
+<div class="page-body">
   {% if details %}
-    <ul class="list-group mt-1">
+    <p class="list-heading">People who follow you</p>
+    <div class="follower-list">
       {% for user in details %}
-      <li class="list-group-item bg-dark text-white border-secondary d-flex justify-content-between align-items-center">
-        <a href="{% url 'user_info' user.user_obj.id  %}" class="link-info link-offset-2 link-underline-opacity-0 link-underline-opacity-0-hover">{{ user.user_obj.username|capfirst }}</a>
-        <a href="{% url 'followers_list_removal' user.user_obj.id  %}" class="btn btn-sm btn-outline-danger">Remove</a>
-      </li>
+        <div class="follower-row">
+          <a href="{% url 'user_info' user.user_obj.id %}" class="follower-user">
+            <div class="follower-avatar">{{ user.user_obj.username|first|upper }}</div>
+            <span class="follower-name">{{ user.user_obj.username|capfirst }}</span>
+          </a>
+          <a href="{% url 'followers_list_removal' user.user_obj.id %}" class="remove-btn">Remove</a>
+        </div>
       {% endfor %}
-    </ul>
+    </div>
   {% else %}
-    <div class="no-following">No Follower</div>
+    <div class="no-following">
+      <i class="fa-solid fa-user-group"></i>
+      <p>No followers yet.</p>
+    </div>
   {% endif %}
-</div>
 </div>
 {% endblock %}
 
 {% block footer %}
-
 {% endblock %}

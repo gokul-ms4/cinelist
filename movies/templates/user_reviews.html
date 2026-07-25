@@ -1,60 +1,476 @@
 {% extends "base.html" %}
 
 {% block title %}
-  <title>Your Reviews</title>
+  <title>Your Reviews - CineList</title>
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5 text-white">
-  <h2 class="mb-4 text-center">Your Reviews</h2>
+<style>
+  .reviews-section {
+    padding: 48px 0 80px;
+  }
 
-  {% if reviews %}
-    <div class="row">
-      {% for review in reviews %}
-        <div class="col-md-4 mb-4">
-          <div class="card bg-dark text-white h-100 shadow">
+  .page-eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
 
-            <img src="https://image.tmdb.org/t/p/w500{{ review.poster_path }}" class="card-img-top" alt="{{ review.title }}">
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 2rem;
+    color: var(--text);
+    margin: 0 0 6px;
+  }
 
-            <div class="card-body d-flex flex-column">
-              
-              <a href="{% url 'movie_detail' review.movie_id %}" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><h5 class="card-title">{{ review.title }}</h5></a>
+  .page-sub {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
 
-              <p class="card-text mb-2">
-                {% for i in range %}
+  .review-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: rgba(201,162,75,0.08);
+    border: 1px solid rgba(201,162,75,0.2);
+    border-radius: 999px;
+    padding: 4px 14px;
+    margin-top: 12px;
+  }
 
-                  {% if i <= review.rating %}
-                    <span class="text-warning">★</span>
+  /* Review card */
+ .review-card {
+  height: 100%;
+  max-width: 300px; /* new — stops the poster from ballooning when the grid has extra room */
+  margin: 0 auto;   /* new — centers the card within its column instead of stretching full-width */
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+}
 
-                  {% else %}
+  .review-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(201,162,75,0.35);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.4);
+  }
 
-                    <span class="text-secondary">☆</span>
-                  
-                  {% endif %}
+  /* Poster */
+.review-poster-wrap {
+  position: relative;
+  overflow: hidden;
+  height: 180px; /* fixed compact height — poster stays visible, card fits on screen */
+}
 
-                {% endfor %}
+.review-poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top; /* shows the top of the poster (faces/title) instead of center-cropping */
+  display: block;
+  transition: transform 400ms ease;
+}
 
-                <span class="ms-2">({{ review.rating }}/5)</span>
-              </p>
+  .review-card:hover .review-poster {
+    transform: scale(1.04);
+  }
 
-              <!-- Content -->
-              <p class="card-text">{{ review.content}}</p>
+  .review-poster-wrap::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: linear-gradient(to top, var(--surface), transparent);
+    pointer-events: none;
+  }
 
-              <!-- Buttons -->
-              <div class="mt-auto d-flex justify-content-between">
-                <a href="{% url 'review_update' review.movie_id %}" class="btn btn-outline-light btn-sm">Edit
-                </a>
-                <a href="{% url 'review_delete' review.movie_id %}" class="btn btn-outline-danger btn-sm">Delete
-                </a>
+  /* Poster overlay link */
+  .poster-link {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  /* Card body */
+.review-body {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+  .review-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: var(--text);
+    text-decoration: none;
+    border-bottom: 1px dashed rgba(201,162,75,0.4);
+    padding-bottom: 2px;
+    display: inline-block;
+    margin-bottom: 12px;
+    transition: color 160ms ease, border-color 160ms ease;
+    line-height: 1.4;
+  }
+
+  .review-title:hover {
+    color: var(--gold-bright);
+    border-color: var(--gold-bright);
+  }
+
+  /* Stars */
+  .stars-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .stars {
+    display: flex;
+    gap: 2px;
+  }
+
+  .star-filled { color: var(--gold); font-size: 1rem; }
+  .star-empty  { color: var(--border); font-size: 1rem; }
+
+  .rating-label {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+  }
+
+  /* Review content */
+  .review-content {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.65;
+    flex-grow: 1;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Divider */
+  .review-divider {
+    height: 1px;
+    background: var(--border);
+    margin-bottom: 10px;
+  }
+
+  /* Action buttons */
+  .action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid;
+    text-decoration: none;
+    transition: transform 160ms ease, background-color 160ms ease,
+                color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+  }
+
+  .action-btn:hover { transform: translateY(-2px); }
+
+  .btn-edit {
+    background: transparent;
+    border-color: rgba(201,162,75,0.3);
+    color: var(--gold);
+  }
+
+  .btn-edit:hover {
+    background: rgba(201,162,75,0.1);
+    border-color: var(--gold);
+    color: var(--gold-bright);
+  }
+
+  .btn-delete {
+    background: transparent;
+    border-color: rgba(224,122,122,0.3);
+    color: #e07a7a;
+  }
+
+  .btn-delete:hover {
+    background: rgba(224,122,122,0.1);
+    border-color: #e07a7a;
+    box-shadow: 0 4px 16px rgba(224,122,122,0.15);
+  }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+  }
+
+  .empty-icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: rgba(201,162,75,0.08);
+    border: 1px solid rgba(201,162,75,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--gold);
+    margin: 0 auto 20px;
+    opacity: 0.75;
+  }
+
+  .empty-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .empty-sub {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+
+  .btn-browse {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--gold);
+    border: none;
+    color: #16130c;
+    font-weight: 600;
+    font-size: 0.88rem;
+    padding: 10px 24px;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: background-color 180ms ease, transform 180ms ease;
+  }
+
+  .btn-browse:hover {
+    background-color: var(--gold-bright);
+    color: #16130c;
+    transform: translateY(-2px);
+  }
+</style>
+
+<div class="reviews-section">
+  <div class="container">
+
+    <!-- Page header -->
+    <div class="mb-5">
+      <p class="page-eyebrow"><i class="fas fa-star me-1"></i> My Collection</p>
+      <h1 class="page-title">Your Reviews</h1>
+      <p class="page-sub">Every film you've rated and written about.</p>
+      {% if reviews %}
+        <span class="review-count">
+          <i class="fas fa-pen"></i>
+          {{ reviews|length }} review{{ reviews|length|pluralize }}
+        </span>
+      {% endif %}
+    </div>
+
+    {% if reviews %}
+      <div class="row g-4">
+        {% for review in reviews %}
+          <div class="col-lg-3 col-md-4 col-sm-6">
+            <div class="review-card">
+
+              <!-- Poster -->
+              <div class="review-poster-wrap">
+                <a href="{% url 'movie_detail' review.movie_id %}" class="poster-link"></a>
+                <img src="https://image.tmdb.org/t/p/w500{{ review.poster_path }}"
+                     alt="{{ review.title }}" class="review-poster">
               </div>
 
+              <!-- Body -->
+              <div class="review-body">
+
+                <!-- Title -->
+                <a href="{% url 'movie_detail' review.movie_id %}" class="review-title">
+                  {{ review.title }}
+                </a>
+
+                <!-- Stars -->
+                <div class="stars-row">
+                  <div class="stars">
+                    {% for i in range %}
+                      {% if i <= review.rating %}
+                        <span class="star-filled">★</span>
+                      {% else %}
+                        <span class="star-empty">☆</span>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                  <span class="rating-label">{{ review.rating }} / 5</span>
+                </div>
+
+                <!-- Review text -->
+                <p class="review-content">{{ review.content }}</p>
+
+                <div class="review-divider"></div>
+
+                <!-- Actions -->
+                <div class="d-flex gap-2">
+                  <a href="{% url 'review_update' review.movie_id %}" class="action-btn btn-edit">
+                    <i class="fas fa-pen"></i> Edit
+                  </a>
+                  <a href="#" class="action-btn btn-delete"
+                     data-url="{% url 'review_delete' review.movie_id %}"
+                     data-title="{{ review.title }}"
+                     onclick="openDeleteModal(this); return false;">
+                    <i class="fas fa-trash-alt"></i> Delete
+                  </a>
+                </div>
+
+              </div>
             </div>
           </div>
+        {% endfor %}
+      </div>
+
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-star"></i>
         </div>
-      {% endfor %}
-    </div>
-  {% else %}
-    <p class="text-muted">You haven’t reviewed any movies yet.</p>
-  {% endif %}
+        <p class="empty-title">No reviews yet</p>
+        <p class="empty-sub">Watch a film and share your thoughts — your reviews will appear here.</p>
+        <a href="{% url 'movie_list' %}" class="btn-browse">
+          <i class="fas fa-film"></i> Browse Movies
+        </a>
+      </div>
+    {% endif %}
+
+  </div>
 </div>
+
+<!-- Delete Modal -->
+<div id="delete-modal" style="
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+">
+  <div onclick="closeDeleteModal()" style="
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+  "></div>
+
+  <div style="
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 420px;
+    margin: 0 16px;
+    background: var(--surface);
+    border: 1px solid rgba(201,162,75,0.2);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+    animation: modalRise 250ms ease-out both;
+  ">
+    <div style="height:2px; background:linear-gradient(90deg, transparent, var(--gold), transparent); opacity:0.6;"></div>
+
+    <div style="padding: 32px 32px 28px;">
+      <div style="
+        width: 52px; height: 52px; border-radius: 50%;
+        background: rgba(224,122,122,0.1);
+        border: 1px solid rgba(224,122,122,0.25);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.2rem; color: #e07a7a; margin-bottom: 20px;
+      ">
+        <i class="fas fa-trash-alt"></i>
+      </div>
+
+      <h5 style="font-family:'Playfair Display',serif; font-weight:600; font-size:1.25rem; color:var(--text); margin:0 0 8px;">
+        Delete Review?
+      </h5>
+      <p style="font-size:0.88rem; color:var(--text-muted); margin:0 0 6px; line-height:1.6;">
+        You're about to delete your review for
+      </p>
+      <p id="modal-movie-title" style="
+        font-size:0.95rem; font-weight:600; color:var(--text);
+        margin:0 0 24px; padding:10px 14px;
+        background:var(--surface-raised); border:1px solid var(--border); border-radius:8px;
+      "></p>
+
+      <div style="height:1px; background:var(--border); margin-bottom:24px;"></div>
+
+      <div style="display:flex; gap:12px;">
+        <button onclick="closeDeleteModal()" style="
+          flex:1; background:transparent; border:1px solid var(--border);
+          color:var(--text-muted); font-weight:600; font-size:0.88rem;
+          padding:10px 0; border-radius:999px; cursor:pointer;
+          transition: border-color 160ms ease, color 160ms ease;
+        "
+        onmouseover="this.style.borderColor='var(--gold)'; this.style.color='var(--gold-bright)';"
+        onmouseout="this.style.borderColor='var(--border)'; this.style.color='var(--text-muted)';">
+          <i class="fas fa-arrow-left me-2"></i>Cancel
+        </button>
+
+        <a id="modal-confirm-btn" href="#" style="
+          flex:1; background:rgba(224,122,122,0.15);
+          border:1px solid rgba(224,122,122,0.35); color:#e07a7a;
+          font-weight:600; font-size:0.88rem; padding:10px 0;
+          border-radius:999px; cursor:pointer; text-decoration:none;
+          display:flex; align-items:center; justify-content:center; gap:8px;
+          transition: background-color 160ms ease, border-color 160ms ease;
+        "
+        onmouseover="this.style.backgroundColor='rgba(224,122,122,0.25)'; this.style.borderColor='#e07a7a';"
+        onmouseout="this.style.backgroundColor='rgba(224,122,122,0.15)'; this.style.borderColor='rgba(224,122,122,0.35)';">
+          <i class="fas fa-trash-alt"></i> Delete
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  @keyframes modalRise {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<script>
+  function openDeleteModal(el) {
+    document.getElementById('modal-movie-title').textContent = el.getAttribute('data-title');
+    document.getElementById('modal-confirm-btn').href = el.getAttribute('data-url');
+    const modal = document.getElementById('delete-modal');
+    modal.style.display = 'flex';
+  }
+
+  function closeDeleteModal() {
+    document.getElementById('delete-modal').style.display = 'none';
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeDeleteModal();
+  });
+</script>
+
 {% endblock %}

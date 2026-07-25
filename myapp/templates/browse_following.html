@@ -8,69 +8,226 @@
 
 {% block content %}
 <style>
-  body {
-    background-color: #000;
-    color: white;
+  .following-wrapper {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 16px 60px;
   }
 
+  /* Top bar */
   .top-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1rem;
-    border-bottom: 1px solid #333;
+    padding: 20px 0 18px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .top-bar-back {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: border-color 160ms ease, color 160ms ease, background-color 160ms ease;
+    flex-shrink: 0;
+  }
+
+  .top-bar-back:hover {
+    border-color: var(--gold);
+    color: var(--gold-bright);
+    background-color: rgba(201,162,75,0.08);
   }
 
   .top-bar h5 {
-    margin: 0 auto;
-    text-align: center;
-    font-weight: bold;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: var(--text);
+    white-space: nowrap;
   }
 
-  .no-following {
-    text-align: center;
-    margin-top: 100px;
-    font-size: 1.5rem;
-    color: #ccc;
+  /* Section label */
+  .section-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin: 20px 0 14px;
   }
 
-  .user-icon {
+  /* User rows */
+  .user-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+    text-decoration: none;
+  }
+
+  .user-row:hover {
+    border-color: rgba(201,162,75,0.35);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    transform: translateY(-2px);
+  }
+
+  .user-row-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(201,162,75,0.1);
+    border: 1px solid rgba(201,162,75,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+
+  .user-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .user-badge {
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: rgba(201,162,75,0.1);
+    border: 1px solid rgba(201,162,75,0.2);
+    border-radius: 999px;
+    padding: 2px 10px;
+  }
+
+  .user-row-arrow {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    transition: color 160ms ease, transform 160ms ease;
+  }
+
+  .user-row:hover .user-row-arrow {
+    color: var(--gold);
+    transform: translateX(3px);
+  }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+  }
+
+  .empty-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(201,162,75,0.08);
+    border: 1px solid rgba(201,162,75,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: var(--gold);
+    margin: 0 auto 20px;
+    opacity: 0.7;
+  }
+
+  .empty-title {
+    font-family: 'Playfair Display', serif;
     font-size: 1.3rem;
-    color: white;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .empty-sub {
+    font-size: 0.88rem;
+    color: var(--text-muted);
   }
 </style>
 
-<div class="top-bar">
-  <a href="{% url 'user_info' user.id %}" class="text-white"><i class="fas fa-arrow-left"></i></a>
-  <h5>Following</h5>
-</div>
+<div class="following-wrapper">
 
-  <h6 class="mt-3">People {{user|capfirst}} following</h6>
+  <!-- Top bar -->
+  <div class="top-bar">
+    <a href="{% url 'user_info' user.id %}" class="top-bar-back">
+      <i class="fas fa-arrow-left"></i>
+    </a>
+    <h5>Following</h5>
+    <div style="width:36px;"></div>
+  </div>
+
+  <!-- Section label -->
+  <p class="section-label">
+    <i class="fas fa-user-group me-1"></i>
+    People {{ user|capfirst }} is following
+  </p>
 
   {% if details %}
-    <ul class="list-group mt-1">
+    <div>
       {% for user in details %}
 
         {% if user.following_id.username != current_user.username %}
-      <li class="list-group-item bg-dark text-white border-secondary d-flex justify-content-between align-items-center">
-        <a href="{% url 'user_info' user.following_id.id  %}" class="link-info link-offset-2 link-underline-opacity-0 link-underline-opacity-0-hover">{{ user.following_id.username|capfirst }}</a>
-      </li>
+          <a href="{% url 'user_info' user.following_id.id %}" class="user-row">
+            <div class="user-row-left">
+              <div class="user-avatar">
+                <i class="fas fa-user"></i>
+              </div>
+              <span class="user-name">{{ user.following_id.username|capfirst }}</span>
+            </div>
+            <i class="fas fa-chevron-right user-row-arrow"></i>
+          </a>
 
         {% else %}
-
-      <li class="list-group-item bg-dark text-white border-secondary d-flex justify-content-between align-items-center">
-        <a href="{% url 'user_profile'  %}" class="link-info link-offset-2 link-underline-opacity-0 link-underline-opacity-0-hover">{{ user.following_id.username|capfirst }}</a>
-      </li>
+          <a href="{% url 'user_profile' %}" class="user-row">
+            <div class="user-row-left">
+              <div class="user-avatar">
+                <i class="fas fa-user"></i>
+              </div>
+              <span class="user-name">{{ user.following_id.username|capfirst }}</span>
+              <span class="user-badge">You</span>
+            </div>
+            <i class="fas fa-chevron-right user-row-arrow"></i>
+          </a>
         {% endif %}
+
       {% endfor %}
-    </ul>
+    </div>
+
   {% else %}
-    <div class="no-following">No Following</div>
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-user-group"></i>
+      </div>
+      <p class="empty-title">Not following anyone</p>
+      <p class="empty-sub">When {{ user|capfirst }} follows someone, they'll appear here.</p>
+    </div>
   {% endif %}
-</div>
+
 </div>
 {% endblock %}
 
-{% block footer %}
-
-{% endblock %}
+{% block footer %}{% endblock %}

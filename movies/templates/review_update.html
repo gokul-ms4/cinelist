@@ -6,69 +6,330 @@
 
 {% block content %}
 <style>
-  .review-form-label {
+  .edit-hero {
+    padding: 60px 0 0;
+    background:
+      radial-gradient(ellipse 700px 400px at 50% 0%, rgba(201,162,75,0.07), transparent 60%),
+      var(--ink);
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.88rem;
     font-weight: 500;
-    margin-bottom: 5px;
-    color: #ddd;
+    margin-bottom: 28px;
+    transition: color 160ms ease;
   }
 
-  .form-control {
-    background-color: #2c2c2c;
-    border: 1px solid #444;
-    color: white;
-    padding: 10px;
-    border-radius: 6px;
+  .back-link:hover { color: var(--gold-bright); }
+
+  .page-eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 1.9rem;
+    color: var(--text);
+    margin: 0 0 4px;
+    line-height: 1.25;
+  }
+
+  .page-title span {
+    color: var(--gold);
+    font-style: italic;
+  }
+
+  .page-sub {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin: 0 0 36px;
+  }
+
+  .review-form-card {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 36px 40px;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.35);
+    max-width: 720px;
+  }
+
+  .review-form-label {
+    display: block;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  /* Style Django form widgets */
+  .review-form-card select,
+  .review-form-card textarea,
+  .review-form-card input {
     width: 100%;
+    background-color: var(--surface-raised);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-size: 0.92rem;
+    font-family: 'Inter', sans-serif;
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+    appearance: none;
   }
 
-  .form-control:focus {
-    background-color: #1f1f1f;
-    border-color: #007bff;
-    color: white;
-    box-shadow: none;
+  .review-form-card select:focus,
+  .review-form-card textarea:focus,
+  .review-form-card input:focus {
     outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201,162,75,0.15);
   }
 
-  .card {
-    border-radius: 12px;
+  .review-form-card textarea {
+    min-height: 160px;
+    resize: vertical;
+    line-height: 1.65;
+  }
+
+  /* Custom select arrow */
+
+  .select-wrap::after {
+    content: "\f107";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gold);
+    pointer-events: none;
+    font-size: 0.85rem;
+  }
+
+  .form-section {
+    margin-bottom: 24px;
+  }
+
+  .form-hint {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+  }
+
+  .star-preview i {
+    font-size: 1.1rem;
+    color: var(--border);
+    transition: color 160ms ease;
+  }
+
+  .star-picker {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0 6px;
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  font-size: 1.8rem;
+  color: var(--border);
+  transition: color 160ms ease, transform 160ms ease;
+  line-height: 1;
+}
+
+.star-btn:hover,
+.star-btn.hovered,
+.star-btn.selected {
+  color: var(--gold);
+}
+
+.star-btn.selected {
+  transform: scale(1.15);
+}
+
+.star-btn:focus-visible {
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.rating-error {
+  color: #e07a7a;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+  .star-preview i.active {
+    color: var(--gold);
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 28px 0;
+  }
+
+  .btn-update {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--gold);
     border: none;
+    color: #16130c;
+    font-weight: 600;
+    font-size: 0.92rem;
+    padding: 12px 28px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+    box-shadow: 0 6px 20px rgba(201,162,75,0.22);
   }
 
-  .btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
+  .btn-update:hover {
+    background-color: var(--gold-bright);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(201,162,75,0.32);
   }
 
-  .btn-primary:hover {
-    background-color: #0056b3;
+  .btn-update:focus-visible {
+    outline: 2px solid var(--gold-bright);
+    outline-offset: 3px;
+  }
+
+  ul.errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 6px 0 0;
+    color: #e07a7a;
+    font-size: 0.8rem;
   }
 </style>
 
-<div class="container mt-5 text-white">
-  <h2 class="mb-4">Write a review about <strong>{{ title }}</strong></h2>
+<div class="edit-hero">
+  <div class="container pb-5">
+    <a href="{% url 'user_reviews' %}" class="back-link">
+      <i class="fas fa-arrow-left"></i> Back to Reviews
+    </a>
 
-  <div class="card bg-dark p-4 shadow">
-    <form method="POST">
-      {% csrf_token %}
-      <div class="row">
+    <p class="page-eyebrow"><i class="fas fa-pen me-1"></i> Edit Review</p>
+    <h1 class="page-title">Reviewing <span>{{ title }}</span></h1>
+    <p class="page-sub">Update your rating and thoughts on this film.</p>
 
-        <div class="col-md-3 mb-3">
-          <label for="rating" class="review-form-label">Rating (1-5)</label>
-          {{form.rating}}
-        </div>
-        <div class="col-md-9"></div>
-      </div>
+    <div class="review-form-card">
+      <form method="POST">
+        {% csrf_token %}
 
-      <div class="mb-3">
-        <label for="content" class="review-form-label">Your Review</label>
-        {{form.content}}
-      </div>
+        <!-- Rating -->
+<div class="form-section">
+  <label class="review-form-label">Rating</label>
 
-      <button type="submit" class="btn btn-primary mt-3">
-        <i class="fas fa-paper-plane"></i> Update Review
+  <!-- hidden input that actually gets submitted — stars write to this -->
+  <input type="hidden" name="rating" id="rating-value" value="{{ form.rating.value|default:'' }}">
+
+  <!-- clickable star picker -->
+  <div class="star-picker" id="star-picker" role="radiogroup" aria-label="Rating">
+    {% for i in "12345" %}
+      <button type="button"
+              class="star-btn"
+              data-value="{{ forloop.counter }}"
+              aria-label="{{ forloop.counter }} star"
+              title="{{ forloop.counter }} star">
+        <i class="fas fa-star"></i>
       </button>
-    </form>
+    {% endfor %}
+  </div>
+
+  <p class="form-hint" id="rating-hint">Click to select your rating.</p>
+  <p class="rating-error" id="rating-error" style="display:none;">Please select a rating before submitting.</p>
+</div>
+
+        <div class="divider"></div>
+
+        <!-- Review content -->
+        <div class="form-section">
+          <label class="review-form-label">Your Review</label>
+          {{ form.content }}
+          <p class="form-hint">Be honest — other film lovers value your perspective.</p>
+        </div>
+
+        <button type="submit" class="btn-update">
+          <i class="fas fa-paper-plane"></i> Update Review
+        </button>
+
+      </form>
+    </div>
   </div>
 </div>
+
+<script>
+  const stars = document.querySelectorAll('.star-btn');
+  const ratingInput = document.getElementById('rating-value');
+  const hint = document.getElementById('rating-hint');
+  const error = document.getElementById('rating-error');
+  const labels = ['','Poor','Fair','Good','Great','Excellent'];
+
+  // pre-fill if editing an existing review
+  let current = parseInt(ratingInput.value) || 0;
+  if (current) setSelected(current);
+
+  function setSelected(val) {
+    current = val;
+    ratingInput.value = val;
+    hint.textContent = labels[val] + ' — ' + val + ' out of 5 stars';
+    error.style.display = 'none';
+    stars.forEach((btn, idx) => {
+      btn.classList.toggle('selected', idx < val);
+      btn.classList.remove('hovered');
+    });
+  }
+
+  stars.forEach((btn, idx) => {
+    const val = idx + 1;
+
+    btn.addEventListener('click', () => setSelected(val));
+
+    btn.addEventListener('mouseenter', () => {
+      stars.forEach((b, i) => b.classList.toggle('hovered', i <= idx));
+    });
+
+    btn.addEventListener('mouseleave', () => {
+      stars.forEach(b => b.classList.remove('hovered'));
+    });
+
+    // keyboard accessibility
+    btn.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        setSelected(val);
+      }
+    });
+  });
+
+  // validate on submit — block if no star selected
+  document.querySelector('form').addEventListener('submit', function(e) {
+    if (!ratingInput.value) {
+      e.preventDefault();
+      error.style.display = 'block';
+      hint.textContent = 'Click to select your rating.';
+      document.getElementById('star-picker').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  });
+</script>
 
 {% endblock %}

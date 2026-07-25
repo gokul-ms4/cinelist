@@ -1,105 +1,479 @@
 {% extends 'base.html' %}
 
 {% block title %}
-
 <title>Cinelist- User Profile</title>
-
 {% endblock %}
 
 {% block content %}
+<style>
+  .profile-hero {
+    padding: 40px 20px 20px;
+    background:
+      radial-gradient(ellipse 700px 500px at 50% 0%, rgba(201,162,75,0.08), transparent 65%),
+      var(--ink);
+  }
 
-<div class="container my-5">
-  <!-- Profile Card -->
-  <div class="card border-0 rounded-4 shadow-lg mx-auto"
-    style="background: linear-gradient(to right, hwb(0 11% 89%), rgb(44, 44, 44)); color: #f1f5f9; width: 600px; height: 380px;position: relative;">
-    <div class="d-flex">
-      <div class="card-body p-4">
-        <div class="flex-column flex-md-row align-items-center gap-4">
-          <!-- Profile Picture -->
-          <div class="text-center mt-2">
-            <div class="rounded-circle d-flex align-items-center justify-content-center border border-light mx-auto"
-              style="width: 130px; height: 130px; background-color: #ffffff; font-size: 85px; color: rgb(25, 3, 3); font-weight: 700; font-family:Verdana, Geneva, Tahoma, sans-serif">
-              {{details.username|first|upper}}
-            </div>
-          </div>
+  .profile-card {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    max-width: 760px;
+    margin: 0 auto;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+  }
 
-          <div class="dropdown" style="position: absolute; top: 30px; right: 30px;">
-            <button class="btn btn-sm btn-light border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <i class="fa-solid fa-caret-down fa-lg" style="color: #000000;"></i>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-dark">
-              <li><a class="dropdown-item" href="{% url 'update' %}">Edit Profile</a></li>
-              <li><a class="dropdown-item" href="{% url 'current_password' %}">Reset Password</a></li>
-            </ul>
-            </li>
-            </ul>
-          </div>
-        </div>
+  /* ===== Cover banner ===== */
+  .profile-cover {
+    position: relative;
+    height: 150px;
+    background:
+      radial-gradient(ellipse 420px 300px at 25% 20%, rgba(201,162,75,0.16), transparent 65%),
+      linear-gradient(135deg, #1a1710 0%, #0b0a0c 80%);
+    z-index: 1; /* explicit stacking layer, kept below the avatar */
+  }
 
-        <!-- Profile Info -->
-        <div class="flex-fill">
-          <p class="fw-bold mb-1 text-uppercase fs-3 mt-4 mx-auto" style="padding-left: 227px;">{{ details.username }}
-          </p>
-          <div class="d-flex">
-            <p class="mb-1 mx-3 mt-2"><i class="fa-solid fa-phone me-1 text-danger"></i> {{ details.phone_number }}</p>
-            <p class="mb-1 mx-2 mt-2"><i class="fas fa-envelope me-1 text-warning"></i> {{details.email}}
-            <p class="mb-1 mx-3 mt-2"><i class="fa-solid fa-clapperboard me-1 text-danger"></i> Action,Sci-fi</p>
-          </div>
-        </div>
-        <div class="d-flex">
-          <div class=" card border-1 rounded-4 shadow-lg mt-4 bg-dark border-secondary"
-            style="width: 30%; height: 60px;margin-left: 70px;">
-            <a href="{% url 'user_followers_list' %}"
-              class=" mx-auto link-offset-2 link-underline link-underline-opacity-0 fw-bold">
-              <div class="fs-6 mt-2 " style="color: rgb(255, 255, 255);">Followers</div>
-              <div class="fs-6" style="color: rgb(255, 255, 255);padding-left: 30px;">{{count}}</div>
-            </a>
-          </div>
+  .profile-cover .reel {
+    position: absolute;
+    top: 50%;
+    right: -60px;
+    transform: translateY(-50%);
+    width: 260px;
+    height: 260px;
+    opacity: 0.45;
+    pointer-events: none;
+     clip-path: inset(0 0 0 0 round 0);
+  }
 
-          <div class=" card border-1 rounded-4 shadow-lg mt-4 bg-dark border-secondary"
-            style="width: 30%; height: 60px;margin-left: 90px;">
-            <a href="{% url 'user_following_list' %}"
-              class=" mx-auto link-offset-2 link-underline link-underline-opacity-0 fw-bold">
-              <div class="fs-6 mt-2 " style="color: rgb(255, 255, 255);">Following</div>
-              <div class="fs-6" style="color: rgb(255, 255, 255);padding-left: 30px;">{{total}}</div>
-            </a>
-          </div>
+  .profile-menu-toggle {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    background: rgba(11,10,12,0.5);
+    backdrop-filter: blur(4px);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    transition: color 160ms ease, border-color 160ms ease;
+  }
 
+  .profile-menu-toggle:hover,
+  .profile-menu-toggle:focus {
+    color: var(--gold-bright);
+    border-color: var(--gold);
+  }
+
+  .dropdown {
+  position: relative;
+  z-index: 10;
+}
+
+.dropdown-menu {
+  z-index: 10;
+}
+
+  /* ===== Body ===== */
+  .profile-body {
+    padding: 0 40px 36px;
+    position: relative;
+    z-index: 2; /* paints above .profile-cover, fixes the avatar clipping bug */
+  }
+
+  .profile-top {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    margin-top: -50px;
+  }
+
+  .profile-avatar {
+    width: 108px;
+    height: 108px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #16130c;
+    background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+    border: 4px solid var(--surface);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    flex-shrink: 0;
+  }
+
+  .profile-username {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 1.5rem;
+    letter-spacing: 0.03em;
+    color: var(--text);
+    margin: 10px 0 0;
+    text-transform: uppercase;
+  }
+
+  .profile-joined {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin: 2px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .profile-joined i { color: var(--gold); }
+
+  .profile-bio {
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    max-width: 460px;
+    margin: 14px auto 0;
+    line-height: 1.55;
+    font-style: italic;
+  }
+
+  .profile-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px 22px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 18px;
+  }
+
+  .profile-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .profile-meta span i {
+    color: var(--gold);
+    width: 14px;
+    text-align: center;
+  }
+
+  .profile-stats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 28px;
+  }
+
+  .stat-box {
+    background-color: var(--surface-raised);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 30px;
+    min-width: 108px;
+    text-align: center;
+    text-decoration: none;
+    transition: border-color 160ms ease, transform 160ms ease;
+  }
+
+  .stat-box:hover {
+    border-color: rgba(201,162,75,0.4);
+    transform: translateY(-2px);
+  }
+
+  .stat-box .stat-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 0 0 6px;
+  }
+
+  .stat-box .stat-count {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--gold-bright);
+    margin: 0;
+  }
+
+  /* ===== Favorite films strip ===== */
+  .favorites-section {
+    max-width: 900px;
+    margin: 44px auto 0;
+    padding: 0 20px;
+  }
+
+  .favorites-section h4 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 1.15rem;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 16px;
+  }
+
+  .favorites-section h4 i { color: var(--gold); }
+
+  .favorites-strip {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+
+  .favorites-strip::-webkit-scrollbar { height: 6px; }
+  .favorites-strip::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+
+  .fav-poster {
+    flex: 0 0 auto;
+    width: 110px;
+  }
+
+  .fav-poster img {
+    width: 110px;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    transition: transform 180ms ease, border-color 180ms ease;
+    display: block;
+  }
+
+  .fav-poster:hover img {
+    transform: translateY(-4px);
+    border-color: rgba(201,162,75,0.4);
+  }
+
+  .fav-poster p {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin: 8px 0 0;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .favorites-empty {
+    background-color: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+  }
+
+  .favorites-empty i {
+    color: var(--gold);
+    font-size: 1.4rem;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  /* ===== Activity panels ===== */
+  .activity-section {
+    max-width: 900px;
+    margin: 44px auto 0;
+    padding: 0 20px;
+  }
+
+  .activity-panel {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 30px;
+    height: 100%;
+  }
+
+  .activity-panel h4 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 1.15rem;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 18px;
+  }
+
+  .activity-panel h4 i {
+    color: var(--gold);
+  }
+
+  .activity-panel p.empty-text {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  .activity-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background-color: transparent;
+    border: 1px solid rgba(242,236,221,0.3);
+    color: var(--text);
+    font-weight: 600;
+    font-size: 0.88rem;
+    padding: 10px 20px;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: border-color 180ms ease, color 180ms ease, transform 180ms ease;
+  }
+
+  .activity-btn:hover {
+    border-color: var(--gold);
+    color: var(--gold-bright);
+    transform: translateY(-2px);
+  }
+
+  .activity-badge {
+    background-color: var(--gold);
+    color: #16130c;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: 999px;
+  }
+
+  @media (max-width: 576px) {
+    .profile-body { padding: 0 20px 30px; }
+    .profile-meta { gap: 8px 16px; }
+  }
+</style>
+
+<div class="profile-hero">
+  <div class="profile-card">
+
+    <div class="profile-cover">
+      <svg class="reel" viewBox="0 0 400 400" fill="none" aria-hidden="true">
+        <circle cx="200" cy="200" r="190" stroke="#c9a24b" stroke-width="1.2" opacity="0.18"/>
+        <circle cx="200" cy="200" r="150" stroke="#c9a24b" stroke-width="1" opacity="0.15"/>
+        <circle cx="200" cy="200" r="46" stroke="#c9a24b" stroke-width="1.4" opacity="0.22"/>
+        <circle cx="200" cy="90" r="26" stroke="#c9a24b" stroke-width="1.2" opacity="0.18"/>
+        <circle cx="310" cy="200" r="26" stroke="#c9a24b" stroke-width="1.2" opacity="0.18"/>
+        <circle cx="200" cy="310" r="26" stroke="#c9a24b" stroke-width="1.2" opacity="0.18"/>
+        <circle cx="90" cy="200" r="26" stroke="#c9a24b" stroke-width="1.2" opacity="0.18"/>
+      </svg>
+    </div>
+    <div class="dropdown">
+    <button class="profile-menu-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="fa-solid fa-caret-down"></i>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-dark">
+      <li><a class="dropdown-item" href="{% url 'update' %}">Edit Profile</a></li>
+      <li><a class="dropdown-item" href="{% url 'current_password' %}">Reset Password</a></li>
+    </ul>
+  </div>
+    <div class="profile-body">
+      <div class="profile-top">
+        <div class="profile-avatar">{{ details.username|first|upper }}</div>
+        <p class="profile-username">{{ details.username }}</p>
+
+        <!-- TODO: swap in your real "date joined" field/context var if different -->
+        <p class="profile-joined">
+          <i class="fa-regular fa-calendar"></i>Member since {{ details.date_joined|default:"—" }}
+        </p>
+
+        <!-- TODO: swap in your real bio field, e.g. details.bio -->
+        {% if details.bio %}
+          <p class="profile-bio">"{{ details.bio }}"</p>
+        {% else %}
+          <p class="profile-bio">Film lover on Cinelist. Building a watchlist one great story at a time.</p>
+        {% endif %}
+
+        <div class="profile-meta">
+          <span><i class="fa-solid fa-phone"></i>{{ details.phone_number }}</span>
+          <span><i class="fas fa-envelope"></i>{{ details.email }}</span>
+          <!-- TODO: replace with a real context variable for genres, e.g. {{ details.favorite_genres }} -->
+          <span><i class="fa-solid fa-clapperboard"></i>Action, Sci-fi</span>
         </div>
       </div>
+
+      <div class="profile-stats">
+        <a href="{% url 'user_followers_list' %}" class="stat-box">
+          <p class="stat-label">Followers</p>
+          <p class="stat-count">{{ count }}</p>
+        </a>
+        <a href="{% url 'user_following_list' %}" class="stat-box">
+          <p class="stat-label">Following</p>
+          <p class="stat-count">{{ total }}</p>
+        </a>
+        <a href="{% url 'user_reviews' %}" class="stat-box">
+          <p class="stat-label">Reviews</p>
+          <p class="stat-count">{{ reviews|length|default:"0" }}</p>
+        </a>
+        <a href="{% url 'user_watchlist' %}" class="stat-box">
+          <p class="stat-label">Watchlist</p>
+          <p class="stat-count">{{ watchlist|length|default:"0" }}</p>
+        </a>
+      </div>
     </div>
+
   </div>
+</div>
 
-  <div class="d-flex">
-    <div class="col-md-6 mt-5" style="padding-left: 30px;">
-      <h4 class="fw-semibold mb-4 text-warning"><i class="fas fa-play-circle me-2"></i>Currently Watching</h4>
-        {% if watchlist %}
-        <a href="{% url 'user_watchlist' %}" class="btn btn-outline-primary position-relative mt-3">
-          View Watchlist
-          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-            {{ watchlist|length }}
-            <span class="visually-hidden">watchlist items</span>
-          </span>
+<!-- TODO: wire to a real "favorite_movies" queryset in the view, each with .poster_url and .title -->
+<div class="favorites-section">
+  <h4><i class="fas fa-heart"></i>Favorite Films</h4>
+  {% if favorite_movies %}
+    <div class="favorites-strip">
+      {% for movie in favorite_movies %}
+        <a href="{% url 'movie_detail' movie.id %}" class="fav-poster text-decoration-none">
+          <img src="{{ movie.poster_url }}" alt="{{ movie.title }}">
+          <p>{{ movie.title }}</p>
         </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="favorites-empty">
+      <i class="fa-solid fa-film"></i>
+      No favorite films added yet.
+    </div>
+  {% endif %}
+</div>
+
+<div class="activity-section">
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="activity-panel">
+        <h4><i class="fas fa-play-circle"></i>Currently Watching</h4>
+        {% if watchlist %}
+          <a href="{% url 'user_watchlist' %}" class="activity-btn">
+            View Watchlist
+            <span class="activity-badge">{{ watchlist|length }}</span>
+          </a>
         {% else %}
-        <p class="text-white">No current shows in watchlist.</p>
+          <p class="empty-text">No current shows in watchlist.</p>
         {% endif %}
+      </div>
     </div>
 
-    <div class="col-md-6 mt-5" style="padding-left: 280px;">
-      <h4 class="fw-semibold mb-4 text-warning"><i class="fas fa-star me-2"></i>Recent Reviews</h4>
-
-      {% if reviews %}
-        <a href="{% url 'user_reviews' %}" class="btn btn-outline-primary position-relative mt-3">
-          View All Reviews
-          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-            {{ reviews|length }}
-            <span class="visually-hidden">Review items</span>
-          </span>
-        </a>
-      {% else %}
-      <p class="text-white">You haven’t written any reviews yet.</p>
-      {% endif %}
+    <div class="col-md-6">
+      <div class="activity-panel">
+        <h4><i class="fas fa-star"></i>Recent Reviews</h4>
+        {% if reviews %}
+          <a href="{% url 'user_reviews' %}" class="activity-btn">
+            View All Reviews
+            <span class="activity-badge">{{ reviews|length }}</span>
+          </a>
+        {% else %}
+          <p class="empty-text">You haven't written any reviews yet.</p>
+        {% endif %}
+      </div>
     </div>
   </div>
 </div>

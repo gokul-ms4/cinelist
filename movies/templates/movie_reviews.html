@@ -1,87 +1,287 @@
 {% extends "base.html" %}
 
 {% block title %}
-<title>{{ movie.title }} - Reviews</title>
+<title>{{ title }} - Reviews</title>
 {% endblock %}
 
 {% block content %}
 <style>
-  .review-box {
-    background-color: #1f1f2e;
-    border-radius: 12px;
-    padding: 20px;
-    color: white;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    transition: transform 0.2s ease;
-    word-wrap: break-word;
-    overflow: hidden;
+  .reviews-hero {
+    padding: 60px 0 0;
+    background:
+      radial-gradient(ellipse 700px 400px at 50% 0%, rgba(201,162,75,0.07), transparent 60%),
+      var(--ink);
   }
 
-  .review-box:hover {
-    transform: scale(1.01);
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 500;
+    margin-bottom: 28px;
+    transition: color 160ms ease;
   }
 
-  .review-user {
+  .back-link:hover { color: var(--gold-bright); }
+
+  .page-eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
     font-weight: 600;
-    color: #f8f9fa;
+    margin-bottom: 6px;
   }
+
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 2rem;
+    color: var(--text);
+    margin: 0 0 4px;
+    line-height: 1.25;
+  }
+
+  .page-title span {
+    color: var(--gold);
+    font-style: italic;
+  }
+
+  .page-sub {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin: 0 0 36px;
+  }
+
+  .count-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: rgba(201,162,75,0.08);
+    border: 1px solid rgba(201,162,75,0.2);
+    border-radius: 999px;
+    padding: 4px 14px;
+    margin-bottom: 32px;
+  }
+
+  /* ===== Review list item ===== */
+  .review-item {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 28px;
+    transition: border-color 220ms ease, box-shadow 220ms ease;
+  }
+
+  .review-item:hover {
+    border-color: rgba(201,162,75,0.3);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+  }
+
+  .review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .reviewer-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .reviewer-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #16130c;
+    background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+    flex-shrink: 0;
+    text-decoration: none;
+  }
+
+  .reviewer-name {
+    font-weight: 600;
+    font-size: 0.94rem;
+    color: var(--text);
+    text-decoration: none;
+    transition: color 160ms ease;
+    display: block;
+  }
+
+  .reviewer-name:hover { color: var(--gold-bright); }
 
   .review-date {
-    font-size: 0.85rem;
-    color: #aaaaaa;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .stars-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .stars { display: flex; gap: 2px; }
+  .star-filled { color: var(--gold); font-size: 1rem; }
+  .star-empty  { color: var(--border); font-size: 1rem; }
+
+  .rating-label {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .review-divider {
+    height: 1px;
+    background: var(--border);
+    margin-bottom: 16px;
   }
 
   .review-content {
-    margin-top: 10px;
-    font-size: 0.95rem;
-    color: #d0d0d0;
-    white-space: pre-wrap; /* Keep line breaks */
-    word-break: break-word; /* Break long words */
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0;
   }
 
-  .review-stars i,
-  .review-stars span {
-    font-size: 1.1rem;
+  /* ===== Empty state ===== */
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
   }
-  
+
+  .empty-icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: rgba(201,162,75,0.08);
+    border: 1px solid rgba(201,162,75,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--gold);
+    margin: 0 auto 20px;
+  }
+
+  .empty-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .empty-sub {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  @media (max-width: 576px) {
+    .review-header { flex-direction: column; gap: 12px; }
+    .review-item { padding: 18px 18px; }
+  }
 </style>
 
-{% if reviews %}
+<div class="reviews-hero">
+  <div class="container pb-5">
 
-<div class="container my-5">
-  <h2 class="text-white mb-4">Reviews for <strong>{{title}}</strong></h2>
-  {% for review in reviews %}
-      <div class="review-box mb-4">
-        <div class="d-flex justify-content-between align-items-center">
-          <div>
-            {% if review.review_id.user_id.username in users %}
-            <a href="{% url 'user_profile' %}" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
-            <span class="review-user">{{ review.review_id.user_id.username|capfirst }}</span>
-            </a>
-            {% else %}
-            <a href="{% url 'user_info' review.review_id.user_id.id %}" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
-            <span class="review-user">{{ review.review_id.user_id.username|capfirst }}</span>
-            </a>
-            {% endif %}
-            <div class="review-date">{{ review.created_date|date:"F j, Y" }}</div>
+    <a href="javascript:history.back()" class="back-link">
+      <i class="fas fa-arrow-left"></i> Go Back
+    </a>
+
+    <p class="page-eyebrow"><i class="fas fa-star me-1"></i> Community Reviews</p>
+    <h1 class="page-title">Reviews for <span>{{ title }}</span></h1>
+    <p class="page-sub">What Cinelist members are saying about this film.</p>
+
+    {% if reviews %}
+      <span class="count-pill">
+        <i class="fas fa-pen"></i>
+        {{ reviews|length }} review{{ reviews|length|pluralize }}
+      </span>
+
+      <div class="d-flex flex-column gap-3">
+        {% for review in reviews %}
+          <div class="review-item">
+
+            <div class="review-header">
+              <div class="reviewer-info">
+                {% if review.review_id.user_id.username in users %}
+                  <a href="{% url 'user_profile' %}" class="reviewer-avatar">
+                    {{ review.review_id.user_id.username|first|upper }}
+                  </a>
+                  <div>
+                    <a href="{% url 'user_profile' %}" class="reviewer-name">
+                      {{ review.review_id.user_id.username|capfirst }}
+                    </a>
+                    <p class="review-date">{{ review.created_date|date:"F j, Y" }}</p>
+                  </div>
+                {% else %}
+                  <a href="{% url 'user_info' review.review_id.user_id.id %}" class="reviewer-avatar">
+                    {{ review.review_id.user_id.username|first|upper }}
+                  </a>
+                  <div>
+                    <a href="{% url 'user_info' review.review_id.user_id.id %}" class="reviewer-name">
+                      {{ review.review_id.user_id.username|capfirst }}
+                    </a>
+                    <p class="review-date">{{ review.created_date|date:"F j, Y" }}</p>
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="stars-row">
+                <div class="stars">
+                  {% for i in range %}
+                    {% if i <= review.rating %}
+                      <span class="star-filled">★</span>
+                    {% else %}
+                      <span class="star-empty">☆</span>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+                <span class="rating-label">{{ review.rating }} / 5</span>
+              </div>
+            </div>
+
+            <div class="review-divider"></div>
+            <p class="review-content">{{ review.content }}</p>
+
           </div>
-          <div class="review-stars">
-            {% for i in range %}
-                  {% if i <= review.rating %}
-                    <span class="text-warning">★</span>
-                  {% else %}
-                    <span class="text-secondary">☆</span>           
-                  {% endif %}
-                {% endfor %}
-                <span class="ms-2">({{ review.rating }}/5)</span>
-          </div>
-        </div>
-        <div class="review-content">{{ review.content}}</div>
+        {% endfor %}
       </div>
-    {% endfor %}
-{% else %}
-<div class="container my-5">
-  <h2 class="text-white mb-4">No reviews have been posted for this movie yet.</h2>
-{% endif %}
+
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-star"></i>
+        </div>
+        <p class="empty-title">No reviews yet</p>
+        <p class="empty-sub">Be the first to share your thoughts on this film.</p>
+      </div>
+    {% endif %}
+
+  </div>
 </div>
+
 {% endblock %}

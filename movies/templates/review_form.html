@@ -6,69 +6,299 @@
 
 {% block content %}
 <style>
-  .review-form-label {
+  .edit-hero {
+    padding: 60px 0 0;
+    background:
+      radial-gradient(ellipse 700px 400px at 50% 0%, rgba(201,162,75,0.07), transparent 60%),
+      var(--ink);
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.88rem;
     font-weight: 500;
-    margin-bottom: 5px;
-    color: #ddd;
-  }
-
-  .form-control {
-    background-color: #2c2c2c;
-    border: 1px solid #444;
-    color: white;
-    padding: 10px;
-    border-radius: 6px;
-    width: 100%;
-  }
-
-  .form-control:focus {
-    background-color: #1f1f1f;
-    border-color: #007bff;
-    color: white;
-    box-shadow: none;
-    outline: none;
-  }
-
-  .card {
-    border-radius: 12px;
+    margin-bottom: 28px;
+    transition: color 160ms ease;
+    cursor: pointer;
+    background: none;
     border: none;
+    padding: 0;
   }
 
-  .btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
+  .back-link:hover { color: var(--gold-bright); }
+
+  .page-eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 6px;
   }
 
-  .btn-primary:hover {
-    background-color: #0056b3;
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 1.9rem;
+    color: var(--text);
+    margin: 0 0 4px;
+    line-height: 1.25;
+  }
+
+  .page-title span {
+    color: var(--gold);
+    font-style: italic;
+  }
+
+  .page-sub {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin: 0 0 36px;
+  }
+
+  .review-form-card {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 36px 40px;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.35);
+    max-width: 720px;
+  }
+
+  .review-form-label {
+    display: block;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .review-form-card textarea {
+    width: 100%;
+    background-color: var(--surface-raised);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-size: 0.92rem;
+    font-family: 'Inter', sans-serif;
+    min-height: 160px;
+    resize: vertical;
+    line-height: 1.65;
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+  }
+
+  .review-form-card textarea:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201,162,75,0.15);
+  }
+
+  .review-form-card textarea::placeholder {
+    color: var(--text-muted);
+    opacity: 0.6;
+  }
+
+  .form-section {
+    margin-bottom: 24px;
+  }
+
+  .form-hint {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+  }
+
+  /* Star picker */
+  .star-picker {
+    display: flex;
+    gap: 8px;
+    margin: 10px 0 6px;
+  }
+
+  .star-btn {
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    font-size: 1.8rem;
+    color: var(--border);
+    transition: color 160ms ease, transform 160ms ease;
+    line-height: 1;
+  }
+
+  .star-btn:hover,
+  .star-btn.hovered,
+  .star-btn.selected {
+    color: var(--gold);
+  }
+
+  .star-btn.selected {
+    transform: scale(1.15);
+  }
+
+  .star-btn:focus-visible {
+    outline: 2px solid var(--gold-bright);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  .rating-error {
+    color: #e07a7a;
+    font-size: 0.8rem;
+    margin-top: 4px;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 28px 0;
+  }
+
+  .btn-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--gold);
+    border: none;
+    color: #16130c;
+    font-weight: 600;
+    font-size: 0.92rem;
+    padding: 12px 28px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+    box-shadow: 0 6px 20px rgba(201,162,75,0.22);
+  }
+
+  .btn-submit:hover {
+    background-color: var(--gold-bright);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(201,162,75,0.32);
+  }
+
+  .btn-submit:focus-visible {
+    outline: 2px solid var(--gold-bright);
+    outline-offset: 3px;
+  }
+
+  ul.errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 6px 0 0;
+    color: #e07a7a;
+    font-size: 0.8rem;
   }
 </style>
 
-<div class="container mt-5 text-white">
-  <h2 class="mb-4">Write a review about <strong>{{ title }}</strong></h2>
+<div class="edit-hero">
+  <div class="container pb-5">
 
-  <div class="card bg-dark p-4 shadow">
-    <form method="POST">
-      {% csrf_token %}
-      <div class="row">
+    <a onclick="history.back()" class="back-link">
+      <i class="fas fa-arrow-left"></i> Go Back
+    </a>
 
-        <div class="col-md-3 mb-3">
-          <label for="rating" class="review-form-label">Rating (1-5)</label>
-          <input type="number" name="rating" min="1" max="10" class="form-control" required>
+    <p class="page-eyebrow"><i class="fas fa-pen me-1"></i> New Review</p>
+    <h1 class="page-title">Reviewing <span>{{ title }}</span></h1>
+    <p class="page-sub">Share your honest thoughts — other film lovers are listening.</p>
+
+    <div class="review-form-card">
+      <form method="POST">
+        {% csrf_token %}
+
+        <!-- Rating -->
+        <div class="form-section">
+          <label class="review-form-label">Rating</label>
+
+          <!-- hidden input submitted to Django — stars write to this -->
+          <input type="hidden" name="rating" id="rating-value" value="">
+
+          <div class="star-picker" id="star-picker" role="radiogroup" aria-label="Rating">
+            <button type="button" class="star-btn" data-value="1" aria-label="1 star" title="1 star — Poor"><i class="fas fa-star"></i></button>
+            <button type="button" class="star-btn" data-value="2" aria-label="2 stars" title="2 stars — Fair"><i class="fas fa-star"></i></button>
+            <button type="button" class="star-btn" data-value="3" aria-label="3 stars" title="3 stars — Good"><i class="fas fa-star"></i></button>
+            <button type="button" class="star-btn" data-value="4" aria-label="4 stars" title="4 stars — Great"><i class="fas fa-star"></i></button>
+            <button type="button" class="star-btn" data-value="5" aria-label="5 stars" title="5 stars — Excellent"><i class="fas fa-star"></i></button>
+          </div>
+
+          <p class="form-hint" id="rating-hint">Click a star to rate this film.</p>
+          <p class="rating-error" id="rating-error" style="display:none;">Please select a rating before submitting.</p>
         </div>
-        <div class="col-md-9"></div>
-      </div>
 
-      <div class="mb-3">
-        <label for="content" class="review-form-label">Your Review</label>
-        <textarea name="content" rows="5" class="form-control" placeholder="Write your thoughts..." required></textarea>
-      </div>
+        <div class="divider"></div>
 
-      <button type="submit" class="btn btn-primary mt-3">
-        <i class="fas fa-paper-plane"></i> Submit Review
-      </button>
-    </form>
+        <!-- Review content -->
+        <div class="form-section">
+          <label class="review-form-label">Your Review</label>
+          <textarea name="content" rows="5" placeholder="Write your thoughts about this film..." required></textarea>
+          <p class="form-hint">Be honest — other film lovers value your perspective.</p>
+        </div>
+
+        <button type="submit" class="btn-submit">
+          <i class="fas fa-paper-plane"></i> Submit Review
+        </button>
+
+      </form>
+    </div>
   </div>
 </div>
+
+<script>
+  const stars = document.querySelectorAll('.star-btn');
+  const ratingInput = document.getElementById('rating-value');
+  const hint = document.getElementById('rating-hint');
+  const error = document.getElementById('rating-error');
+  const labels = ['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent'];
+
+  let current = 0;
+
+  function setSelected(val) {
+    current = val;
+    ratingInput.value = val;
+    hint.textContent = labels[val] + ' — ' + val + ' out of 5 stars';
+    error.style.display = 'none';
+    stars.forEach((btn, idx) => {
+      btn.classList.toggle('selected', idx < val);
+      btn.classList.remove('hovered');
+    });
+  }
+
+  stars.forEach((btn, idx) => {
+    const val = idx + 1;
+
+    btn.addEventListener('click', () => setSelected(val));
+
+    btn.addEventListener('mouseenter', () => {
+      stars.forEach((b, i) => b.classList.toggle('hovered', i <= idx));
+    });
+
+    btn.addEventListener('mouseleave', () => {
+      stars.forEach(b => b.classList.remove('hovered'));
+    });
+
+    btn.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        setSelected(val);
+      }
+    });
+  });
+
+  // block submit if no star selected
+  document.querySelector('form').addEventListener('submit', function(e) {
+    if (!ratingInput.value) {
+      e.preventDefault();
+      error.style.display = 'block';
+      hint.textContent = 'Click a star to rate this film.';
+      document.getElementById('star-picker').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  });
+</script>
 
 {% endblock %}

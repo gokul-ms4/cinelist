@@ -6,121 +6,336 @@
 
 {% block content %}
 <style>
-  .watchlist-container {
-    background-color: #1e1e1e;
-    color: #fff;
-    font-family: 'Segoe UI', sans-serif;
-    padding: 40px 20px;
+  .wishlist-section {
+    padding: 48px 0 80px;
   }
 
-  .watchlist-container h1 {
-    text-align: center;
-    margin-bottom: 30px;
+  /* Page header */
+  .page-header {
+    margin-bottom: 36px;
   }
 
-  .watchlist-container table {
+  .page-eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 2rem;
+    color: var(--text);
+    margin: 0 0 6px;
+  }
+
+  .page-sub {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  .wishlist-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: rgba(201,162,75,0.08);
+    border: 1px solid rgba(201,162,75,0.2);
+    border-radius: 999px;
+    padding: 4px 14px;
+    margin-top: 12px;
+  }
+
+  /* Table card */
+  .table-card {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+  }
+
+  .table-card table {
     width: 100%;
     border-collapse: collapse;
-    background-color: #2a2a2a;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   }
 
-  .watchlist-container th,
-  .watchlist-container td {
-    padding: 15px;
-    text-align: left;
-    border-bottom: 1px solid #444;
+  .table-card thead tr {
+    border-bottom: 1px solid rgba(201,162,75,0.15);
+    background: rgba(201,162,75,0.04);
   }
 
-  .watchlist-container th {
-    background-color: #333;
-    font-weight: bold;
+  .table-card th {
+    padding: 14px 20px;
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    white-space: nowrap;
   }
 
-  .watchlist-container tr:hover {
-    background-color: #3a3a3a;
+  .table-card td {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: middle;
   }
 
-  .watchlist-container .poster-img {
-    width: 60px;
-    height: auto;
-    border-radius: 4px;
+  .table-card tbody tr:last-child td {
+    border-bottom: none;
   }
 
-  .watchlist-container .actions {
-    display: flex;
-    gap: 10px;
+  .table-card tbody tr {
+    transition: background-color 160ms ease;
   }
 
-  .watchlist-container .btn {
-    padding: 6px 10px;
-    font-size: 14px;
-    border: none;
-    border-radius: 4px;
+  .table-card tbody tr:hover {
+    background-color: rgba(201,162,75,0.03);
+  }
+
+  /* Poster */
+  .poster-wrap {
+    position: relative;
+    width: 52px;
+    flex-shrink: 0;
+  }
+
+  .poster-img {
+    width: 52px;
+    height: 78px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    display: block;
+  }
+
+  /* Movie title link */
+.movie-link {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(201,162,75,0.4);
+  padding-bottom: 2px;
+  transition: color 160ms ease, border-color 160ms ease;
+}
+
+.movie-link:hover {
+  color: var(--gold-bright);
+  border-color: var(--gold-bright);
+}
+
+  /* Action buttons */
+  .action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid;
+    text-decoration: none;
     cursor: pointer;
-    color: #fff;
+    white-space: nowrap;
+    transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease, color 160ms ease, border-color 160ms ease;
   }
 
-  .watchlist-container .btn-add {
-    background-color: #4caf50;
+  .action-btn:hover {
+    transform: translateY(-2px);
   }
 
-  .watchlist-container .btn-delete {
-    background-color: #e53935;
+  /* Add to watchlist */
+  .btn-add {
+    background-color: var(--gold);
+    border-color: var(--gold);
+    color: #16130c;
   }
 
-  .watchlist-container .btn i {
-    margin-right: 4px;
+  .btn-add:hover {
+    background-color: var(--gold-bright);
+    border-color: var(--gold-bright);
+    color: #16130c;
+    box-shadow: 0 6px 20px rgba(201,162,75,0.3);
+  }
+
+  /* Already in watchlist */
+  .btn-added {
+    background-color: transparent;
+    border-color: var(--border);
+    color: var(--text-muted);
+    cursor: default;
+    opacity: 0.7;
+  }
+
+  .btn-added:hover {
+    transform: none;
+  }
+
+  /* Remove */
+  .btn-remove {
+    background-color: transparent;
+    border-color: rgba(224,122,122,0.3);
+    color: #e07a7a;
+  }
+
+  .btn-remove:hover {
+    background-color: rgba(224,122,122,0.1);
+    border-color: #e07a7a;
+    box-shadow: 0 6px 20px rgba(224,122,122,0.15);
+  }
+
+  /* Empty state */
+  .empty-state {
+    padding: 80px 20px;
+    text-align: center;
+  }
+
+  .empty-icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: rgba(201,162,75,0.08);
+    border: 1px solid rgba(201,162,75,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--gold);
+    margin: 0 auto 20px;
+    opacity: 0.75;
+  }
+
+  .empty-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .empty-sub {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+
+  .btn-browse {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--gold);
+    border: none;
+    color: #16130c;
+    font-weight: 600;
+    font-size: 0.88rem;
+    padding: 10px 24px;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: background-color 180ms ease, transform 180ms ease;
+  }
+
+  .btn-browse:hover {
+    background-color: var(--gold-bright);
+    color: #16130c;
+    transform: translateY(-2px);
   }
 </style>
 
-<div class="watchlist-container">
-  <h1>💖 My Wishlist</h1>
+<div class="wishlist-section">
+  <div class="container">
 
-  <table>
-    <thead>
-      <tr>
-        <th>Poster</th>
-        <th>Title</th>
-        <th>Add</th>
-        <th>Remove</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in movie_list %}
-      <tr>
-        <td><img src="https://image.tmdb.org/t/p/w92{{ item.poster_path }}" alt="{{ item.title }}"
-            class="poster-img"></td>
-        <td><a href="{% url 'movie_detail' item.movie_id %}" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
-        {{ item.title }}</a></td>
-        {% if item.watch_id %}
-        <td>
-          <button class="btn btn-add" disabled>
-            <i class="fas fa-check-circle"></i> Already in Watchlist
-          </button>
-        </td>
-        {% else %}
-        <td>
-          <a href="{% url 'wishlist_to_watchlist' item.movie_id %}" class="btn btn-add">
-            <i class="fas fa-plus-circle"></i> Add to watchlist
-          </a>
-        </td>
-        {% endif %}
-        <td>
-          <div class="actions">
-            <a href="{% url 'wishlist_delete' item.movie_id %}" class="btn btn-delete"><i class="fas fa-trash-alt"></i>
-              Remove</a>
+    <!-- Page header -->
+    <div class="page-header">
+      <p class="page-eyebrow"><i class="fa-solid fa-heart me-1"></i> My Collection</p>
+      <h1 class="page-title">Wishlist</h1>
+      <p class="page-sub">Movies you've saved to watch someday.</p>
+      {% if movie_list %}
+        <span class="wishlist-count">
+          <i class="fas fa-film"></i>
+          {{ movie_list|length }} film{{ movie_list|length|pluralize }}
+        </span>
+      {% endif %}
+    </div>
+
+    <!-- Table card -->
+    <div class="table-card">
+      {% if movie_list %}
+      <table>
+        <thead>
+          <tr>
+            <th>Poster</th>
+            <th>Title</th>
+            <th>Watchlist</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in movie_list %}
+          <tr>
+            <!-- Poster -->
+            <td>
+              <div class="poster-wrap">
+                <a href="{% url 'movie_detail' item.movie_id %}">
+    <img src="https://image.tmdb.org/t/p/w92{{ item.poster_path }}"
+         alt="{{ item.title }}" class="poster-img">
+  </a>
+              </div>
+            </td>
+
+            <!-- Title -->
+            <td>
+              <a href="{% url 'movie_detail' item.movie_id %}" class="movie-link">
+                {{ item.title }}
+              </a>
+            </td>
+
+            <!-- Add to watchlist -->
+            <td>
+              {% if item.watch_id %}
+                <span class="action-btn btn-added">
+                  <i class="fas fa-check-circle"></i> In Watchlist
+                </span>
+              {% else %}
+                <a href="{% url 'wishlist_to_watchlist' item.movie_id %}" class="action-btn btn-add">
+                  <i class="fas fa-plus-circle"></i> Add to Watchlist
+                </a>
+              {% endif %}
+            </td>
+
+            <!-- Remove -->
+            <td>
+              <a href="{% url 'wishlist_delete' item.movie_id %}" class="action-btn btn-remove">
+                <i class="fas fa-trash-alt"></i> Remove
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">
+            <i class="fa-solid fa-heart"></i>
           </div>
-        </td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="4" style="text-align: center;">No movies in your wishlist.</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+          <p class="empty-title">Your wishlist is empty</p>
+          <p class="empty-sub">Save movies you'd like to watch and they'll appear here.</p>
+          <a href="{% url 'movie_list' %}" class="btn-browse">
+            <i class="fas fa-film"></i> Browse Movies
+          </a>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
 </div>
 {% endblock %}

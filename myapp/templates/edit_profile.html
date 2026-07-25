@@ -1,27 +1,140 @@
 {% extends 'base.html' %}
 
 {% block title %}
-<title>Cinelist- User Profile</title>
+<title>Cinelist - Edit Profile</title>
 {% endblock %}
 
 {% block content %}
 <div class="container my-5">
-  <div class="card border-0 rounded-4 shadow-lg mx-auto" style="background: linear-gradient(to right, hwb(0 11% 89%), rgb(44, 44, 44)); color: #f1f5f9; width: 600px; height: 400px; position: relative;">
-    <div class="card-body p-5 d-flex justify-content-center align-items-center">
-      <form action="" method="post" class="w-100">
-        <div class="col-auto">
-         <label for="inputPassword6" name="current_password" class="col-form-label fs-6"></label>
-        </div>
-        {% csrf_token %}
-        {{ form.as_p }}
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
-          <button class="btn btn-outline-info me-md-2" type="submit">Submit</button>
-          <a href="{% url 'user_profile' %}" class="link-offset-0">
-            <button class="btn btn-outline-secondary me-md-2" type="button">Cancel</button>
-          </a>
-        </div>
-      </form>
+  <div class="mx-auto" style="max-width: 600px;">
+
+    <!-- Header -->
+    <div class="mb-4">
+      <p style="font-size:0.72rem; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); font-weight:600; margin-bottom:6px;">
+        <i class="fas fa-user-pen me-1"></i> Account
+      </p>
+      <h2 style="font-family:'Playfair Display',serif; font-weight:600; font-size:1.9rem; color:var(--text); margin:0 0 4px;">
+        Edit Profile
+      </h2>
+      <p style="font-size:0.88rem; color:var(--text-muted); margin:0;">
+        Update your personal information below.
+      </p>
     </div>
+
+    <!-- Card -->
+    <div style="
+      background: linear-gradient(160deg, var(--surface-raised) 0%, var(--surface) 100%);
+      border: 1px solid rgba(201,162,75,0.18);
+      border-radius: 18px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(201,162,75,0.06);
+      overflow: hidden;
+      position: relative;
+    ">
+      <!-- Gold top accent -->
+      <div style="height:2px; background:linear-gradient(90deg, transparent, var(--gold), transparent); opacity:0.5;"></div>
+
+      <div class="p-4 p-md-5">
+        <form action="" method="post" class="w-100">
+          {% csrf_token %}
+
+          <!-- Style raw Django form output -->
+          <style>
+            #edit-profile-form p { margin-bottom: 18px; }
+
+            #edit-profile-form label {
+              display: block;
+              font-size: 0.75rem;
+              letter-spacing: 0.08em;
+              text-transform: uppercase;
+              color: var(--text-muted);
+              font-weight: 600;
+              margin-bottom: 7px;
+            }
+
+            #edit-profile-form input,
+            #edit-profile-form select,
+            #edit-profile-form textarea {
+              width: 100%;
+              background-color: var(--ink);
+              border: 1px solid var(--border);
+              color: var(--text);
+              border-radius: 9px;
+              padding: 11px 14px;
+              font-size: 0.92rem;
+              font-family: 'Inter', sans-serif;
+              transition: border-color 160ms ease, box-shadow 160ms ease;
+            }
+
+            #edit-profile-form input:focus,
+            #edit-profile-form select:focus,
+            #edit-profile-form textarea:focus {
+              outline: none;
+              border-color: var(--gold);
+              box-shadow: 0 0 0 3px rgba(201,162,75,0.15);
+            }
+
+            #edit-profile-form ul.errorlist {
+              list-style: none;
+              padding: 0;
+              margin: 6px 0 0;
+              color: #e07a7a;
+              font-size: 0.8rem;
+            }
+          </style>
+
+          <div id="edit-profile-form">
+            {{ form.as_p }}
+          </div>
+
+          <!-- Divider -->
+          <div style="height:1px; background:var(--border); margin: 28px 0 24px;"></div>
+
+          <!-- Actions -->
+          <div class="d-flex gap-3">
+            <button type="submit" style="
+              flex: 1;
+              background-color: var(--gold);
+              border: none;
+              color: #16130c;
+              font-weight: 600;
+              font-size: 0.92rem;
+              letter-spacing: 0.02em;
+              padding: 11px 0;
+              border-radius: 999px;
+              transition: transform 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+              box-shadow: 0 6px 24px rgba(201,162,75,0.22);
+              cursor: pointer;
+            "
+            onmouseover="this.style.backgroundColor='var(--gold-bright)'; this.style.transform='translateY(-2px)';"
+            onmouseout="this.style.backgroundColor='var(--gold)'; this.style.transform='translateY(0)';">
+              <i class="fas fa-check me-2"></i>Save Changes
+            </button>
+
+            <a href="{% url 'user_profile' %}" style="flex:1; text-decoration:none;">
+              <button type="button" style="
+                width: 100%;
+                background-color: transparent;
+                border: 1px solid var(--border);
+                color: var(--text-muted);
+                font-weight: 600;
+                font-size: 0.92rem;
+                letter-spacing: 0.02em;
+                padding: 11px 0;
+                border-radius: 999px;
+                transition: border-color 180ms ease, color 180ms ease;
+                cursor: pointer;
+              "
+              onmouseover="this.style.borderColor='var(--gold)'; this.style.color='var(--gold-bright)';"
+              onmouseout="this.style.borderColor='var(--border)'; this.style.color='var(--text-muted)';">
+                <i class="fas fa-arrow-left me-2"></i>Cancel
+              </button>
+            </a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
   </div>
 </div>
 {% endblock %}

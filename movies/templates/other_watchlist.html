@@ -1,126 +1,241 @@
 {% extends 'base.html' %}
 
 {% block title %}
-<title>Cinelist - Watchlist</title>
+<title>Cinelist - {{ name|capfirst }}'s Watchlist</title>
 {% endblock %}
 
 {% block content %}
 <style>
-  .watchlist-container {
-    background-color: #1e1e1e;
-    color: #fff;
-    font-family: 'Segoe UI', sans-serif;
-    padding: 40px 20px;
+  .watchlist-hero {
+    padding: 60px 0 0;
+    background:
+      radial-gradient(ellipse 700px 400px at 50% 0%, rgba(201,162,75,0.07), transparent 60%),
+      var(--ink);
   }
 
-  .watchlist-container h1 {
-    text-align: center;
-    margin-bottom: 30px;
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 500;
+    margin-bottom: 28px;
+    transition: color 160ms ease;
   }
 
-  .watchlist-container table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: #2a2a2a;
-    border-radius: 10px;
+  .back-link:hover { color: var(--gold-bright); }
+
+  .page-eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 2rem;
+    color: var(--text);
+    margin: 0 0 4px;
+    line-height: 1.2;
+  }
+
+  .page-title span {
+    color: var(--gold);
+    font-style: italic;
+  }
+
+  .page-sub {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin: 0 0 36px;
+  }
+
+  .count-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: rgba(201,162,75,0.08);
+    border: 1px solid rgba(201,162,75,0.2);
+    border-radius: 999px;
+    padding: 4px 14px;
+    margin-bottom: 32px;
+  }
+
+  /* ===== Movie cards ===== */
+  .movie-card {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
     overflow: hidden;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  }
-
-  .watchlist-container th,
-  .watchlist-container td {
-    padding: 15px;
-    text-align: left;
-    border-bottom: 1px solid #444;
-  }
-
-  .watchlist-container th {
-    background-color: #333;
-    font-weight: bold;
-  }
-
-  .watchlist-container tr:hover {
-    background-color: #3a3a3a;
-  }
-
-  .watchlist-container .poster-img {
-    width: 60px;
-    height: auto;
-    border-radius: 4px;
-  }
-
-  .watchlist-container .status {
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-weight: bold;
-    font-size: 14px;
-  }
-
-  .watchlist-container .watched {
-    background-color: #4caf50;
-    color: white;
-  }
-
-  .watchlist-container .not-watched {
-    background-color: #f44336;
-    color: white;
-  }
-
-  .watchlist-container .actions {
     display: flex;
-    gap: 10px;
+    flex-direction: column;
+    max-width: 200px;
+    margin: 0 auto;
+    transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+    text-decoration: none;
   }
 
-  .watchlist-container .btn {
-    padding: 6px 10px;
-    font-size: 14px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    color: #fff;
+  .movie-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(201,162,75,0.35);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.4);
   }
 
-  .watchlist-container .btn-edit {
-    background-color: #2196f3;
+  .movie-poster-wrap {
+    position: relative;
+    overflow: hidden;
+    height: 180px;
   }
 
-  .watchlist-container .btn-delete {
-    background-color: #e53935;
+  .movie-poster-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+    transition: transform 400ms ease;
   }
 
-  .watchlist-container .btn i {
-    margin-right: 4px;
+  .movie-card:hover .movie-poster-wrap img {
+    transform: scale(1.05);
+  }
+
+  .movie-poster-wrap::after {
+    content: "";
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 60px;
+    background: linear-gradient(to top, var(--surface), transparent);
+    pointer-events: none;
+  }
+
+  .movie-card-body {
+    padding: 12px 14px 16px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .movie-card-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 0.92rem;
+    color: var(--text);
+    line-height: 1.35;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .watched-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #7ee0a0;
+    background: rgba(126,224,160,0.1);
+    border: 1px solid rgba(126,224,160,0.25);
+    border-radius: 999px;
+    padding: 3px 10px;
+    width: fit-content;
+  }
+
+  /* ===== Empty state ===== */
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+  }
+
+  .empty-icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: rgba(201,162,75,0.08);
+    border: 1px solid rgba(201,162,75,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--gold);
+    margin: 0 auto 20px;
+  }
+
+  .empty-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .empty-sub {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin: 0;
   }
 </style>
 
-<div class="watchlist-container">
-  <h1>🎬 {{name|capfirst}}'s Watchlist</h1>
+<div class="watchlist-hero">
+  <div class="container pb-5">
 
-  <table>
-    <thead>
-      <tr>
-        <th>Poster</th>
-        <th>Title</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in watchlist %}
-      <tr>
-        <td><img src="https://image.tmdb.org/t/p/w92{{ item.poster_path }}" alt="{{ item.title }}"
-            class="poster-img"></td>
-        <td><a href="{% url 'movie_detail' item.movie_id %}" class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
-          {{ item.title }}</a></td>
-        <td>
-            <span class="status watched"><i class="fas fa-check-circle"></i> Watched</span>
-        </td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="5" style="text-align: center;">No movies in {{name|capfirst}}'s watchlist.</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+    <a href="javascript:history.back()" class="back-link">
+      <i class="fas fa-arrow-left"></i> Go Back
+    </a>
+
+    <p class="page-eyebrow"><i class="fas fa-bookmark me-1"></i> Watchlist</p>
+    <h1 class="page-title"><span>{{ name|capfirst }}</span>'s Watchlist</h1>
+    <p class="page-sub">Films {{ name|capfirst }} has saved and watched.</p>
+
+    {% if watchlist %}
+      <span class="count-pill">
+        <i class="fas fa-film"></i>
+        {{ watchlist|length }} film{{ watchlist|length|pluralize }}
+      </span>
+
+      <div class="row g-4">
+        {% for item in watchlist %}
+          <div class="col-lg-2 col-md-3 col-sm-4 col-6">
+            <a href="{% url 'movie_detail' item.movie_id %}" class="movie-card">
+              <div class="movie-poster-wrap">
+                <img src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}"
+                     alt="{{ item.title }}">
+              </div>
+              <div class="movie-card-body">
+                <p class="movie-card-title">{{ item.title }}</p>
+                <span class="watched-badge">
+                  <i class="fas fa-check-circle"></i> Watched
+                </span>
+              </div>
+            </a>
+          </div>
+        {% endfor %}
+      </div>
+
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-bookmark"></i>
+        </div>
+        <p class="empty-title">Nothing here yet</p>
+        <p class="empty-sub">{{ name|capfirst }} hasn't added any films to their watchlist.</p>
+      </div>
+    {% endif %}
+
+  </div>
 </div>
+
 {% endblock %}

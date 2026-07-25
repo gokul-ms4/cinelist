@@ -14,83 +14,84 @@ from django.contrib.auth.decorators import login_required
 
 from django.utils.decorators import method_decorator
 
+from requests.exceptions import RequestException
+
+from .tmdb_client import get_popular_movies, search_movies, get_movie_details, get_movie_credits
+from requests.exceptions import RequestException
+
 API_KEY = 'faecc784db46297338de9a2cec3b7cc2'
 
 BASE_URL = 'https://api.themoviedb.org/3'
 
 class MovieListView(View):
- 
- def get(self,request):
 
-    query = request.GET.get("query")
+    def get(self, request):
 
-    if query:
+        query = request.GET.get("query")
 
-        movies = search_movies(query)
+        try:
+            if query:
+                movies = search_movies(query)
+            else:
+                movies = get_popular_movies()
+        except RequestException:
+            return render(request, "api_error.html", status=503)
 
-    else:
-
-        movies = get_popular_movies()
-
-    return render(request, "movie_list.html", {"movies": movies})
-
+        return render(request, "movie_list.html", {"movies": movies})
+    
 @method_decorator(login_required,name="dispatch")
 class MovieDetailView(View):
-   
-   def get(self,request,**kwargs):
-      
-       id = kwargs.get("id")
 
-       movie_response = requests.get(
-          url=f"{BASE_URL}/movie/{id}",
-          params={"api_key" : API_KEY}
-       )
+    def get(self, request, **kwargs):
 
-       movie = movie_response.json()
+        id = kwargs.get("id")
 
-       crew_response = requests.get(
-          url=f"{BASE_URL}/movie/{id}/credits",
-          params={"api_key" : API_KEY}
-       )
+        try:
+            movie = get_movie_details(id)
+            cast = get_movie_credits(id)
+        except RequestException:
+            return render(request, "api_error.html", status=503)
 
-       cast = crew_response.json()
+        watchlist = WatchlistModel.objects.get(user_id=request.user)
+        wishlist = WishlistModel.objects.get(user_id=request.user)
 
-       watchlist = WatchlistModel.objects.get(user_id = request.user)
+        is_watchlist = WatchlistItems.objects.filter(watchlist_id=watchlist, movie_id=id)
+        is_wishlist = WishlistItems.objects.filter(wishlist_id=wishlist, movie_id=id)
 
-       wishlist = WishlistModel.objects.get(user_id = request.user)
-
-       is_watchlist = WatchlistItems.objects.filter(watchlist_id = watchlist, movie_id = id)
-
-       is_wishlist = WishlistItems.objects.filter(wishlist_id = wishlist,movie_id = id)
-
-       return render(request,"movie_detail.html",{"movie":movie,"cast":cast, "is_watchlist" : is_watchlist, "is_wishlist" : is_wishlist})
-
+        return render(request, "movie_detail.html", {
+            "movie": movie,
+            "cast": cast,
+            "is_watchlist": is_watchlist,
+            "is_wishlist": is_wishlist
+        })
 class About(View):
 
    def get(self,request):
 
       return render(request,"about.html")
 
-@method_decorator(login_required,name="dispatch")   
+@method_decorator(login_required, name="dispatch")
 class WatchlistAddView(View):
 
-   def post(self,request,**kwargs):
+    def post(self, request, **kwargs):
 
-         id = kwargs.get("id")
+        id = kwargs.get("id")
 
-         user = WatchlistModel.objects.get(user_id = request.user)
+        user = WatchlistModel.objects.get(user_id=request.user)
 
-         response = requests.get(
-            url=f"{BASE_URL}/movie/{id}",
-            params={"api_key" : API_KEY}
-         )
+        try:
+            data = get_movie_details(id)
+        except RequestException:
+            return render(request, "api_error.html", status=503)
 
-         data = response.json()
+        WatchlistItems.objects.create(
+            watchlist_id=user,
+            movie_id=id,
+            title=data.get("title"),
+            poster_path=data.get("poster_path")
+        )
 
-         WatchlistItems.objects.create(watchlist_id = user, movie_id = id, title = data.get("title"), poster_path = data.get("poster_path"))
-
-         return redirect("movie_detail",id)
-
+        return redirect("movie_detail", id)
 @method_decorator(login_required,name="dispatch")   
 class WatchlistItemsView(View):
 
@@ -161,26 +162,28 @@ class WatchlistUpdateView(View):
 
       return redirect("user_watchlist")
 
-@method_decorator(login_required,name="dispatch") 
+@method_decorator(login_required, name="dispatch")
 class wishlistAddView(View):
 
-   def post(self,request,**kwargs):
+    def post(self, request, **kwargs):
 
-      id = kwargs.get("id")
+        id = kwargs.get("id")
 
-      response = requests.get(
-         url=f"{BASE_URL}/movie/{id}",
-         params={"api_key" : API_KEY}
-      )
+        try:
+            data = get_movie_details(id)
+        except RequestException:
+            return render(request, "api_error.html", status=503)
 
-      data =response.json()
+        wishlist = WishlistModel.objects.get(user_id=request.user)
 
-      wishlist = WishlistModel.objects.get(user_id = request.user)
+        WishlistItems.objects.create(
+            wishlist_id=wishlist,
+            movie_id=id,
+            title=data.get("title"),
+            poster_path=data.get("poster_path")
+        )
 
-      WishlistItems.objects.create(wishlist_id = wishlist, movie_id = id, title = data.get("title"), poster_path = data.get("poster_path"))
-
-      return redirect("movie_detail",id)
-   
+        return redirect("movie_detail", id)
 @method_decorator(login_required,name="dispatch")
 class WishlistItemsView(View):
 

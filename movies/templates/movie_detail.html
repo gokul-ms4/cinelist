@@ -1,237 +1,435 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css"
-    integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ=="
-    crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <title>{{ movie.title }}</title>
+  <meta charset="UTF-8">
+  <title>{{ movie.title }} — CineList</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  {% load static %}
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
   <style>
+    :root {
+      --ink:           #0b0a0c;
+      --surface:       #14131a;
+      --surface-raised:#1a1822;
+      --gold:          #c9a24b;
+      --gold-bright:   #e8c87a;
+      --text:          #f2ecdd;
+      --text-muted:    #9c9788;
+      --border:        #2a2732;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #1e1e1e;
-      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      background-color: var(--ink);
+      color: var(--text);
+      min-height: 100vh;
       margin: 0;
-      padding: 40px 20px;
     }
 
-    .exit-icon {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      color: white;
-      font-size: 15px;
+    /* ── Back button ── */
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
       text-decoration: none;
-      z-index: 1000;
-      background-color: #333;
-      padding: 8px 12px;
-      border-radius: 50%;
-      transition: background-color 0.3s ease;
+      font-size: 0.83rem;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      transition: color 160ms ease, border-color 160ms ease, background-color 160ms ease;
+    }
+    .back-btn:hover {
+      color: var(--gold-bright);
+      border-color: rgba(201,162,75,0.4);
+      background-color: rgba(201,162,75,0.06);
+    }
+    .back-btn i { font-size: 0.78rem; }
+
+    /* ── Hero backdrop strip ── */
+    .detail-hero {
+      background:
+        radial-gradient(ellipse 800px 400px at 50% 0%, rgba(201,162,75,0.07), transparent 65%),
+        var(--ink);
+      padding: 32px 0 0;
+      border-bottom: 1px solid var(--border);
     }
 
-    .exit-icon:hover {
-      background-color: #555;
-    }
-
-    .detail-container {
-      display: flex;
-      flex-wrap: wrap;
-      max-width: 1100px;
-      margin: auto;
-      background-color: #2a2a2a;
-      border-radius: 10px;
+    /* ── Poster ── */
+    .poster-wrap {
+      position: relative;
+      border-radius: 14px;
       overflow: hidden;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+      border: 1px solid var(--border);
     }
-
-    .poster {
-      flex: 1 1 350px;
-      min-width: 300px;
-      background-color: #1b1b1b;
-      padding: 20px;
-      box-sizing: border-box;
-    }
-
-    .poster img {
+    .poster-wrap img {
       width: 100%;
-      height: auto;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+      display: block;
+    }
+    .poster-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(11,10,12,0.82);
+      border: 1px solid rgba(201,162,75,0.35);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 0.08em;
+      backdrop-filter: blur(8px);
     }
 
-    .info {
-      flex: 2;
-      padding: 30px;
-      box-sizing: border-box;
-    }
-
-    .info h1 {
-      margin-top: 0;
-      font-size: 36px;
-      margin-bottom: 15px;
-    }
-
-    .info p {
-      font-size: 16px;
-      line-height: 1.6;
-      margin: 10px 0;
-      color: #ccc;
-    }
-
-    .genres {
-      font-style: italic;
-      color: #aaa;
-      margin-top: 5px;
-    }
-
-    .cast-section {
-      margin-top: 30px;
-    }
-
-    .cast-section h2 {
+    /* ── Title block ── */
+    .movie-eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
       margin-bottom: 10px;
     }
+    .movie-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 600;
+      font-size: clamp(1.9rem, 4vw, 2.9rem);
+      color: var(--text);
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
 
+    /* ── Meta pills ── */
+    .meta-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .meta-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: rgba(201,162,75,0.05);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 12px;
+    }
+    .meta-pill i { color: var(--gold); font-size: 0.72rem; }
+    .meta-pill--rating {
+      color: var(--gold);
+      border-color: rgba(201,162,75,0.3);
+      background: rgba(201,162,75,0.08);
+      font-weight: 600;
+    }
+
+    /* ── Genre tags ── */
+    .genre-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid rgba(201,162,75,0.28);
+      border-radius: 6px;
+      padding: 4px 10px;
+      background: rgba(201,162,75,0.06);
+    }
+
+    /* ── Overview ── */
+    .overview-text {
+      font-size: 0.96rem;
+      line-height: 1.75;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    /* ── Section label ── */
+    .section-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── Action buttons ── */
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 11px 22px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 170ms ease, box-shadow 170ms ease, background-color 170ms ease, border-color 170ms ease, color 170ms ease;
+      white-space: nowrap;
+    }
+    .action-btn:hover { transform: translateY(-2px); }
+
+    .btn-watchlist {
+      background-color: var(--gold);
+      border-color: var(--gold);
+      color: #16130c;
+    }
+    .btn-watchlist:hover {
+      background-color: var(--gold-bright);
+      border-color: var(--gold-bright);
+      color: #16130c;
+      box-shadow: 0 6px 20px rgba(201,162,75,0.3);
+    }
+
+    .btn-wishlist {
+      background-color: transparent;
+      border-color: rgba(224,122,122,0.5);
+      color: #e07a9a;
+    }
+    .btn-wishlist:hover {
+      background-color: rgba(224,122,122,0.1);
+      border-color: #e07a9a;
+      color: #f0a0b8;
+      box-shadow: 0 6px 20px rgba(224,122,155,0.15);
+    }
+
+    .btn-reviews {
+      background-color: transparent;
+      border-color: rgba(201,162,75,0.35);
+      color: var(--text-muted);
+    }
+    .btn-reviews:hover {
+      border-color: var(--gold);
+      color: var(--gold-bright);
+    }
+
+    /* Already-added redirect buttons */
+    .btn-goto-watchlist {
+      background-color: rgba(201,162,75,0.1);
+      border-color: rgba(201,162,75,0.4);
+      color: var(--gold);
+    }
+    .btn-goto-watchlist:hover {
+      background-color: rgba(201,162,75,0.18);
+      border-color: var(--gold);
+      color: var(--gold-bright);
+    }
+
+    .btn-goto-wishlist {
+      background-color: rgba(224,122,122,0.08);
+      border-color: rgba(224,122,122,0.4);
+      color: #e07a9a;
+    }
+    .btn-goto-wishlist:hover {
+      background-color: rgba(224,122,122,0.15);
+      border-color: #e07a9a;
+      color: #f0a0b8;
+    }
+
+    /* submit button reset so it inherits action-btn styles */
+    button.action-btn {
+      font-family: inherit;
+      line-height: 1;
+    }
+
+    /* ── Cast ── */
     .cast-grid {
       display: flex;
       flex-wrap: wrap;
-      gap: 15px;
+      gap: 14px;
     }
-
-    .cast-member {
-      width: 100px;
+    .cast-card {
+      width: 90px;
+      flex-shrink: 0;
       text-align: center;
     }
-
-    .cast-member img {
-      width: 100px;
-      height: 150px;
+    .cast-card img,
+    .cast-placeholder {
+      width: 90px;
+      height: 130px;
       object-fit: cover;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      display: block;
+    }
+    .cast-placeholder {
+      background: var(--surface-raised);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cast-placeholder i {
+      color: var(--text-muted);
+      font-size: 1.4rem;
+      opacity: 0.4;
+    }
+    .cast-name {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 8px 0 2px;
+      line-height: 1.3;
+    }
+    .cast-role {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      line-height: 1.3;
     }
 
-    .cast-member p {
-      margin: 5px 0;
-      font-size: 14px;
+    /* ── Divider ── */
+    .gold-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 28px 0;
     }
 
-    .buttons {
-      margin-top: 30px;
-      display: inline-block;
-      background-color: #ff3c00;
-      color: white;
-      text-decoration: none;
-      padding: 10px 20px;
-      margin-right: 15px;
-      border-radius: 5px;
-      font-size: 15px;
-      transition: background-color 0.3s;
-    }
-
-    .buttons a:hover {
-      background-color: #e03200;
-    }
-
-    @media screen and (max-width: 768px) {
-      .detail-container {
-        flex-direction: column;
-      }
-
-      .info {
-        padding: 20px;
-      }
+    /* ── Main layout ── */
+    .detail-layout {
+      padding: 40px 0 70px;
     }
   </style>
 </head>
 
 <body>
 
-  <a href="{% url 'movie_list' %}" class="exit-icon" title="Go Back">
-    <i class="fas fa-arrow-left"></i>
-  </a>
+  <!-- Back nav -->
+  <div class="detail-hero">
+    <div class="container">
+      <a href="{% url 'movie_list' %}" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Back to Films
+      </a>
 
-  <div class="detail-container">
-    <div class="poster">
-      <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="{{ movie.title }}">
-      <div style="margin-top: 15px; text-align: center;">
-        <a href="{% url 'movie_reviews' movie.id %}"
-          style="display: inline-block; background-color: #2196F3; color: white; padding: 8px 16px; border-radius: 5px; text-decoration: none; font-weight: bold; font-size: 14px;">
-          <i class="fas fa-comments"></i> View Reviews
-        </a>
-      </div>
-    </div>
+      <div class="row g-5 mt-2 pb-5 align-items-start">
 
-    <div class="info">
-      <h1>{{ movie.title }}</h1>
-      <p><strong>Release Date:</strong> {{ movie.release_date }}</p>
-      <p><strong>Overview:</strong> {{ movie.overview }}</p>
-      <p class="genres">
-        <strong>Genres:</strong>
-        {% for g in movie.genres %}
-        {{ g.name }}
-        {% endfor %}
-      </p>
-      <p><strong>Rating:</strong> {{ movie.vote_average }}</p>
+        <!-- Poster -->
+        <div class="col-lg-3 col-md-4 col-sm-6 mx-auto mx-md-0">
+          <div class="poster-wrap">
+            <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="{{ movie.title }}">
+            <span class="poster-badge"><i class="fas fa-star me-1"></i>{{ movie.vote_average|floatformat:1 }}</span>
+          </div>
+        </div>
 
-      <div class="cast-section">
-        <h2>Top Cast</h2>
-        <div class="cast-grid">
-          {% for actor in cast.cast|slice:":10" %}
-          <div class="cast-member">
-            {% if actor.profile_path %}
-            <img src="https://image.tmdb.org/t/p/w185{{ actor.profile_path }}" alt="{{ actor.name }}">
+        <!-- Info -->
+        <div class="col-lg-9 col-md-8">
+
+          <p class="movie-eyebrow">Film Detail</p>
+          <h1 class="movie-title">{{ movie.title }}</h1>
+
+          <!-- Meta pills -->
+          <div class="meta-pills">
+            <span class="meta-pill">
+              <i class="fas fa-calendar"></i>{{ movie.release_date }}
+            </span>
+            <span class="meta-pill meta-pill--rating">
+              <i class="fas fa-star"></i>{{ movie.vote_average|floatformat:1 }} / 10
+            </span>
+          </div>
+
+          <!-- Genres -->
+          <div class="d-flex flex-wrap gap-2 mb-4">
+            {% for g in movie.genres %}
+              <span class="genre-tag">{{ g.name }}</span>
+            {% endfor %}
+          </div>
+
+          <!-- Overview -->
+          <p class="overview-text">{{ movie.overview }}</p>
+
+          <hr class="gold-divider">
+
+          <!-- Action buttons -->
+          <div class="d-flex flex-wrap gap-3 align-items-center">
+
+            <!-- Watchlist -->
+            {% if is_watchlist %}
+              <a href="{% url 'user_watchlist' %}" class="action-btn btn-goto-watchlist">
+                <i class="fas fa-bookmark"></i> Go to Watchlist
+              </a>
             {% else %}
-            <div style="width: 100px; height: 150px; background-color: #555; border-radius: 8px;"></div>
+              <form action="{% url 'watchlist_add' movie.id %}" method="post" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="action-btn btn-watchlist">
+                  <i class="fas fa-bookmark"></i> Add to Watchlist
+                </button>
+              </form>
             {% endif %}
-            <p><strong>{{ actor.name }}</strong></p>
-            <p>{{ actor.character }}</p>
+
+            <!-- Wishlist -->
+            {% if is_wishlist %}
+              <a href="{% url 'user_wishlist' %}" class="action-btn btn-goto-wishlist">
+                <i class="fas fa-heart"></i> Go to Wishlist
+              </a>
+            {% else %}
+              <form action="{% url 'wishlist_add' movie.id %}" method="post" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="action-btn btn-wishlist">
+                  <i class="fas fa-heart"></i> Add to Wishlist
+                </button>
+              </form>
+            {% endif %}
+
+            <!-- Reviews -->
+            <a href="{% url 'movie_reviews' movie.id %}" class="action-btn btn-reviews">
+              <i class="fas fa-comments"></i> View Reviews
+            </a>
+
           </div>
-          {% endfor %}
+
         </div>
+      </div><!-- /row -->
+    </div>
+  </div><!-- /detail-hero -->
+
+
+  <!-- Cast section -->
+  <div class="detail-layout">
+    <div class="container">
+      <p class="section-label"><i class="fas fa-users me-2"></i>Top Cast</p>
+      <div class="cast-grid">
+        {% for actor in cast.cast|slice:":10" %}
+          <div class="cast-card">
+            {% if actor.profile_path %}
+              <img src="https://image.tmdb.org/t/p/w185{{ actor.profile_path }}" alt="{{ actor.name }}">
+            {% else %}
+              <div class="cast-placeholder">
+                <i class="fas fa-user"></i>
+              </div>
+            {% endif %}
+            <p class="cast-name">{{ actor.name }}</p>
+            <p class="cast-role">{{ actor.character }}</p>
+          </div>
+        {% endfor %}
       </div>
-      <div style="display: flex; gap: 15px; margin-top: 30px; align-items: center; flex-wrap: wrap;">
-
-        <div>
-          {% if is_watchlist %}
-          <div
-            style="background-color: #ffc107; padding: 10px 20px; border-radius: 5px; font-size: 15px; color: #1e1e1e; font-weight: bold;">
-            <i class="fas fa-eye"></i> Already in watchlist
-          </div>
-          {% else %}
-          <form action="{% url 'watchlist_add' movie.id %}" method="post">
-            {% csrf_token %}
-            <button type="submit"
-              style="background-color: #ffc107; border: none; padding: 10px 20px; border-radius: 5px; font-size: 15px; color: #1e1e1e; font-weight: bold; cursor: pointer;">
-              <i class="fas fa-eye"></i> Add to Watchlist
-            </button>
-          </form>
-          {% endif %}
-        </div>
-
-        <div>
-          {% if is_wishlist %}
-          <div
-            style="background-color: #ff4081; padding: 10px 20px; border-radius: 5px; font-size: 15px; color: white; font-weight: bold;">
-            <i class="fas fa-heart"></i> Already in wishlist
-          </div>
-          {% else %}
-          <form action="{% url 'wishlist_add' movie.id %}" method="post">
-            {% csrf_token %}
-            <button type="submit"
-              style="background-color: #ff4081; border: none; padding: 10px 20px; border-radius: 5px; font-size: 15px; color: white; font-weight: bold; cursor: pointer;">
-              <i class="fas fa-heart"></i> Add to Wishlist
-            </button>
-          </form>
-          {% endif %}
-        </div>
-
-      </div>
-
-
     </div>
   </div>
 
-</body>
+  <!-- Bootstrap Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+</body>
 </html>

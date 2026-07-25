@@ -18,81 +18,296 @@
 
   {% load static %}
 
+  <!-- Fonts: Playfair Display for the cinematic quote, Inter for UI -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
   {% block style %}
   <style>
+    :root {
+      --ink: #0b0a0c;
+      --surface: #151318;
+      --gold: #c9a24b;
+      --gold-bright: #e8c87a;
+      --text: #f2ecdd;
+      --text-muted: #a49c8a;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+      background-color: var(--ink);
+      font-family: 'Inter', sans-serif;
+    }
+
     body {
-     background-image: url("{% static 'images/avt_bg.jpg' %}");
-     background-size: cover;
-     background-position: right;
-     background-repeat: no-repeat;
-     height: 100vh;
-     margin: 0;
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse 900px 700px at 68% 42%, rgba(201,162,75,0.10), transparent 60%),
+        radial-gradient(ellipse 1200px 900px at 15% 60%, rgba(201,162,75,0.05), transparent 55%),
+        var(--ink);
+    }
+
+    /* faint film grain for texture */
+    body::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.35;
+      background-image: radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 3px 3px;
+    }
+
+    /* signature element: film-strip rail with sprocket holes down the left edge */
+    .film-rail {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 34px;
+      background: linear-gradient(180deg, #1a1710, #0b0a0c);
+      border-right: 1px solid rgba(201,162,75,0.35);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      align-items: center;
+      z-index: 20;
+    }
+
+    .film-rail span {
+      width: 9px;
+      height: 9px;
+      border-radius: 2px;
+      background: var(--gold);
+      opacity: 0.55;
+    }
+
+    /* ghosted film-reel graphic, echoes the rail's sprocket holes, replaces the stock photo */
+    .reel {
+      position: absolute;
+      top: 50%;
+      right: -12%;
+      transform: translateY(-50%);
+      width: min(60vw, 780px);
+      height: min(60vw, 780px);
+      opacity: 0.9;
+      pointer-events: none;
+      z-index: 1;
     }
 
     .overlay {
       height: 100%;
       width: 100%;
+      position: relative;
+      z-index: 10;
+      padding-left: 34px; /* clear the film rail */
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .content-box {
-      text-align: center;
-      color: rgb(230, 227, 255);
+      color: var(--text);
+      max-width: 640px;
+      width: 100%;
+      padding: 0 32px;
+      animation: rise 900ms ease-out both;
     }
 
-    .btn-custom {
-      padding: 7px 25px;
-      font-size: 1.1rem;
-      border-radius: 30px;
+    @media (prefers-reduced-motion: reduce) {
+      .content-box { animation: none; }
     }
 
-    .btn-register {
-      background-color: #198754;
-      color: white;
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
-    .btn-login {
-      background-color: #198754;
-      color: white;
+    .logo-mark {
+      width: 88px;
+      height: 88px;
+      object-fit: contain;
+      border-radius: 12px;
+      filter: drop-shadow(0 4px 18px rgba(201,162,75,0.25));
     }
 
-    .btn-register:hover {
-      background-color: #0d6efd;
+    .eyebrow {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin: 18px 0 4px;
     }
 
-    .btn-login:hover {
-      background-color: #0d6efd;
+    .tagline {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin: 0 0 22px;
+      letter-spacing: 0.01em;
     }
 
     .quote {
-      font-size: 2rem;
-      font-weight: 600;
+      font-family: 'Playfair Display', serif;
+      font-weight: 500;
+      font-size: clamp(1.5rem, 2.8vw, 2.2rem);
+      line-height: 1.38;
+      color: var(--text);
+      margin: 0 0 24px;
+      position: relative;
+    }
+
+    /* large translucent watermark quotation mark, sits behind the text, not a boxed span */
+    .quote::before {
+      content: "\201C";
+      position: absolute;
+      top: -0.5em;
+      left: -0.38em;
+      font-size: 3.6em;
+      font-family: 'Playfair Display', serif;
+      color: var(--gold);
+      opacity: 0.16;
+      z-index: -1;
+      line-height: 1;
+    }
+
+    .quote em {
+      font-style: italic;
+      color: var(--gold-bright);
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 28px;
+    }
+
+    .divider .line {
+      height: 1px;
+      width: 46px;
+      background: linear-gradient(90deg, var(--gold), transparent);
     }
 
     .author {
-      font-style: italic;
-      margin-bottom: 30px;
+      font-family: 'Inter', sans-serif;
+      font-style: normal;
+      font-size: 0.92rem;
+      letter-spacing: 0.03em;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .author strong {
+      color: var(--gold-bright);
+      font-weight: 600;
+    }
+
+    .btn-custom {
+      padding: 11px 34px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      transition: transform 180ms ease, background-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
+    }
+
+    .btn-register {
+      background-color: var(--gold);
+      color: #16130c;
+      box-shadow: 0 6px 24px rgba(201,162,75,0.25);
+    }
+
+    .btn-register:hover {
+      background-color: var(--gold-bright);
+      color: #16130c;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(201,162,75,0.35);
+    }
+
+    .btn-login {
+      background-color: transparent;
+      color: var(--text);
+      border-color: rgba(242,236,221,0.35);
+    }
+
+    .btn-login:hover {
+      border-color: var(--gold);
+      color: var(--gold-bright);
+      transform: translateY(-2px);
+    }
+
+    .btn-custom:focus-visible {
+      outline: 2px solid var(--gold-bright);
+      outline-offset: 3px;
+    }
+
+    @media (max-width: 768px) {
+      .reel { opacity: 0.5; right: -30%; }
+    }
+
+    @media (max-width: 576px) {
+      .film-rail { display: none; }
+      .overlay { padding-left: 0; }
+      .content-box { text-align: center; margin: 0 auto; }
+      .divider { justify-content: center; }
+      .quote::before { left: 50%; transform: translateX(-50%); top: -0.6em; }
+      .reel { display: none; }
     }
   </style>
 </head>
 <body>
 
+<div class="film-rail" aria-hidden="true">
+  <span></span><span></span><span></span><span></span><span></span>
+  <span></span><span></span><span></span><span></span><span></span>
+</div>
+
+<svg class="reel" viewBox="0 0 400 400" fill="none" aria-hidden="true">
+  <circle cx="200" cy="200" r="190" stroke="#c9a24b" stroke-width="1.2" opacity="0.14"/>
+  <circle cx="200" cy="200" r="150" stroke="#c9a24b" stroke-width="1" opacity="0.12"/>
+  <circle cx="200" cy="200" r="46" stroke="#c9a24b" stroke-width="1.4" opacity="0.18"/>
+  <circle cx="200" cy="90" r="26" stroke="#c9a24b" stroke-width="1.2" opacity="0.16"/>
+  <circle cx="310" cy="200" r="26" stroke="#c9a24b" stroke-width="1.2" opacity="0.16"/>
+  <circle cx="200" cy="310" r="26" stroke="#c9a24b" stroke-width="1.2" opacity="0.16"/>
+  <circle cx="90" cy="200" r="26" stroke="#c9a24b" stroke-width="1.2" opacity="0.16"/>
+  <circle cx="270" cy="130" r="18" stroke="#c9a24b" stroke-width="1" opacity="0.13"/>
+  <circle cx="270" cy="270" r="18" stroke="#c9a24b" stroke-width="1" opacity="0.13"/>
+  <circle cx="130" cy="270" r="18" stroke="#c9a24b" stroke-width="1" opacity="0.13"/>
+  <circle cx="130" cy="130" r="18" stroke="#c9a24b" stroke-width="1" opacity="0.13"/>
+</svg>
+
 {% endblock %}
 
 {% block cards %}
-    
-<div class="overlay d-flex align-items-center">
-  <div class="content-box ms-4 mt-5">
-    <h1 class="quote mb-3">
-    <img style="width: 200px; height: 200px; padding-bottom: 20px;" class="mx-auto" src="{% static 'images/logos.png' %}" alt="">
-      “Once you overcome the <br>one-inch tall barrier of subtitles,<br> you will be introduced to so many more amazing films.”
-    </h1>
-    <p class="author">– Bong Joon-ho</p>
-    <div class="d-flex gap-5 justify-content-center">
+
+<div class="overlay">
+  <div class="content-box">
+        <p class="eyebrow">Cinelist</p>
+    <p class="tagline">Discover. Watch. Inspire.</p>
+    <p class="quote">
+      Once you overcome the one-inch tall barrier of subtitles, you will be introduced to so many more <em>amazing films</em>.
+    </p>
+    <div class="divider">
+      <span class="line"></span>
+      <p class="author">&mdash; <strong>Bong Joon-ho</strong></p>
+    </div>
+    <div class="d-flex gap-3 flex-wrap">
       <a href="{% url 'signup' %}" class="btn btn-custom btn-register">Register</a>
       <a href="{% url 'login' %}" class="btn btn-custom btn-login">Login</a>
     </div>
   </div>
 </div>
+
 </body>
 </html>
 
