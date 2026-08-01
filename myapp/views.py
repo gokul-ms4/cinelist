@@ -10,6 +10,8 @@ from myapp.forms import *
 
 from django.views.generic import View
 
+from rest_framework_simplejwt.tokens import RefreshToken
+
 import random
 
 from django.core.mail import send_mail
@@ -137,7 +139,6 @@ class OtpVerifyView(View):
         return render(request, "otpverify.html", {"form": form})
 
 class LoginView(View):
-
     def get(self, request):
         form = LoginForm()
         return render(request, "login.html", {"form": form})
@@ -151,12 +152,20 @@ class LoginView(View):
 
             if user_obj:
                 login(request, user_obj)
-                return redirect("cinelist_home")
+                refresh = RefreshToken.for_user(user_obj)
+                access_token = str(refresh.access_token)
+                refresh_token = str(refresh)
+
+                response = redirect("cinelist_home")
+
+                response.set_cookie('access_token', access_token, httponly=True, samesite='Lax')
+                response.set_cookie('refresh_token', refresh_token, httponly=True, samesite='Lax')
+
+                return response
             else:
                 form.add_error(None, "Incorrect username or password.")
 
         return render(request, "login.html", {"form": form})
-
 class ForgetPasswordView(View):
 
     def get(self, request):
@@ -300,14 +309,16 @@ class UserProfileView(View):
         return render(request,"user_profile.html",{"details":details,"total":total,"count":count,
                                                    "watchlist" : watchlist, "reviews" : reviews})
     
-@method_decorator(login_required,name="dispatch")
+@method_decorator(login_required, name="dispatch")
 class LogoutView(View):
-
-    def get(self,request):
-
+    def get(self, request):
         logout(request)
+        response = redirect("login")
 
-        return redirect("login")
+        response.delete_cookie('access_token')
+        response.delete_cookie('refresh_token')
+
+        return response
 
 class UserUpdateView(View):
 
