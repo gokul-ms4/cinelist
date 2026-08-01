@@ -6,11 +6,6 @@
 
 {% load static %}
 
-<!-- Fonts: Playfair Display for headings, Inter for UI/form -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-
 {% block style %}
 <style>
 :root {
@@ -58,8 +53,7 @@ body::after {
 
 .film-rail {
   position: fixed;
-  top: 0;
-  left: 0;
+  top: 0; left: 0;
   height: 100%;
   width: 34px;
   background: linear-gradient(180deg, #1a1710, #0b0a0c);
@@ -72,8 +66,7 @@ body::after {
 }
 
 .film-rail span {
-  width: 9px;
-  height: 9px;
+  width: 9px; height: 9px;
   border-radius: 2px;
   background: var(--gold);
   opacity: 0.55;
@@ -120,11 +113,9 @@ body::after {
 
 .poster .reel {
   position: absolute;
-  top: 50%;
-  left: 50%;
+  top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  width: 220px;
-  height: 220px;
+  width: 220px; height: 220px;
   opacity: 0.5;
   pointer-events: none;
 }
@@ -156,14 +147,10 @@ body::after {
   font-weight: 500;
 }
 
-.poster-bottom {
-  position: relative;
-  z-index: 2;
-}
+.poster-bottom { position: relative; z-index: 2; }
 
 .poster-bottom .rule {
-  width: 40px;
-  height: 1px;
+  width: 40px; height: 1px;
   background: linear-gradient(90deg, var(--gold), transparent);
   margin-bottom: 10px;
 }
@@ -238,6 +225,56 @@ body::after {
   font-size: 0.8rem;
 }
 
+/* Single-line message styles — no box */
+.auth-message {
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-align: center;
+  padding: 4px 0;
+  margin: 0 0 12px;
+  background: none;
+  border: none;
+  display: block;
+}
+
+.auth-message.success { color: #6fcf97; }
+.auth-message.error   { color: #e07a7a; }
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-decoration: none;
+  letter-spacing: 0.03em;
+  margin-bottom: 20px;
+  transition: color 160ms ease;
+}
+
+.back-link:hover { color: var(--gold); }
+
+.resend-row {
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-top: 18px;
+  margin-bottom: 0;
+}
+
+.resend-link {
+  color: var(--gold);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.resend-link:hover {
+  color: var(--gold-bright);
+  text-decoration: underline;
+}
+
 .btn-danger {
   background-color: var(--gold);
   border: none;
@@ -269,7 +306,6 @@ body::after {
   .form-section { width: 100%; padding: 32px 26px; }
 }
 </style>
-
 {% endblock %}
 
 {% block cards %}
@@ -299,16 +335,51 @@ body::after {
       <p>A quick verification step to keep your account secure.</p>
     </div>
   </div>
+
   <div class="form-section">
+
+    <!-- Back arrow -->
+    <a href="{% url 'signup' %}" class="back-link">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+      Back
+    </a>
+
     <h2>Enter OTP</h2>
     <p class="subtext">We've sent a verification code to your email. Enter it below to continue.</p>
+
+    <!-- Messages — single line, no box -->
+    {% if messages %}
+      {% for message in messages %}
+        <span class="auth-message {{ message.tags }}">{{ message }}</span>
+      {% endfor %}
+    {% endif %}
 
     <form method="POST" action="">
       {% csrf_token %}
       {{ form }}
       <button type="submit" class="btn btn-danger w-100 mt-3">Verify</button>
     </form>
+
+    <p class="resend-row">
+      Didn't receive a code?
+      <a href="{% url 'pswdresendotp' %}" class="resend-link">Resend OTP</a>
+    </p>
+
   </div>
 </div>
+
+<script>
+  // Auto-dismiss messages after 3 seconds
+  setTimeout(() => {
+    document.querySelectorAll('.auth-message').forEach(el => {
+      el.style.transition = 'opacity 500ms ease';
+      el.style.opacity = '0';
+      setTimeout(() => el.remove(), 500);
+    });
+  }, 3000);
+</script>
 
 {% endblock %}

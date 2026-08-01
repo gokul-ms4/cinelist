@@ -271,13 +271,13 @@
     transform: translateY(-2px);
   }
 
-  [title] {
+  [data-tooltip] {
   position: relative;
   cursor: pointer;
 }
 
-[title]:hover::after {
-  content: attr(title);
+[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
   position: absolute;
   bottom: calc(100% + 8px);
   left: 50%;
@@ -371,7 +371,7 @@
                 </div>
               {% else %}
                 <a href="{% url 'watchlist_update' item.movie_id %}" class="status-badge status-pending"
-   title="Click to mark as Watched">
+   data-tooltip="Click to mark as Watched">
   <i class="fas fa-clock"></i> Not Watched
 </a>
               {% endif %}

@@ -1,16 +1,67 @@
-{% extends 'base.html' %}
-
-{% block title %}
+{% extends 'base.html' %} {% block title %}
 <title>Cinelist- User Profile</title>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <style>
   .profile-hero {
     padding: 40px 20px 20px;
     background:
-      radial-gradient(ellipse 700px 500px at 50% 0%, rgba(201,162,75,0.08), transparent 65%),
+      radial-gradient(
+        ellipse 700px 500px at 50% 0%,
+        rgba(201, 162, 75, 0.08),
+        transparent 65%
+      ),
       var(--ink);
+  }
+
+  .avatar-wrapper {
+    position: relative;
+    width: 108px;
+    height: 108px;
+    flex-shrink: 0;
+  }
+
+  .avatar-wrapper .profile-avatar {
+    width: 108px;
+    height: 108px;
+  }
+
+  .avatar-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    opacity: 0;
+    transition: opacity 200ms ease;
+    border: 4px solid var(--surface);
+  }
+
+  .avatar-wrapper:hover .avatar-overlay {
+    opacity: 1;
+  }
+
+  .overlay-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 160ms ease, color 160ms ease;
+    padding: 0;
+  }
+
+  .overlay-btn:hover {
+    background: var(--gold);
+    color: #16130c;
   }
 
   .profile-card {
@@ -19,18 +70,22 @@
     border-radius: 20px;
     max-width: 760px;
     margin: 0 auto;
-    overflow: hidden;
-    box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+    overflow: visible;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
   }
 
-  /* ===== Cover banner ===== */
   .profile-cover {
     position: relative;
     height: 150px;
     background:
-      radial-gradient(ellipse 420px 300px at 25% 20%, rgba(201,162,75,0.16), transparent 65%),
+      radial-gradient(
+        ellipse 420px 300px at 25% 20%,
+        rgba(201, 162, 75, 0.16),
+        transparent 65%
+      ),
       linear-gradient(135deg, #1a1710 0%, #0b0a0c 80%);
-    z-index: 1; /* explicit stacking layer, kept below the avatar */
+    border-radius: 20px 20px 0 0;
+    overflow: visible;
   }
 
   .profile-cover .reel {
@@ -42,47 +97,411 @@
     height: 260px;
     opacity: 0.45;
     pointer-events: none;
-     clip-path: inset(0 0 0 0 round 0);
+    clip-path: inset(0 0 0 0 round 0);
   }
 
-  .profile-menu-toggle {
+  /* ── Settings button ── */
+  .profile-settings-btn {
     position: absolute;
     top: 18px;
     right: 18px;
-    background: rgba(11,10,12,0.5);
-    backdrop-filter: blur(4px);
-    border: 1px solid var(--border);
-    color: var(--text-muted);
     width: 36px;
     height: 36px;
     border-radius: 50%;
+    background: rgba(11, 10, 12, 0.5);
+    backdrop-filter: blur(4px);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
     z-index: 5;
-    transition: color 160ms ease, border-color 160ms ease;
+    transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
+    font-size: 16px;
   }
 
-  .profile-menu-toggle:hover,
-  .profile-menu-toggle:focus {
+  .profile-settings-btn:hover,
+  .profile-settings-btn.open {
     color: var(--gold-bright);
     border-color: var(--gold);
+    background: rgba(11, 10, 12, 0.75);
   }
 
-  .dropdown {
-  position: relative;
-  z-index: 10;
-}
+  .profile-settings-btn i {
+    transition: transform 0.22s ease;
+    display: block;
+  }
 
-.dropdown-menu {
-  z-index: 10;
-}
+  .profile-settings-btn.open i {
+    transform: rotate(45deg);
+  }
 
-  /* ===== Body ===== */
+  /* ── Settings dropdown — fixed position, outside all containers ── */
+  .settings-dropdown {
+    position: fixed;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    min-width: 230px;
+    padding: 6px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.2);
+    transform-origin: top right;
+    transition: opacity 0.16s ease, transform 0.16s ease;
+    opacity: 0;
+    transform: scale(0.93);
+    pointer-events: none;
+    z-index: 9999;
+    display: none;
+  }
+
+  .settings-dropdown.visible {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: all;
+  }
+
+  .settings-menu-label {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 7px 12px 3px;
+    font-weight: 600;
+  }
+
+  .settings-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 9px;
+    font-size: 0.875rem;
+    color: var(--text);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.13s ease;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+  }
+
+  .settings-menu-item:hover {
+    background: var(--surface-raised);
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .settings-menu-item i {
+    font-size: 15px;
+    color: var(--text-muted);
+    width: 18px;
+    text-align: center;
+  }
+
+  .settings-menu-item.danger {
+    color: #e05050;
+  }
+
+  .settings-menu-item.danger i {
+    color: #e05050;
+  }
+
+  .settings-menu-item.danger:hover {
+    background: rgba(224, 80, 80, 0.08);
+  }
+
+  .settings-menu-sep {
+    height: 1px;
+    background: var(--border);
+    margin: 5px 4px;
+  }
+
+  /* ── Toggle row ── */
+  .settings-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 12px;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: background 0.13s ease;
+    gap: 10px;
+  }
+
+  .settings-toggle-row:hover {
+    background: var(--surface-raised);
+  }
+
+  .settings-toggle-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .settings-toggle-left i {
+    font-size: 15px;
+    color: var(--text-muted);
+    width: 18px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .settings-toggle-text .toggle-label {
+    font-size: 0.875rem;
+    color: var(--text);
+  }
+
+  .settings-toggle-text .toggle-sublabel {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 1px;
+  }
+
+  .toggle-switch {
+    width: 36px;
+    height: 20px;
+    border-radius: 999px;
+    background: var(--border);
+    position: relative;
+    transition: background 0.2s ease;
+    flex-shrink: 0;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    padding: 0;
+  }
+
+  .toggle-switch.on {
+    background: var(--gold);
+  }
+
+  .toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
+  .toggle-switch.on::after {
+    transform: translateX(16px);
+  }
+
+  /* ── Shared modal styles ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease;
+    padding: 20px;
+  }
+
+  .modal-overlay.visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 360px;
+    padding: 30px 28px 26px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+    transform: translateY(12px) scale(0.97);
+    transition: transform 0.2s ease;
+  }
+
+  .modal-overlay.visible .modal-box {
+    transform: translateY(0) scale(1);
+  }
+
+  .modal-icon-wrap {
+    width: 46px;
+    height: 46px;
+    border-radius: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 18px;
+  }
+
+  .modal-icon-wrap.gold {
+    background: rgba(201, 162, 75, 0.12);
+    border: 1px solid rgba(201, 162, 75, 0.2);
+    color: var(--gold);
+  }
+
+  .modal-icon-wrap.danger {
+    background: rgba(224, 80, 80, 0.1);
+    border: 1px solid rgba(224, 80, 80, 0.2);
+    color: #e05050;
+  }
+
+  .modal-box h3 {
+    font-family: "Playfair Display", serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 8px;
+  }
+
+  .modal-box p {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin: 0 0 22px;
+  }
+
+  .modal-input-group {
+    margin-bottom: 14px;
+  }
+
+  .modal-input-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 7px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .modal-input-group input {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface-raised, rgba(255,255,255,0.04));
+    color: var(--text);
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    font-family: inherit;
+    box-sizing: border-box;
+  }
+
+  .modal-input-group input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201, 162, 75, 0.15);
+  }
+
+  .modal-input-group input.error {
+    border-color: #e05050;
+    box-shadow: 0 0 0 3px rgba(224, 80, 80, 0.12);
+  }
+
+  .modal-input-group input.error:focus {
+    border-color: #e05050;
+    box-shadow: 0 0 0 3px rgba(224, 80, 80, 0.12);
+  }
+
+  .modal-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    border-radius: 10px;
+    padding: 11px 13px;
+    margin-bottom: 22px;
+  }
+
+  .modal-notice.gold {
+    background: rgba(201, 162, 75, 0.07);
+    border: 1px solid rgba(201, 162, 75, 0.18);
+  }
+
+  .modal-notice.danger {
+    background: rgba(224, 80, 80, 0.06);
+    border: 1px solid rgba(224, 80, 80, 0.18);
+  }
+
+  .modal-notice i {
+    font-size: 14px;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+
+  .modal-notice.gold i { color: var(--gold); }
+  .modal-notice.danger i { color: #e05050; }
+
+  .modal-notice span {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.55;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .modal-btn-cancel {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.13s ease, color 0.13s ease;
+  }
+
+  .modal-btn-cancel:hover {
+    background: var(--surface-raised);
+    color: var(--text);
+  }
+
+  .modal-btn-confirm {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity 0.13s ease;
+  }
+
+  .modal-btn-confirm.gold {
+    background: var(--gold);
+    color: #16130c;
+  }
+
+  .modal-btn-confirm.danger {
+    background: #e05050;
+    color: #fff;
+  }
+
+  .modal-btn-confirm:hover {
+    opacity: 0.88;
+  }
+
+  /* ── Profile body ── */
   .profile-body {
     padding: 0 40px 36px;
     position: relative;
-    z-index: 2; /* paints above .profile-cover, fixes the avatar clipping bug */
+    z-index: 0;
+    border-radius: 0 0 20px 20px;
   }
 
   .profile-top {
@@ -92,6 +511,8 @@
     text-align: center;
     gap: 8px;
     margin-top: -50px;
+    position: relative;
+    z-index: 0;
   }
 
   .profile-avatar {
@@ -101,18 +522,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Playfair Display', serif;
+    font-family: "Playfair Display", serif;
     font-size: 2.5rem;
     font-weight: 600;
     color: #16130c;
     background: linear-gradient(135deg, var(--gold-bright), var(--gold));
     border: 4px solid var(--surface);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
     flex-shrink: 0;
   }
 
   .profile-username {
-    font-family: 'Playfair Display', serif;
+    font-family: "Playfair Display", serif;
     font-weight: 600;
     font-size: 1.5rem;
     letter-spacing: 0.03em;
@@ -186,7 +607,7 @@
   }
 
   .stat-box:hover {
-    border-color: rgba(201,162,75,0.4);
+    border-color: rgba(201, 162, 75, 0.4);
     transform: translateY(-2px);
   }
 
@@ -199,14 +620,13 @@
   }
 
   .stat-box .stat-count {
-    font-family: 'Playfair Display', serif;
+    font-family: "Playfair Display", serif;
     font-size: 1.3rem;
     font-weight: 600;
     color: var(--gold-bright);
     margin: 0;
   }
 
-  /* ===== Favorite films strip ===== */
   .favorites-section {
     max-width: 900px;
     margin: 44px auto 0;
@@ -214,7 +634,7 @@
   }
 
   .favorites-section h4 {
-    font-family: 'Playfair Display', serif;
+    font-family: "Playfair Display", serif;
     font-weight: 600;
     font-size: 1.15rem;
     color: var(--text);
@@ -236,10 +656,7 @@
   .favorites-strip::-webkit-scrollbar { height: 6px; }
   .favorites-strip::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
 
-  .fav-poster {
-    flex: 0 0 auto;
-    width: 110px;
-  }
+  .fav-poster { flex: 0 0 auto; width: 110px; }
 
   .fav-poster img {
     width: 110px;
@@ -253,7 +670,7 @@
 
   .fav-poster:hover img {
     transform: translateY(-4px);
-    border-color: rgba(201,162,75,0.4);
+    border-color: rgba(201, 162, 75, 0.4);
   }
 
   .fav-poster p {
@@ -283,7 +700,6 @@
     margin-bottom: 8px;
   }
 
-  /* ===== Activity panels ===== */
   .activity-section {
     max-width: 900px;
     margin: 44px auto 0;
@@ -299,32 +715,26 @@
   }
 
   .activity-panel h4 {
-    font-family: 'Playfair Display', serif;
+    font-family: "Playfair Display", serif;
     font-weight: 600;
-    font-size: 1.15rem;
     color: var(--text);
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 10px;
     margin: 0 0 18px;
+    font-size: 1.05rem;
+    white-space: nowrap;
   }
 
-  .activity-panel h4 i {
-    color: var(--gold);
-  }
-
-  .activity-panel p.empty-text {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    margin: 0;
-  }
+  .activity-panel h4 i { color: var(--gold); }
+  .activity-panel p.empty-text { font-size: 0.9rem; color: var(--text-muted); margin: 0; }
 
   .activity-btn {
     display: inline-flex;
     align-items: center;
     gap: 10px;
     background-color: transparent;
-    border: 1px solid rgba(242,236,221,0.3);
+    border: 1px solid rgba(242, 236, 221, 0.3);
     color: var(--text);
     font-weight: 600;
     font-size: 0.88rem;
@@ -357,7 +767,6 @@
 
 <div class="profile-hero">
   <div class="profile-card">
-
     <div class="profile-cover">
       <svg class="reel" viewBox="0 0 400 400" fill="none" aria-hidden="true">
         <circle cx="200" cy="200" r="190" stroke="#c9a24b" stroke-width="1.2" opacity="0.18"/>
@@ -368,27 +777,60 @@
         <circle cx="200" cy="310" r="26" stroke="#c9a24b" stroke-width="1.2" opacity="0.18"/>
         <circle cx="90" cy="200" r="26" stroke="#c9a24b" stroke-width="1.2" opacity="0.18"/>
       </svg>
+
+      <button
+        class="profile-settings-btn"
+        id="profileSettingsBtn"
+        type="button"
+        aria-label="Profile settings"
+        aria-expanded="false"
+        aria-haspopup="true"
+      >
+        <i class="fa-solid fa-gear"></i>
+      </button>
     </div>
-    <div class="dropdown">
-    <button class="profile-menu-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-      <i class="fa-solid fa-caret-down"></i>
-    </button>
-    <ul class="dropdown-menu dropdown-menu-dark">
-      <li><a class="dropdown-item" href="{% url 'update' %}">Edit Profile</a></li>
-      <li><a class="dropdown-item" href="{% url 'current_password' %}">Reset Password</a></li>
-    </ul>
-  </div>
+
     <div class="profile-body">
       <div class="profile-top">
-        <div class="profile-avatar">{{ details.username|first|upper }}</div>
-        <p class="profile-username">{{ details.username }}</p>
 
-        <!-- TODO: swap in your real "date joined" field/context var if different -->
+        <div class="avatar-wrapper">
+          {% if details.profile_picture %}
+            <img
+              src="{{ details.profile_picture.url }}"
+              alt="{{ details.username }}"
+              class="profile-avatar"
+              style="object-fit: cover"
+            />
+          {% else %}
+            <div class="profile-avatar">{{ details.username|first|upper }}</div>
+          {% endif %}
+
+          <div class="avatar-overlay">
+            <form method="POST" action="{% url 'update_profile_picture' %}" enctype="multipart/form-data">
+              {% csrf_token %}
+              <label for="profile_picture" title="Change photo" class="overlay-btn">
+                <i class="fa-solid fa-camera"></i>
+              </label>
+              <input type="file" id="profile_picture" name="profile_picture" accept="image/*"
+                     style="display:none" onchange="this.form.submit()"/>
+            </form>
+
+            {% if details.profile_picture %}
+              <form method="POST" action="{% url 'delete_profile_picture' %}">
+                {% csrf_token %}
+                <button type="submit" class="overlay-btn" title="Remove photo">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+
+        <p class="profile-username">{{ details.username }}</p>
         <p class="profile-joined">
           <i class="fa-regular fa-calendar"></i>Member since {{ details.date_joined|default:"—" }}
         </p>
 
-        <!-- TODO: swap in your real bio field, e.g. details.bio -->
         {% if details.bio %}
           <p class="profile-bio">"{{ details.bio }}"</p>
         {% else %}
@@ -398,9 +840,9 @@
         <div class="profile-meta">
           <span><i class="fa-solid fa-phone"></i>{{ details.phone_number }}</span>
           <span><i class="fas fa-envelope"></i>{{ details.email }}</span>
-          <!-- TODO: replace with a real context variable for genres, e.g. {{ details.favorite_genres }} -->
           <span><i class="fa-solid fa-clapperboard"></i>Action, Sci-fi</span>
         </div>
+
       </div>
 
       <div class="profile-stats">
@@ -421,19 +863,18 @@
           <p class="stat-count">{{ watchlist|length|default:"0" }}</p>
         </a>
       </div>
-    </div>
 
+    </div>
   </div>
 </div>
 
-<!-- TODO: wire to a real "favorite_movies" queryset in the view, each with .poster_url and .title -->
 <div class="favorites-section">
   <h4><i class="fas fa-heart"></i>Favorite Films</h4>
   {% if favorite_movies %}
     <div class="favorites-strip">
       {% for movie in favorite_movies %}
         <a href="{% url 'movie_detail' movie.id %}" class="fav-poster text-decoration-none">
-          <img src="{{ movie.poster_url }}" alt="{{ movie.title }}">
+          <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" />
           <p>{{ movie.title }}</p>
         </a>
       {% endfor %}
@@ -477,4 +918,322 @@
     </div>
   </div>
 </div>
+
+<!-- Dropdown -->
+<div class="settings-dropdown" id="profileSettingsDropdown" role="menu">
+  <div class="settings-menu-label">Account</div>
+  <a class="settings-menu-item" href="{% url 'update' %}" role="menuitem">
+    <i class="fa-regular fa-pen-to-square"></i>
+    Edit profile
+  </a>
+  <a class="settings-menu-item" href="{% url 'current_password' %}" role="menuitem">
+    <i class="fa-solid fa-key"></i>
+    Reset password
+  </a>
+  <div class="settings-menu-sep"></div>
+  <div class="settings-menu-label">Privacy</div>
+  <div class="settings-toggle-row" id="privateToggleRow">
+    <div class="settings-toggle-left">
+      <i class="fa-solid fa-lock"></i>
+      <div class="settings-toggle-text">
+        <div class="toggle-label">Private account</div>
+        <div class="toggle-sublabel" id="toggleSubLabel">
+          {% if details.is_private %}Your account is private{% else %}Only followers see your activity{% endif %}
+        </div>
+      </div>
+    </div>
+    <button
+      class="toggle-switch {% if details.is_private %}on{% endif %}"
+      id="privateToggleSwitch"
+      type="button"
+      role="switch"
+      aria-checked="{{ details.is_private|yesno:'true,false' }}"
+      aria-label="Toggle private account"
+    ></button>
+  </div>
+  <div class="settings-menu-sep"></div>
+  <div class="settings-menu-label">Danger zone</div>
+  <button class="settings-menu-item danger" id="deleteAccountBtn" type="button" role="menuitem">
+    <i class="fa-solid fa-trash-can"></i>
+    Delete account
+  </button>
+  <div class="settings-menu-sep"></div>
+  <a class="settings-menu-item danger" href="{% url 'logout' %}" role="menuitem">
+    <i class="fa-solid fa-right-from-bracket"></i>
+    Sign out
+  </a>
+</div>
+
+<!-- Private Account Modal -->
+<div class="modal-overlay" id="privateModalOverlay" role="dialog" aria-modal="true" aria-labelledby="privateModalTitle">
+  <div class="modal-box">
+    <div class="modal-icon-wrap gold">
+      <i class="fa-solid fa-lock"></i>
+    </div>
+    <h3 id="privateModalTitle">Enable private account</h3>
+    <p>Confirm your current password to make this account private. Only your followers will be able to see your watchlist and reviews.</p>
+
+    <div class="modal-input-group">
+      <label for="privateConfirmPwd">Current password</label>
+      <input
+        type="password"
+        id="privateConfirmPwd"
+        name="password"
+        placeholder="Enter your password"
+        autocomplete="current-password"
+      />
+    </div>
+
+    <div class="modal-notice gold">
+      <i class="fa-solid fa-circle-info"></i>
+      <span>Existing followers won't be removed. New follow requests will need your approval.</span>
+    </div>
+
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" id="privateModalCancel" type="button">Cancel</button>
+      <button class="modal-btn-confirm gold" id="privateModalConfirm" type="button">Make private</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div class="modal-overlay" id="deleteModalOverlay" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
+  <div class="modal-box">
+    <div class="modal-icon-wrap danger">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+    </div>
+    <h3 id="deleteModalTitle">Delete account</h3>
+    <p>This will permanently erase your profile, watchlist, reviews, and all activity. This action cannot be undone.</p>
+
+    <div class="modal-input-group">
+      <label for="deleteConfirmPwd">Confirm your password</label>
+      <input
+        type="password"
+        id="deleteConfirmPwd"
+        name="password"
+        placeholder="Enter your password"
+        autocomplete="current-password"
+      />
+    </div>
+
+    <div class="modal-notice danger">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      <span>Your account and all associated data will be permanently deleted and cannot be recovered.</span>
+    </div>
+
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" id="deleteModalCancel" type="button">Cancel</button>
+      <button class="modal-btn-confirm danger" id="deleteModalConfirm" type="button">Delete account</button>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const settingsBtn    = document.getElementById('profileSettingsBtn');
+  const dropdown       = document.getElementById('profileSettingsDropdown');
+
+  // Private account elements
+  const toggleRow      = document.getElementById('privateToggleRow');
+  const toggleSwitch   = document.getElementById('privateToggleSwitch');
+  const toggleSubLabel = document.getElementById('toggleSubLabel');
+  const privateOverlay = document.getElementById('privateModalOverlay');
+  const privateCancel  = document.getElementById('privateModalCancel');
+  const privateConfirm = document.getElementById('privateModalConfirm');
+  const privatePwd     = document.getElementById('privateConfirmPwd');
+
+  // Delete account elements
+  const deleteBtn      = document.getElementById('deleteAccountBtn');
+  const deleteOverlay  = document.getElementById('deleteModalOverlay');
+  const deleteCancel   = document.getElementById('deleteModalCancel');
+  const deleteConfirm  = document.getElementById('deleteModalConfirm');
+  const deletePwd      = document.getElementById('deleteConfirmPwd');
+
+  let isPrivate = toggleSwitch.classList.contains('on');
+
+  // ── Dropdown open / close ──
+  function openDropdown() {
+    const rect = settingsBtn.getBoundingClientRect();
+    dropdown.style.top   = (rect.bottom + window.scrollY + 8) + 'px';
+    dropdown.style.right = (window.innerWidth - rect.right) + 'px';
+    dropdown.style.display = 'block';
+    setTimeout(() => dropdown.classList.add('visible'), 10);
+    settingsBtn.classList.add('open');
+    settingsBtn.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeDropdown() {
+    dropdown.classList.remove('visible');
+    settingsBtn.classList.remove('open');
+    settingsBtn.setAttribute('aria-expanded', 'false');
+    setTimeout(() => dropdown.style.display = 'none', 160);
+  }
+
+  settingsBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dropdown.classList.contains('visible') ? closeDropdown() : openDropdown();
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!settingsBtn.contains(e.target) && !dropdown.contains(e.target)) {
+      closeDropdown();
+    }
+  });
+
+  // ── Private toggle ──
+  function handleToggle(e) {
+    e.stopPropagation();
+    if (!isPrivate) {
+      closeDropdown();
+      openPrivateModal();
+    } else {
+      submitPrivacyChange(false, '');
+    }
+  }
+
+  toggleSwitch.addEventListener('click', handleToggle);
+  toggleRow.addEventListener('click', (e) => {
+    if (e.target !== toggleSwitch) handleToggle(e);
+  });
+
+  function openPrivateModal() {
+    privateOverlay.classList.add('visible');
+    setTimeout(() => privatePwd.focus(), 200);
+  }
+
+  function closePrivateModal() {
+    privateOverlay.classList.remove('visible');
+    privatePwd.value = '';
+    privatePwd.classList.remove('error');
+    privatePwd.placeholder = 'Enter your password';
+  }
+
+  privateCancel.addEventListener('click', closePrivateModal);
+  privateOverlay.addEventListener('click', (e) => {
+    if (e.target === privateOverlay) closePrivateModal();
+  });
+
+  privateConfirm.addEventListener('click', () => {
+    if (!privatePwd.value.trim()) {
+      privatePwd.classList.add('error');
+      privatePwd.focus();
+      return;
+    }
+    submitPrivacyChange(true, privatePwd.value);
+  });
+
+  privatePwd.addEventListener('input', () => privatePwd.classList.remove('error'));
+
+  // ── Delete account ──
+  deleteBtn.addEventListener('click', () => {
+    closeDropdown();
+    openDeleteModal();
+  });
+
+  function openDeleteModal() {
+    deleteOverlay.classList.add('visible');
+    setTimeout(() => deletePwd.focus(), 200);
+  }
+
+  function closeDeleteModal() {
+    deleteOverlay.classList.remove('visible');
+    deletePwd.value = '';
+    deletePwd.classList.remove('error');
+    deletePwd.placeholder = 'Enter your password';
+  }
+
+  deleteCancel.addEventListener('click', closeDeleteModal);
+  deleteOverlay.addEventListener('click', (e) => {
+    if (e.target === deleteOverlay) closeDeleteModal();
+  });
+
+  deleteConfirm.addEventListener('click', () => {
+    if (!deletePwd.value.trim()) {
+      deletePwd.classList.add('error');
+      deletePwd.focus();
+      return;
+    }
+    submitDeleteAccount(deletePwd.value);
+  });
+
+  deletePwd.addEventListener('input', () => deletePwd.classList.remove('error'));
+
+  // ── Global Escape key ──
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closePrivateModal();
+      closeDeleteModal();
+    }
+  });
+
+  // ── CSRF helper ──
+  function getCookie(name) {
+    const val = document.cookie.split('; ').find(r => r.startsWith(name + '='));
+    return val ? decodeURIComponent(val.split('=')[1]) : null;
+  }
+
+  // ── Privacy fetch ──
+  function submitPrivacyChange(makePrivate, password) {
+    const body = new FormData();
+    body.append('is_private', makePrivate ? '1' : '0');
+    if (password) body.append('password', password);
+
+    fetch("{% url 'toggle_private_account' %}", {
+      method: 'POST',
+      headers: { 'X-CSRFToken': getCookie('csrftoken') },
+      body: body,
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        isPrivate = makePrivate;
+        toggleSwitch.classList.toggle('on', isPrivate);
+        toggleSwitch.setAttribute('aria-checked', isPrivate ? 'true' : 'false');
+        toggleSubLabel.textContent = isPrivate
+          ? 'Your account is private'
+          : 'Only followers see your activity';
+        closePrivateModal();
+      } else {
+        privatePwd.classList.add('error');
+        privatePwd.focus();
+        privatePwd.value = '';
+        privatePwd.placeholder = data.error || 'Incorrect password';
+      }
+    })
+    .catch(() => {
+      privatePwd.classList.add('error');
+      privatePwd.placeholder = 'Something went wrong, try again';
+    });
+  }
+
+  // ── Delete account fetch ──
+  function submitDeleteAccount(password) {
+    const body = new FormData();
+    body.append('password', password);
+
+    fetch("{% url 'delete_account'  %}", {
+      method: 'POST',
+      headers: { 'X-CSRFToken': getCookie('csrftoken') },
+      body: body,
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        // Redirect after successful deletion
+        window.location.href = data.redirect || '/';
+      } else {
+        deletePwd.classList.add('error');
+        deletePwd.focus();
+        deletePwd.value = '';
+        deletePwd.placeholder = data.error || 'Incorrect password';
+      }
+    })
+    .catch(() => {
+      deletePwd.classList.add('error');
+      deletePwd.placeholder = 'Something went wrong, try again';
+    });
+  }
+});
+</script>
+
 {% endblock %}

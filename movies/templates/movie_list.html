@@ -143,7 +143,7 @@
     font-weight: 600;
     font-size: 0.88rem;
     color: var(--text);
-    margin: 0 0 3px;
+    margin: 0 0 5px;
     line-height: 1.3;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -151,30 +151,42 @@
     overflow: hidden;
   }
 
-  .movie-caption .movie-director {
-    font-size: 0.74rem;
-    color: var(--text-muted);
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  /* Star rating row in caption */
+  .caption-rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
   }
 
-  .movie-caption .movie-director i {
+  .caption-stars {
+    display: flex;
+    gap: 1px;
+  }
+
+  .caption-stars i {
+    font-size: 0.62rem;
     color: var(--gold);
-    margin-right: 4px;
-    font-size: 0.68rem;
   }
 
-  /* Hover overlay — reveals genre, runtime, release date */
+  .caption-stars i.empty {
+    color: var(--border);
+  }
+
+  .caption-score {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--gold);
+  }
+
+  /* ===== Hover overlay ===== */
   .movie-overlay {
     position: absolute;
     inset: 0;
     background: linear-gradient(
       to top,
-      rgba(11,10,12,0.97) 0%,
-      rgba(11,10,12,0.88) 40%,
-      rgba(11,10,12,0.3) 100%
+      rgba(11,10,12,0.98) 0%,
+      rgba(11,10,12,0.85) 45%,
+      rgba(11,10,12,0.25) 100%
     );
     display: flex;
     flex-direction: column;
@@ -192,23 +204,62 @@
   .overlay-title {
     font-family: 'Playfair Display', serif;
     font-weight: 600;
-    font-size: 0.92rem;
+    font-size: 0.9rem;
     color: var(--text);
-    margin: 0 0 8px;
+    margin: 0 0 10px;
     line-height: 1.3;
   }
 
+  /* Big score display */
+  .overlay-score-row {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+
+  .overlay-score-big {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--gold);
+    line-height: 1;
+  }
+
+  .overlay-score-denom {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+
+  /* Stars row */
+  .overlay-stars {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 10px;
+  }
+
+  .overlay-stars i {
+    font-size: 0.7rem;
+    color: var(--gold);
+  }
+
+  .overlay-stars i.empty {
+    color: rgba(201,162,75,0.25);
+  }
+
+  /* Meta row */
   .overlay-meta {
     display: flex;
     flex-direction: column;
     gap: 5px;
+    margin-bottom: 10px;
   }
 
   .overlay-row {
     display: flex;
     align-items: center;
     gap: 7px;
-    font-size: 0.76rem;
+    font-size: 0.74rem;
     color: var(--text-muted);
   }
 
@@ -217,14 +268,41 @@
     width: 12px;
     text-align: center;
     flex-shrink: 0;
+    font-size: 0.68rem;
   }
 
+  /* Popularity bar */
+  .overlay-pop-bar {
+    height: 3px;
+    background: var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .overlay-pop-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--gold-bright));
+    border-radius: 999px;
+  }
+
+  .overlay-pop-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  /* Divider */
   .overlay-divider {
     height: 1px;
-    background: rgba(201,162,75,0.25);
+    background: rgba(201,162,75,0.2);
     margin: 8px 0;
   }
 
+  /* CTA */
   .overlay-cta {
     display: inline-flex;
     align-items: center;
@@ -234,10 +312,49 @@
     color: #16130c;
     background: var(--gold);
     border-radius: 999px;
-    padding: 5px 13px;
-    margin-top: 10px;
+    padding: 6px 14px;
     width: fit-content;
     pointer-events: auto;
+    transition: background-color 160ms ease;
+  }
+
+  .movie-card:hover .overlay-cta {
+    background: var(--gold-bright);
+  }
+
+  /* Top badge — language */
+  .poster-lang-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(11,10,12,0.78);
+    border: 1px solid rgba(201,162,75,0.3);
+    border-radius: 6px;
+    padding: 3px 7px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    backdrop-filter: blur(6px);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* Adult badge */
+  .poster-adult-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(180,50,50,0.85);
+    border-radius: 6px;
+    padding: 3px 7px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    pointer-events: none;
+    z-index: 2;
   }
 </style>
 
@@ -265,36 +382,60 @@
       {% for movie in movies %}
         <a href="{% url 'movie_detail' movie.id %}" class="movie-card">
 
+          <!-- Poster -->
           <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}"
                alt="{{ movie.title }}"
                class="movie-poster">
 
+          <!-- Language badge top-right -->
+          {% if movie.original_language %}
+            <span class="poster-lang-badge">{{ movie.original_language }}</span>
+          {% endif %}
+
           <!-- Hover overlay -->
           <div class="movie-overlay">
             <p class="overlay-title">{{ movie.title }}</p>
+
+            <!-- Big score -->
+            <div class="overlay-score-row">
+              <span class="overlay-score-big">{{ movie.vote_average|floatformat:1 }}</span>
+              <span class="overlay-score-denom">/ 10</span>
+            </div>
+
+            <!-- Stars (out of 5, vote_average is out of 10) -->
+            <div class="overlay-stars">
+              {% with score=movie.vote_average %}
+                {% if score >= 2 %}<i class="fas fa-star"></i>{% else %}<i class="fas fa-star empty"></i>{% endif %}
+                {% if score >= 4 %}<i class="fas fa-star"></i>{% else %}<i class="fas fa-star empty"></i>{% endif %}
+                {% if score >= 6 %}<i class="fas fa-star"></i>{% else %}<i class="fas fa-star empty"></i>{% endif %}
+                {% if score >= 8 %}<i class="fas fa-star"></i>{% else %}<i class="fas fa-star empty"></i>{% endif %}
+                {% if score >= 9 %}<i class="fas fa-star"></i>{% else %}<i class="fas fa-star-half-alt"></i>{% endif %}
+              {% endwith %}
+            </div>
+
+            <!-- Meta -->
             <div class="overlay-meta">
-              <!-- Genre: available if your view resolves genre names, shows — otherwise -->
-              <div class="overlay-row">
-                <i class="fas fa-tag"></i>
-                <span>{{ movie.genres|default:"—" }}</span>
-              </div>
-              <!-- Runtime: only available if your view fetches movie detail -->
-              <div class="overlay-row">
-                <i class="fas fa-clock"></i>
-                <span>
-                  {% if movie.runtime %}
-                    {{ movie.runtime }} min
-                  {% else %}
-                    —
-                  {% endif %}
-                </span>
-              </div>
               <div class="overlay-row">
                 <i class="fas fa-calendar"></i>
                 <span>{{ movie.release_date|default:"—" }}</span>
               </div>
+              <div class="overlay-row">
+                <i class="fas fa-users"></i>
+                <span>{{ movie.vote_count|default:"0" }} votes</span>
+              </div>
             </div>
+
+            <!-- Popularity bar -->
+            <div class="overlay-pop-label">
+              <span>Popularity</span>
+              <span>{{ movie.popularity|floatformat:0 }}</span>
+            </div>
+            <div class="overlay-pop-bar">
+              <div class="overlay-pop-fill" data-pct="{{ movie.popularity_pct }}"></div>
+            </div>
+
             <div class="overlay-divider"></div>
+
             <span class="overlay-cta">
               <i class="fas fa-play"></i> View Details
             </span>
@@ -303,11 +444,18 @@
           <!-- Always-visible caption -->
           <div class="movie-caption">
             <p class="movie-title">{{ movie.title }}</p>
-            <p class="movie-director">
-              <i class="fas fa-video"></i>
-              <!-- Director: only available if your view fetches movie detail -->
-              {{ movie.director|default:"—" }}
-            </p>
+            <div class="caption-rating">
+              <div class="caption-stars">
+                {% with score=movie.vote_average %}
+                  {% if score >= 2 %}<i class="fas fa-star"></i>{% else %}<i class="fas fa-star empty"></i>{% endif %}
+                  {% if score >= 4 %}<i class="fas fa-star"></i>{% else %}<i class="fas fa-star empty"></i>{% endif %}
+                  {% if score >= 6 %}<i class="fas fa-star"></i>{% else %}<i class="fas fa-star empty"></i>{% endif %}
+                  {% if score >= 8 %}<i class="fas fa-star"></i>{% else %}<i class="fas fa-star empty"></i>{% endif %}
+                  {% if score >= 9 %}<i class="fas fa-star"></i>{% else %}<i class="fas fa-star empty"></i>{% endif %}
+                {% endwith %}
+              </div>
+              <span class="caption-score">{{ movie.vote_average|floatformat:1 }}</span>
+            </div>
           </div>
 
         </a>
@@ -316,5 +464,11 @@
 
   </div>
 </div>
+
+<script>
+  document.querySelectorAll('.overlay-pop-fill').forEach(el => {
+    el.style.width = el.dataset.pct + '%';
+  });
+</script>
 
 {% endblock %}

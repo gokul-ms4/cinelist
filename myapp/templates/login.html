@@ -6,13 +6,31 @@
 
   {% load static %}
 
-  <!-- Fonts: Playfair Display for headings, Inter for UI/form -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
   {% block style %}
   <style>
+    .auth-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  background: rgba(224, 80, 80, 0.08);
+  border: 1px solid rgba(224, 80, 80, 0.25);
+  border-radius: 10px;
+  padding: 11px 13px;
+  margin-bottom: 18px;
+  font-size: 0.85rem;
+  color: #e07a7a;
+  line-height: 1.5;
+}
+
+.auth-error i {
+  font-size: 14px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
   :root {
     --ink: #0b0a0c;
     --surface: #14131a;
@@ -46,7 +64,6 @@
     padding: 24px;
   }
 
-  /* faint film grain, matches homepage / signup texture */
   body::after {
     content: "";
     position: absolute;
@@ -57,7 +74,6 @@
     background-size: 3px 3px;
   }
 
-  /* signature element carried over from other pages, for site-wide continuity */
   .film-rail {
     position: fixed;
     top: 0;
@@ -106,7 +122,6 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* typographic panel, no photo dependency */
   .poster {
     position: relative;
     width: 42%;
@@ -201,9 +216,9 @@
     margin: 0 0 22px;
   }
 
-  /* style raw Django {{ form.as_p }} output */
   .form-section form p {
     margin: 0 0 14px;
+    position: relative;
   }
 
   .form-section form label {
@@ -222,7 +237,7 @@
     border: 1px solid var(--border);
     color: var(--text);
     border-radius: 8px;
-    padding: 10px 12px;
+    padding: 10px 40px 10px 12px;
     font-size: 0.92rem;
     font-family: 'Inter', sans-serif;
     transition: border-color 160ms ease, box-shadow 160ms ease;
@@ -240,6 +255,32 @@
     margin: 4px 0 0;
     color: #e07a7a;
     font-size: 0.8rem;
+  }
+
+  /* ── Password toggle ── */
+  .pwd-wrapper {
+    position: relative;
+    display: block;
+  }
+
+  .pwd-toggle-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 15px;
+    padding: 4px;
+    line-height: 1;
+    transition: color 150ms ease;
+    z-index: 2;
+  }
+
+  .pwd-toggle-btn:hover {
+    color: var(--gold);
   }
 
   .btn-danger {
@@ -331,6 +372,15 @@
 
     <form method="POST" action="">
       {% csrf_token %}
+      {# ── Auth error banner ── #}
+  {% if form.non_field_errors %}
+    <div class="auth-error">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      {% for error in form.non_field_errors %}
+        {{ error }}
+      {% endfor %}
+    </div>
+  {% endif %}
       {{form.as_p}}
 
       <div class="d-flex justify-content-between align-items-center mb-3">
@@ -349,5 +399,35 @@
 
 </body>
 </html>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('input[type="password"]').forEach(function (input) {
+    var parent = input.parentElement;
+    if (parent.classList.contains('pwd-wrapper')) return;
+
+    var wrapper = document.createElement('div');
+    wrapper.className = 'pwd-wrapper';
+    parent.insertBefore(wrapper, input);
+    wrapper.appendChild(input);
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pwd-toggle-btn';
+    btn.setAttribute('aria-label', 'Toggle password visibility');
+    btn.innerHTML = '<i class="fa-regular fa-eye"></i>';
+
+    btn.addEventListener('click', function () {
+      var isHidden = input.type === 'password';
+      input.type = isHidden ? 'text' : 'password';
+      btn.innerHTML = isHidden
+        ? '<i class="fa-regular fa-eye-slash"></i>'
+        : '<i class="fa-regular fa-eye"></i>';
+    });
+
+    wrapper.appendChild(btn);
+  });
+});
+</script>
 
 {% endblock %}

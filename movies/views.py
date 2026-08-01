@@ -37,6 +37,9 @@ class MovieListView(View):
         except RequestException:
             return render(request, "api_error.html", status=503)
 
+        for movie in movies:
+            movie['popularity_pct'] = min(int(movie.get('popularity', 0) / 5), 100)
+
         return render(request, "movie_list.html", {"movies": movies})
     
 @method_decorator(login_required,name="dispatch")
@@ -309,33 +312,21 @@ class ReviewAddView(View):
 
 class ReviewUpdateView(View):
 
-   def get(self,request,**kwargs):
+    def get(self, request, **kwargs):
+        id = kwargs.get("id")
+        review_model = ReviewModel.objects.get(user_id=request.user)
+        review_item = ReviewItems.objects.get(review_id=review_model, movie_id=str(id))
+        form = ReviewForm(instance=review_item)
+        return render(request, "review_update.html", {"form": form, "title": review_item.title})
 
-      id = kwargs.get("id")
-
-      review_id = ReviewModel.objects.get(user_id = request.user)
-
-      review_item = ReviewItems.objects.get(review_id = review_id, movie_id = id)
-
-      form = ReviewForm(instance=review_item)
-
-      return render(request,"review_update.html",{"form" : form, "title" : review_item.title})
-   
-   def post(self,request,**kwargs):
-
-      id = kwargs.get("id")
-
-      review_id = ReviewModel.objects.get(user_id = request.user)
-
-      review_item = ReviewItems.objects.get(review_id = review_id, movie_id = id)
-
-      form = ReviewForm(request.POST, instance=review_item)
-
-      if form.is_valid():
-
-         form.save()
-
-      return redirect("user_reviews")
+    def post(self, request, **kwargs):
+        id = kwargs.get("id")
+        review_model = ReviewModel.objects.get(user_id=request.user)
+        review_item = ReviewItems.objects.get(review_id=review_model, movie_id=str(id))
+        form = ReviewForm(request.POST, instance=review_item)
+        if form.is_valid():
+            form.save()
+        return redirect("user_reviews")
    
 class ReviewDeleteView(View):
 
@@ -345,7 +336,7 @@ class ReviewDeleteView(View):
 
       review_id = ReviewModel.objects.get(user_id = request.user)
 
-      ReviewItems.objects.get(review_id = review_id, movie_id = id).delete()
+      ReviewItems.objects.filter(review_id = review_id, movie_id = id).delete()
 
       return redirect("user_reviews")
    
@@ -387,10 +378,12 @@ class MovieReviewsView(View):
       range_obj = range(1,6)
       
       users = [user.username,"admin"]
-
-      print(users)
-   
-      return render(request,"movie_reviews.html",{"reviews":reviews, "range" : range_obj, "title" : title, "users" : users})
+      watchlist_id = WatchlistModel.objects.get(user_id = user)
+      is_watched = WatchlistItems.objects.filter(watchlist_id = watchlist_id, movie_id = id, watch_status = True).exists()
+      review_id = ReviewModel.objects.get(user_id = user)
+      user_review = ReviewItems.objects.filter(review_id = review_id, movie_id = id)
+      return render(request,"movie_reviews.html",{"reviews":reviews, "range" : range_obj, "title" : title,
+                                                   "users" : users, "is_watched" : is_watched, "user_review" : user_review, "movie_id" : id})
    
 class OtherWatchlistView(View):
 

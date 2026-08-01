@@ -18,6 +18,11 @@ from django.utils.decorators import method_decorator
 
 from django.contrib.auth.decorators import login_required
 
+from django.contrib import messages
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
+
 class UserRegisterView(View):
 
     def get(self,request):
@@ -48,10 +53,29 @@ class UserRegisterView(View):
 
           request.session["password"] =  form.cleaned_data.get("password")
 
-        send_mail(subject="OTP FOR SIGNUP",message=str(otp),from_email="gokulms538@gmail.com",recipient_list=[email])
+          send_mail(subject="OTP FOR SIGNUP",message=str(otp),from_email="gokulms538@gmail.com",recipient_list=[email])
 
+          return redirect("otpverify")
+
+        return render(request, "signup.html", {"form": form}) 
+
+class RegisterResendOtpView(View):
+    def get(self,request):
+        email = request.session.get("email")    
+        if not email:
+            messages.error(request, 'Session expired. Please register again.')
+            return redirect("signup")
+        otp = random.randint(1000,9999)
+        print(otp)
+        request.session["otp"] = str(otp)
+        request.session["email"] = email
+        send_mail(subject="OTP for Reset Password",
+                              message=str(otp),
+                              from_email="gokulms538@gmail.com",
+                              recipient_list=[email])
+        messages.success(request, f'A new OTP has been sent to {email}')
         return redirect("otpverify")
-    
+
 class CinelistHomeView(View):
 
     def get(self,request):
@@ -68,7 +92,7 @@ class OtpVerifyView(View):
 
     def get(self,request):
 
-        form = OtpVerifyForm
+        form = OtpVerifyForm()
 
         return render(request,"otpverify.html",{"form":form})
     
@@ -97,140 +121,145 @@ class OtpVerifyView(View):
                 WishlistModel.objects.create(user_id = user)
 
                 WatchlistModel.objects.create(user_id = user)
-
                 ReviewModel.objects.create(user_id = user)
 
                 login(request,user)
 
-                return render(request,"cinelist_home.html")
-            
-            else:
-
-                return redirect("otpverify")
-
-class LoginView(View):
-
-    def get(self,request):
-
-        form = LoginForm
-
-        return render(request,"login.html",{"form":form})
-    
-    def post(self,request):
-
-        form = LoginForm(request.POST)
-
-        if form.is_valid():
-
-            username = form.cleaned_data.get("username")
-
-            password = form.cleaned_data.get("password")
-
-            user_obj = authenticate(request,username=username,password=password)
-
-            if user_obj:
-
-                login(request,user_obj)
+                for key in ["otp", "email", "username", "password", "phone_number"]:
+                    request.session.pop(key, None)
 
                 return redirect("cinelist_home")
             
             else:
+                messages.error(request, 'Invalid OTP. Please check and try again.')
+                return redirect("otpverify")
 
-                return redirect("login")
+        return render(request, "otpverify.html", {"form": form})
+
+class LoginView(View):
+
+    def get(self, request):
+        form = LoginForm()
+        return render(request, "login.html", {"form": form})
+
+    def post(self, request):
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get("username").lower()
+            password = form.cleaned_data.get("password")
+            user_obj = authenticate(request, username=username, password=password)
+
+            if user_obj:
+                login(request, user_obj)
+                return redirect("cinelist_home")
+            else:
+                form.add_error(None, "Incorrect username or password.")
+
+        return render(request, "login.html", {"form": form})
 
 class ForgetPasswordView(View):
 
-    def get(self,request):
+    def get(self, request):
+        form = ForgotPasswordForm()   # ✅ add ()
+        return render(request, "forgotpswd.html", {"form": form})
 
-        form = ForgotPasswordForm
-
-        return render(request,"forgotpswd.html",{"form":form})
-    
-    def post(self,request):
-
+    def post(self, request):
         form = ForgotPasswordForm(request.POST)
-
         if form.is_valid():
-
             email = form.cleaned_data.get("email")
 
-            otp = random.randint(1000,9999)
+            # check if email exists before sending OTP
+            if not CustomUserModel.objects.filter(email=email).exists():
+                messages.error(request, "No account found with that email.")
+                return render(request, "forgotpswd.html", {"form": form})
 
+            otp = random.randint(1000, 9999)
             request.session["otp"] = str(otp)
-
             request.session["email"] = email
-
-            send_mail(subject="OTP for Reset Password",
-                      message=str(otp),
-                      from_email="gokulms538@gmail.com",
-                      recipient_list=[email])
-            
+            send_mail(
+                subject="OTP for Reset Password",
+                message=str(otp),
+                from_email="gokulms538@gmail.com",
+                recipient_list=[email]
+            )
+            print(otp)
             return redirect("pswdotp")
-        
         else:
+            return render(request, "forgotpswd.html", {"form": form})  # ✅ pass form back
 
-            return render(request,"forgotpswd.html")
-        
+
+class ForgotPswdResendOtpView(View):
+
+    def get(self, request):
+        email = request.session.get("email")
+        if not email:
+            messages.error(request, "Session expired. Please try again.")
+            return redirect("forgotpswd")
+        otp = random.randint(1000, 9999)
+        request.session["otp"] = str(otp)
+        send_mail(
+            subject="OTP for Reset Password",
+            message=str(otp),
+            from_email="gokulms538@gmail.com",
+            recipient_list=[email]
+        )
+        messages.success(request, f"A new OTP has been sent to {email}.")
+        return redirect("pswdotp")
+
+
 class ForgotOtpVerifyView(View):
 
-    def get(self,request):
+    def get(self, request):
+        form = OtpVerifyForm()   # ✅ add ()
+        return render(request, "pswdotp.html", {"form": form})
 
-      form = OtpVerifyForm
-
-      return render(request,"pswdotp.html",{"form":form})
-    
-    def post(self,request):
-
+    def post(self, request):
         form = OtpVerifyForm(request.POST)
-
         if form.is_valid():
-
-            entered_otp = form.cleaned_data.get("otp")
-
+            entered_otp = str(form.cleaned_data.get("otp"))  # ✅ convert to str to match session
             generated_otp = request.session.get("otp")
 
             if entered_otp == generated_otp:
-
+                request.session.pop("otp", None)  # ✅ clear OTP but keep email for NewPasswordView
                 return redirect("newpswd")
-            
             else:
+                messages.error(request, "Invalid OTP. Please check and try again.")
+                return redirect("pswdotp")
 
-                return render(request,"pswdotp.html")
-            
+
 class NewPasswordView(View):
 
-    def get(self,request):
+    def get(self, request):
+        form = NewPasswordForm()   # ✅ add ()
+        return render(request, "new_password.html", {"form": form})
 
-        form = NewPasswordForm
-
-        return render(request,"new_password.html",{"form":form})
-    
-    def post(self,request):
-
+    def post(self, request):
         form = NewPasswordForm(request.POST)
-
         if form.is_valid():
-
             new_password = form.cleaned_data.get("new_password")
-
             confirm_password = form.cleaned_data.get("confirm_password")
 
-            if new_password == confirm_password:
+            if new_password != confirm_password:
+                messages.error(request, "Passwords do not match.")
+                return render(request, "new_password.html", {"form": form})
 
-                email = request.session.get("email")
+            email = request.session.get("email")
+            if not email:
+                messages.error(request, "Session expired. Please try again.")
+                return redirect("forgotpswd")
 
+            try:
                 user_obj = CustomUserModel.objects.get(email=email)
-
                 user_obj.set_password(new_password)
-
                 user_obj.save()
-
+                request.session.pop("email", None)  # ✅ clean up session after password reset
+                messages.success(request, "Password reset successful. Please log in.")
                 return redirect("login")
-            
-        else:
+            except CustomUserModel.DoesNotExist:
+                messages.error(request, "No account found. Please try again.")
+                return redirect("forgotpswd")
 
-                return render(request,"new_password.html")
-
+        return render(request, "new_password.html", {"form": form})  # ✅ pass form back on invalid
 @method_decorator(login_required,name="dispatch")
 class UserProfileView(View):
 
@@ -404,7 +433,9 @@ class UserInfoView(View):
 
         details = CustomUserModel.objects.get(id = id)
 
-        is_following = FollowingModel.objects.filter(user_obj = request.user,following_id = id)
+        is_following_user = FollowingModel.objects.filter(user_obj = request.user,following_id = id).exists()
+
+        is_following_back = FollowingModel.objects.filter(user_obj = id, following_id = request.user).exists()
 
         watchlist_id = WatchlistModel.objects.get(user_id = id)
 
@@ -414,32 +445,94 @@ class UserInfoView(View):
 
         reviews = ReviewItems.objects.filter(review_id = review_id)
 
-        return render(request,"user_info.html",{"details":details,"is_following":is_following,"total":total,
-                                                "count":count,"watchlist" : watchlist, "reviews" : reviews})
+        follow_request = FollowRequestModel.objects.filter(sender=details,receiver=request.user).first()
+
+        follow_back_request = FollowRequestModel.objects.filter(sender=request.user,receiver=details).first()
+
+        return render(request,"user_info.html",{"details":details,"is_following_user":is_following_user,"is_following_back":is_following_back,"total":total, "friends" : is_following_user,
+                                                "count":count,"watchlist" : watchlist, "reviews" : reviews, "follow_request" : follow_request, "follow_back_request" : follow_back_request})
     
 class FollowingView(View):
-
     def get(self,request,**kwargs):
-
         id = kwargs.get("id")
-
         another_user = CustomUserModel.objects.get(id = id)
-
         user = request.user
-
-        FollowingModel.objects.create(following_id = another_user,user_obj = user)
-
+        if another_user.is_private :
+            already_requested = FollowRequestModel.objects.filter(sender=user,receiver=another_user).exists()
+            if not already_requested:
+             FollowRequestModel.objects.create(sender=user, receiver=another_user)
+             NotificationModel.objects.create(
+                    sender=user,
+                    receiver=another_user,
+                    message="sent a follow request"
+                )
+        elif not another_user.is_private:
+                NotificationModel.objects.create(
+                       sender=user,
+                       receiver=another_user,
+                       message="started following you"
+                   )
+                FollowingModel.objects.get_or_create(following_id = another_user,user_obj = user)
+            
         return redirect("user_info",id = id)
+
+class NotificationView(View):
+    def get(self,request):
+        NotificationModel.objects.filter(
+            receiver=request.user,
+            is_read=False
+        ).update(is_read=True)
+        return render(request,"notifications.html")
+
+class AcceptrequestView(View):
+    def post(self,request,**kwargs):
+        user = request.user
+        id = kwargs.get("id")
+        notification = NotificationModel.objects.get(sender = id, receiver = user)
+        FollowingModel.objects.create(following_id = user,user_obj = notification.sender)
+        follow_request = FollowRequestModel.objects.get(sender = id, receiver =user)
+        follow_request.accept = True
+        follow_request.save()
+        notification.delete()
+        return redirect("user_info",id)
+
+class RejectrequestView(View):
+    def post(self,request,**kwargs):
+        id = kwargs.get("id")
+        user = request.user
+        notification = NotificationModel.objects.filter(sender = id, receiver = user)
+        follow_request = FollowRequestModel.objects.filter(sender = id, receiver = user)
+        follow_request.delete()
+        if notification:
+         notification.delete()
+        return redirect("user_info",id)
     
+class DeleteNotificationView(View):
+    def post(self, request, **kwargs):
+        id = kwargs.get("id")
+        NotificationModel.objects.filter(id=id, receiver=request.user).delete()
+        return redirect(request.META.get('HTTP_REFERER', '/'))
+
+class MarkNotificationsReadView(LoginRequiredMixin, View):
+    def post(self, request):
+        NotificationModel.objects.filter(
+            receiver=request.user,
+            is_read=False
+        ).update(is_read=True)
+        return JsonResponse({'status': 'ok'})
+
+    def handle_no_permission(self):
+        return JsonResponse({'status': 'error'}, status=401)
+
 class FollowingRemovalView(View):
 
     def get(self,request,**kwargs):
-
         user = request.user
-
         id = kwargs.get("id")
-
+        another_user = CustomUserModel.objects.get(id=id)
         FollowingModel.objects.get(following_id = id,user_obj = user ).delete()
+        FollowRequestModel.objects.filter(sender=user, receiver=another_user).delete()
+        NotificationModel.objects.filter(sender=user, receiver=another_user).delete()
 
         return redirect("user_info",id=id)
 
@@ -515,3 +608,52 @@ class BrowseFollowingView(View):
 
         return render(request,"browse_following.html",{"details":details,"user":user,"current_user":current_user})
 
+class UpdateProfilePictureView(LoginRequiredMixin, View):
+
+     def post(self, request):
+        form = ProfilePictureForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profile picture updated successfully.")
+        else:
+            messages.error(request, "Failed to update profile picture.")
+        return redirect("user_profile")
+
+class DeleteProfilePictureView(LoginRequiredMixin, View):
+
+    def post(self, request):
+        user = request.user
+        if user.profile_picture:
+            user.profile_picture.delete(save=True)  # deletes file from disk too
+            messages.success(request, "Profile picture removed.")
+        else:
+            messages.error(request, "No profile picture to remove.")
+        return redirect("user_profile")
+
+class ToggleAcoountPrivacyView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        make_private = request.POST.get('is_private') == '1'
+        password = request.POST.get('password', '')
+
+        if make_private:
+            if not request.user.check_password(password):
+                return JsonResponse({'success': False, 'error': 'Incorrect password'})
+
+        request.user.is_private = make_private
+        request.user.save()
+
+        return JsonResponse({'success': True})
+
+    def http_method_not_allowed(self, request, *args, **kwargs):
+        return JsonResponse({'success': False, 'error': 'Invalid method'}, status=405)
+
+class DeleteUserAccountView(View):
+    def post(self, request, **kwargs):
+        user = request.user
+        password = request.POST.get('password', '')
+
+        if not user.check_password(password):
+            return JsonResponse({'success': False, 'error': 'Incorrect password'})
+        logout(request)
+        user.delete()
+        return JsonResponse({'success': True, 'redirect': '/'})

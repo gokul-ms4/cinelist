@@ -289,6 +289,11 @@
 {% endblock %}
 
 {% block cards %}
+{% if messages %}
+  {% for message in messages %}
+    <p class="auth-message {{ message.tags }}">{{ message }}</p>
+  {% endfor %}
+{% endif %}
 
 <div class="overlay">
   <div class="content-box">

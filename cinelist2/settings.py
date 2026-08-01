@@ -63,6 +63,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'myapp.context_processors.notifications',
             ],
         },
     },
@@ -139,3 +140,6 @@ EMAIL_HOST_USER = "gokulms538@gmail.com"
 EMAIL_HOST_PASSWORD = "ulmr vqmt cxjm aapi"
 
 LOGIN_URL = "/intro/"
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
