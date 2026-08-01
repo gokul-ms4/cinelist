@@ -2,6 +2,7 @@
 
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
+from myapp.models import *
 
 class JWTAuthMiddleware:
     def __init__(self, get_response):
