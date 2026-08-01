@@ -3,7 +3,7 @@ import time
 import requests
 from requests.exceptions import RequestException
 
-API_KEY = 'faecc784db46297338de9a2cec3b7cc2'  # set this in your environment / .env file
+API_KEY = os.environ.get("TMDB_API_KEY")  # set this in your environment / .env file
 BASE_URL = 'https://api.themoviedb.org/3'
 
 
