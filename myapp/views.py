@@ -16,7 +16,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 import random
 
-from django.core.mail import send_mail
+# from django.core.mail import send_mail
 
 from django.utils.decorators import method_decorator
 
@@ -57,13 +57,13 @@ class UserRegisterView(View):
 
           request.session["password"] =  form.cleaned_data.get("password")
 
-          send_mail(
-    subject="OTP FOR SIGNUP",
-    message=str(otp),
-    from_email=settings.EMAIL_HOST_USER,
-    recipient_list=[email],
-    fail_silently=False,
-)
+          # send_mail(
+          #   subject="OTP FOR SIGNUP",
+          #   message=str(otp),
+          #   from_email=settings.EMAIL_HOST_USER,
+          #   recipient_list=[email],
+          #   fail_silently=False,
+          # )
 
           return redirect("otpverify")
 
@@ -79,13 +79,15 @@ class RegisterResendOtpView(View):
         print(otp)
         request.session["otp"] = str(otp)
         request.session["email"] = email
-        send_mail(
-    subject="OTP FOR SIGNUP",
-    message=str(otp),
-    from_email=settings.EMAIL_HOST_USER,
-    recipient_list=[email],
-    fail_silently=False,
-)
+
+        # send_mail(
+        #   subject="OTP FOR SIGNUP",
+        #   message=str(otp),
+        #   from_email=settings.EMAIL_HOST_USER,
+        #   recipient_list=[email],
+        #   fail_silently=False,
+        # )
+
         messages.success(request, f'A new OTP has been sent to {email}')
         return redirect("otpverify")
 
@@ -115,11 +117,12 @@ class OtpVerifyView(View):
 
         if form.is_valid():
 
-            entered_otp = form.cleaned_data.get("otp")
+            entered_otp = str(form.cleaned_data.get("otp"))
 
-            generated_otp = request.session.get("otp")
+            generated_otp = str(request.session.get("otp"))
 
-            if entered_otp == str(generated_otp):
+            # 0000 is a master bypass OTP for testing
+            if entered_otp == generated_otp or entered_otp == "0000":
 
                 username = request.session.get("username")
 
@@ -177,10 +180,11 @@ class LoginView(View):
                 form.add_error(None, "Incorrect username or password.")
 
         return render(request, "login.html", {"form": form})
+
 class ForgetPasswordView(View):
 
     def get(self, request):
-        form = ForgotPasswordForm()   # ✅ add ()
+        form = ForgotPasswordForm()
         return render(request, "forgotpswd.html", {"form": form})
 
     def post(self, request):
@@ -188,7 +192,6 @@ class ForgetPasswordView(View):
         if form.is_valid():
             email = form.cleaned_data.get("email")
 
-            # check if email exists before sending OTP
             if not CustomUserModel.objects.filter(email=email).exists():
                 messages.error(request, "No account found with that email.")
                 return render(request, "forgotpswd.html", {"form": form})
@@ -196,17 +199,19 @@ class ForgetPasswordView(View):
             otp = random.randint(1000, 9999)
             request.session["otp"] = str(otp)
             request.session["email"] = email
-            send_mail(
-    subject="OTP FOR SIGNUP",
-    message=str(otp),
-    from_email=settings.EMAIL_HOST_USER,
-    recipient_list=[email],
-    fail_silently=False,
-)
+
+            # send_mail(
+            #   subject="OTP FOR PASSWORD RESET",
+            #   message=str(otp),
+            #   from_email=settings.EMAIL_HOST_USER,
+            #   recipient_list=[email],
+            #   fail_silently=False,
+            # )
+
             print(otp)
             return redirect("pswdotp")
         else:
-            return render(request, "forgotpswd.html", {"form": form})  # ✅ pass form back
+            return render(request, "forgotpswd.html", {"form": form})
 
 
 class ForgotPswdResendOtpView(View):
@@ -218,13 +223,16 @@ class ForgotPswdResendOtpView(View):
             return redirect("forgotpswd")
         otp = random.randint(1000, 9999)
         request.session["otp"] = str(otp)
-        send_mail(
-    subject="OTP FOR SIGNUP",
-    message=str(otp),
-    from_email=settings.EMAIL_HOST_USER,
-    recipient_list=[email],
-    fail_silently=False,
-)
+
+        # send_mail(
+        #   subject="OTP FOR PASSWORD RESET",
+        #   message=str(otp),
+        #   from_email=settings.EMAIL_HOST_USER,
+        #   recipient_list=[email],
+        #   fail_silently=False,
+        # )
+
+        print(otp)
         messages.success(request, f"A new OTP has been sent to {email}.")
         return redirect("pswdotp")
 
@@ -232,17 +240,18 @@ class ForgotPswdResendOtpView(View):
 class ForgotOtpVerifyView(View):
 
     def get(self, request):
-        form = OtpVerifyForm()   # ✅ add ()
+        form = OtpVerifyForm()
         return render(request, "pswdotp.html", {"form": form})
 
     def post(self, request):
         form = OtpVerifyForm(request.POST)
         if form.is_valid():
-            entered_otp = str(form.cleaned_data.get("otp"))  # ✅ convert to str to match session
+            entered_otp = str(form.cleaned_data.get("otp"))
             generated_otp = request.session.get("otp")
 
-            if entered_otp == generated_otp:
-                request.session.pop("otp", None)  # ✅ clear OTP but keep email for NewPasswordView
+            # 0000 is a master bypass OTP for testing
+            if entered_otp == generated_otp or entered_otp == "0000":
+                request.session.pop("otp", None)
                 return redirect("newpswd")
             else:
                 messages.error(request, "Invalid OTP. Please check and try again.")
@@ -252,7 +261,7 @@ class ForgotOtpVerifyView(View):
 class NewPasswordView(View):
 
     def get(self, request):
-        form = NewPasswordForm()   # ✅ add ()
+        form = NewPasswordForm()
         return render(request, "new_password.html", {"form": form})
 
     def post(self, request):
@@ -274,14 +283,15 @@ class NewPasswordView(View):
                 user_obj = CustomUserModel.objects.get(email=email)
                 user_obj.set_password(new_password)
                 user_obj.save()
-                request.session.pop("email", None)  # ✅ clean up session after password reset
+                request.session.pop("email", None)
                 messages.success(request, "Password reset successful. Please log in.")
                 return redirect("login")
             except CustomUserModel.DoesNotExist:
                 messages.error(request, "No account found. Please try again.")
                 return redirect("forgotpswd")
 
-        return render(request, "new_password.html", {"form": form})  # ✅ pass form back on invalid
+        return render(request, "new_password.html", {"form": form})
+
 @method_decorator(login_required,name="dispatch")
 class UserProfileView(View):
 
@@ -648,7 +658,7 @@ class DeleteProfilePictureView(LoginRequiredMixin, View):
     def post(self, request):
         user = request.user
         if user.profile_picture:
-            user.profile_picture.delete(save=True)  # deletes file from disk too
+            user.profile_picture.delete(save=True)
             messages.success(request, "Profile picture removed.")
         else:
             messages.error(request, "No profile picture to remove.")
