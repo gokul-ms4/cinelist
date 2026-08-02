@@ -8,6 +8,8 @@ from movies.models import *
 
 from myapp.forms import *
 
+from django.conf import settings
+
 from django.views.generic import View
 
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -55,7 +57,13 @@ class UserRegisterView(View):
 
           request.session["password"] =  form.cleaned_data.get("password")
 
-          send_mail(subject="OTP FOR SIGNUP",message=str(otp),from_email="gokulms538@gmail.com",recipient_list=[email])
+          send_mail(
+    subject="OTP FOR SIGNUP",
+    message=str(otp),
+    from_email=settings.EMAIL_HOST_USER,
+    recipient_list=[email],
+    fail_silently=False,
+)
 
           return redirect("otpverify")
 
@@ -71,10 +79,13 @@ class RegisterResendOtpView(View):
         print(otp)
         request.session["otp"] = str(otp)
         request.session["email"] = email
-        send_mail(subject="OTP for Reset Password",
-                              message=str(otp),
-                              from_email="gokulms538@gmail.com",
-                              recipient_list=[email])
+        send_mail(
+    subject="OTP FOR SIGNUP",
+    message=str(otp),
+    from_email=settings.EMAIL_HOST_USER,
+    recipient_list=[email],
+    fail_silently=False,
+)
         messages.success(request, f'A new OTP has been sent to {email}')
         return redirect("otpverify")
 
@@ -186,11 +197,12 @@ class ForgetPasswordView(View):
             request.session["otp"] = str(otp)
             request.session["email"] = email
             send_mail(
-                subject="OTP for Reset Password",
-                message=str(otp),
-                from_email="gokulms538@gmail.com",
-                recipient_list=[email]
-            )
+    subject="OTP FOR SIGNUP",
+    message=str(otp),
+    from_email=settings.EMAIL_HOST_USER,
+    recipient_list=[email],
+    fail_silently=False,
+)
             print(otp)
             return redirect("pswdotp")
         else:
@@ -207,11 +219,12 @@ class ForgotPswdResendOtpView(View):
         otp = random.randint(1000, 9999)
         request.session["otp"] = str(otp)
         send_mail(
-            subject="OTP for Reset Password",
-            message=str(otp),
-            from_email="gokulms538@gmail.com",
-            recipient_list=[email]
-        )
+    subject="OTP FOR SIGNUP",
+    message=str(otp),
+    from_email=settings.EMAIL_HOST_USER,
+    recipient_list=[email],
+    fail_silently=False,
+)
         messages.success(request, f"A new OTP has been sent to {email}.")
         return redirect("pswdotp")
 
