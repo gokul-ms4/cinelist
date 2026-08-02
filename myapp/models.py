@@ -1,11 +1,17 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from myapp.storage import CloudinaryStorage
 
 class CustomUserModel(AbstractUser):
 
     phone_number = models.CharField(max_length=15, unique=True, blank=False)
     is_private = models.BooleanField(default=False)
-    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    profile_picture = models.ImageField(
+        upload_to='profile_pics/',
+        storage=CloudinaryStorage(),
+        blank=True,
+        null=True
+    )
     email = models.EmailField(unique=True, blank=False)
 
     def clean(self):
