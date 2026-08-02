@@ -644,13 +644,18 @@ class BrowseFollowingView(View):
         return render(request,"browse_following.html",{"details":details,"user":user,"current_user":current_user})
 
 class UpdateProfilePictureView(LoginRequiredMixin, View):
-
-     def post(self, request):
+    def post(self, request):
+        import cloudinary
+        print("CLOUDINARY CONFIG:", cloudinary.config().cloud_name, cloudinary.config().api_key)
+        
         form = ProfilePictureForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
+            print("FORM VALID - saving...")
             form.save()
+            print("SAVED - profile_picture url:", request.user.profile_picture.url if request.user.profile_picture else "None")
             messages.success(request, "Profile picture updated successfully.")
         else:
+            print("FORM ERRORS:", form.errors)
             messages.error(request, "Failed to update profile picture.")
         return redirect("user_profile")
 
