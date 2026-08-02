@@ -427,16 +427,17 @@ class ChangePasswordView(View):
 
 @method_decorator(login_required,name="dispatch")       
 class UsersListView(View):
-
-    def get(self,request):
-
+    def get(self, request):
         users = CustomUserModel.objects.all()
+        profiles = [request.user]
 
-        admin = CustomUserModel.objects.get(username = "admin")
+        try:
+            admin = CustomUserModel.objects.get(username="admin")
+            profiles.append(admin)
+        except CustomUserModel.DoesNotExist:
+            pass
 
-        profiles = [request.user,admin]
-
-        return render(request,"users_list.html",{"users":users,"profiles":profiles})
+        return render(request, "users_list.html", {"users": users, "profiles": profiles})
 
 @method_decorator(login_required,name="dispatch")   
 class UserInfoView(View):

@@ -20,6 +20,10 @@ class UserRegistrationForm(forms.ModelForm):
             "phone_number": forms.TextInput(attrs={"class": "form-control w-100 mx-auto", "placeholder": "Enter your phone number"}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].help_text = None
+
     def clean_username(self):
         username = self.cleaned_data.get('username', '').lower()
         if CustomUserModel.objects.filter(username__iexact=username).exists():
