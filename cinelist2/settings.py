@@ -146,7 +146,6 @@ if DEBUG:
 else:
     # Production — serve from Cloudinary
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    MEDIA_URL = f'https://res.cloudinary.com/{os.environ.get("CLOUDINARY_CLOUD_NAME")}/'
 
 # ===== Security (Production only) =====
 if not DEBUG:
