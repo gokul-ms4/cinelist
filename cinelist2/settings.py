@@ -112,8 +112,9 @@ USE_TZ = True
 
 # ===== Static Files =====
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -139,15 +140,9 @@ CLOUDINARY_STORAGE = {
 if DEBUG:
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 else:
-    STORAGES = {
-        "default": {
-            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-        },
-    }
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # ===== Security (Production only) =====
 if not DEBUG:
