@@ -31,7 +31,7 @@
   .hero-section h1 {
     font-family: 'Playfair Display', serif;
     font-weight: 600;
-    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    font-size: clamp(2rem, 6vw, 3.4rem);
     color: var(--text);
     margin: 0 0 16px;
     line-height: 1.15;
@@ -87,6 +87,7 @@
     font-size: 1.35rem;
     color: var(--gold);
     margin-bottom: 20px;
+    flex-shrink: 0;
   }
 
   .feature-card .card-title {
@@ -102,6 +103,7 @@
     color: var(--text-muted);
     line-height: 1.6;
     margin: 0 0 26px;
+    flex: 1; /* pushes button to bottom */
   }
 
   .feature-btn {
@@ -134,6 +136,85 @@
     border-color: var(--gold-bright);
     color: #16130c;
   }
+
+  /* ===== Responsive ===== */
+
+  /* Tablet: tighten hero */
+  @media (max-width: 768px) {
+    .hero-section {
+      padding: 60px 24px 50px;
+    }
+
+    .hero-section p {
+      font-size: 0.97rem;
+    }
+  }
+
+  /* Mobile */
+  @media (max-width: 576px) {
+    .hero-section {
+      padding: 44px 20px 36px;
+    }
+
+    .hero-section p {
+      font-size: 0.92rem;
+    }
+
+    /* Cards: horizontal layout on mobile (icon left, text right) */
+    .feature-card {
+      flex-direction: row;
+      text-align: left;
+      align-items: flex-start;
+      padding: 22px 20px;
+      gap: 18px;
+      border-radius: 14px;
+    }
+
+    /* Disable lift on touch */
+    .feature-card:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    .feature-icon {
+      margin-bottom: 0;
+      width: 46px;
+      height: 46px;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .feature-card-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .feature-card .card-title {
+      font-size: 1.05rem;
+      margin-bottom: 6px;
+    }
+
+    .feature-card .card-text {
+      font-size: 0.85rem;
+      margin-bottom: 14px;
+    }
+
+    .feature-btn {
+      padding: 9px 0;
+      font-size: 0.85rem;
+    }
+
+    /* Tighter grid spacing */
+    .features-grid {
+      gap: 12px !important;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .hero-section { padding: 36px 16px 28px; }
+    .feature-card { padding: 18px 16px; gap: 14px; }
+    .feature-icon { width: 40px; height: 40px; font-size: 1rem; }
+  }
 </style>
 
 <div class="hero-section">
@@ -142,47 +223,55 @@
   <p>Discover and manage your favorite movies all in one place.</p>
 </div>
 
-<div class="container my-5">
-  <div class="row">
-    <div class="col-md-4 mb-4">
+<div class="container my-4 my-md-5">
+  <div class="row features-grid g-3 g-md-4">
+
+    <div class="col-md-4 col-12">
       <div class="feature-card">
         <div class="feature-icon">
           <i class="fas fa-star"></i>
         </div>
-        <h5 class="card-title">Write Reviews</h5>
-        <p class="card-text">
-          Express your opinions about the movies you've watched. Let others know what's worth watching or skipping.
-        </p>
-        <a href="{% url 'user_reviews' %}" class="btn feature-btn">My Reviews</a>
+        <div class="feature-card-body">
+          <h5 class="card-title">Write Reviews</h5>
+          <p class="card-text">
+            Express your opinions about the movies you've watched. Let others know what's worth watching or skipping.
+          </p>
+          <a href="{% url 'user_reviews' %}" class="btn feature-btn">My Reviews</a>
+        </div>
       </div>
     </div>
 
-    <div class="col-md-4 mb-4">
+    <div class="col-md-4 col-12">
       <div class="feature-card feature-card--accent">
         <div class="feature-icon">
           <i class="fas fa-film"></i>
         </div>
-        <h5 class="card-title">Browse Films</h5>
-        <p class="card-text">
-          Explore a world of movies. Browse what's trending, top-rated, or upcoming straight from TMDB's vast
-          collection.
-        </p>
-        <a href="{% url 'movie_list' %}" class="btn feature-btn feature-btn--solid">Browse</a>
+        <div class="feature-card-body">
+          <h5 class="card-title">Browse Films</h5>
+          <p class="card-text">
+            Explore a world of movies. Browse what's trending, top-rated, or upcoming straight from TMDB's vast
+            collection.
+          </p>
+          <a href="{% url 'movie_list' %}" class="btn feature-btn feature-btn--solid">Browse</a>
+        </div>
       </div>
     </div>
 
-    <div class="col-md-4 mb-4">
+    <div class="col-md-4 col-12">
       <div class="feature-card">
         <div class="feature-icon">
           <i class="fas fa-list"></i>
         </div>
-        <h5 class="card-title">Manage Watchlist</h5>
-        <p class="card-text">
-          Save movies to watch later. Easily access your personal watchlist and track what's next.
-        </p>
-        <a href="{% url 'user_watchlist' %}" class="btn feature-btn">Go to Watchlist</a>
+        <div class="feature-card-body">
+          <h5 class="card-title">Manage Watchlist</h5>
+          <p class="card-text">
+            Save movies to watch later. Easily access your personal watchlist and track what's next.
+          </p>
+          <a href="{% url 'user_watchlist' %}" class="btn feature-btn">Go to Watchlist</a>
+        </div>
       </div>
     </div>
+
   </div>
 </div>
 

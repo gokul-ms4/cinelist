@@ -62,7 +62,6 @@
     gap: 12px;
     padding-bottom: 18px;
     border-bottom: 1px solid var(--border);
-    margin-bottom: 0;
     flex-wrap: wrap;
   }
 
@@ -95,17 +94,14 @@
     transform: translateY(-1px);
   }
 
-  /* ===== Review Row (Letterboxd style) ===== */
+  /* ===== Review Row ===== */
   .review-row {
     display: flex;
     gap: 16px;
     padding: 26px 0;
     border-bottom: 1px solid var(--border);
   }
-
-  .review-row:last-child {
-    border-bottom: none;
-  }
+  .review-row:last-child { border-bottom: none; }
 
   .review-avatar {
     width: 44px;
@@ -141,7 +137,6 @@
     font-size: 0.85rem;
     color: var(--text-muted);
   }
-
   .review-byline-text a {
     font-weight: 700;
     color: var(--text);
@@ -150,10 +145,7 @@
   }
   .review-byline-text a:hover { color: var(--gold-bright); }
 
-  .stars {
-    display: flex;
-    gap: 1px;
-  }
+  .stars { display: flex; gap: 1px; }
   .star-filled { color: var(--gold); font-size: 0.9rem; }
   .star-empty  { color: var(--border); font-size: 0.9rem; }
 
@@ -173,6 +165,7 @@
     font-size: 0.76rem;
     color: var(--text-muted);
     margin-left: auto;
+    white-space: nowrap;
   }
 
   .review-content {
@@ -184,7 +177,6 @@
     margin: 0 0 14px;
   }
 
-  /* Edit/Delete actions */
   .review-actions {
     display: flex;
     align-items: center;
@@ -256,10 +248,72 @@
     margin: 0 0 24px;
   }
 
-  @media (max-width: 576px) {
-    .review-row { gap: 12px; }
-    .review-date { margin-left: 0; }
-    .review-byline { gap: 6px; }
+  /* ===== Mobile tweaks ===== */
+  @media (max-width: 575px) {
+    .reviews-hero {
+      padding: 36px 0 0;
+    }
+
+    .page-title {
+      font-size: 1.55rem;
+    }
+
+    .page-sub {
+      margin-bottom: 24px;
+    }
+
+    /* Topbar: count left, button right — already wraps via flex-wrap,
+       but make the button full-width when it wraps to avoid orphan button */
+    .reviews-topbar {
+      padding-bottom: 14px;
+    }
+
+    .btn-write-review {
+      width: 100%;
+      justify-content: center;
+    }
+
+    /* Review row: shrink gap and avatar on very narrow screens */
+    .review-row {
+      gap: 10px;
+      padding: 20px 0;
+    }
+
+    .review-avatar {
+      width: 36px;
+      height: 36px;
+      font-size: 0.85rem;
+    }
+
+    /* Byline: pull date below stars instead of pushing it right */
+    .review-byline {
+      gap: 6px;
+      row-gap: 4px;
+    }
+
+    .review-date {
+      margin-left: 0;
+      width: 100%;       /* force onto its own line */
+      order: 999;        /* always last in the flex row */
+    }
+
+    .review-content {
+      font-size: 0.88rem;
+    }
+
+    /* Action buttons: stack side by side but stretch to fill */
+    .review-actions {
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      flex: 1;
+      justify-content: center;
+    }
+
+    .empty-state {
+      padding: 60px 20px;
+    }
   }
 </style>
 
@@ -349,13 +403,13 @@
                   <a href="{% url 'review_update' movie_id %}" class="btn-action btn-action-edit">
                     <i class="fas fa-edit"></i> Edit
                   </a>
-                  <a href="{% url 'review_delete' review.id %}" 
-   class="btn-action btn-action-delete"
-   data-url="{% url 'review_delete' movie_id %}"
-   data-title="{{ review.title }}"
-   onclick="openDeleteModal(this); return false;">
-  <i class="fas fa-trash"></i> Delete
-</a>
+                  <a href="#"
+                     class="btn-action btn-action-delete"
+                     data-url="{% url 'review_delete' movie_id %}"
+                     data-title="{{ review.title }}"
+                     onclick="openDeleteModal(this); return false;">
+                    <i class="fas fa-trash"></i> Delete
+                  </a>
                 </div>
               {% endif %}
             </div>
@@ -476,8 +530,7 @@
   function openDeleteModal(el) {
     document.getElementById('modal-movie-title').textContent = el.getAttribute('data-title');
     document.getElementById('modal-confirm-btn').href = el.getAttribute('data-url');
-    const modal = document.getElementById('delete-modal');
-    modal.style.display = 'flex';
+    document.getElementById('delete-modal').style.display = 'flex';
   }
 
   function closeDeleteModal() {

@@ -41,7 +41,9 @@
   /* ── Search bar ── */
   .search-wrap {
     position: relative;
-    max-width: 280px;
+    /* Full width up to a comfortable max */
+    max-width: 360px;
+    width: 100%;
     margin: 0 auto;
   }
 
@@ -65,12 +67,14 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 999px;
-    padding: 8px 14px 8px 36px;
-    font-size: 0.82rem;
+    padding: 10px 16px 10px 38px;
+    font-size: 0.9rem;
     font-family: "Inter", sans-serif;
     color: var(--text);
     outline: none;
     transition: border-color 160ms ease, box-shadow 160ms ease;
+    /* Prevent iOS zoom — needs font-size ≥ 16px OR explicitly set */
+    font-size: 16px;
   }
 
   #userSearch::placeholder { color: var(--text-muted); }
@@ -89,7 +93,7 @@
     min-height: 18px;
   }
 
-  /* ── User card — compact horizontal ── */
+  /* ── User card ── */
   .user-card {
     display: flex;
     align-items: center;
@@ -181,6 +185,61 @@
 
   #noResults { display: none; }
   #noResults strong { color: var(--text); }
+
+  /* ─────────────────────────────────────────
+     MOBILE RESPONSIVE
+     ───────────────────────────────────────── */
+  @media (max-width: 576px) {
+    .users-hero {
+      /* Reduce top padding — navbar already provides clearance */
+      padding: 40px 16px 22px;
+    }
+
+    .users-hero p {
+      font-size: 0.88rem;
+    }
+
+    /* Search bar fills the screen with comfortable margins */
+    .search-wrap {
+      max-width: 100%;
+    }
+
+    /* Single-column cards on small phones */
+    #usersGrid .col-sm-6 {
+      width: 100%;
+    }
+
+    .user-card {
+      padding: 12px 14px;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 38px;
+      height: 38px;
+      font-size: 0.9rem;
+    }
+
+    .user-info .username {
+      font-size: 0.84rem;
+    }
+
+    .user-info .email {
+      font-size: 0.74rem;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .users-hero {
+      padding: 32px 14px 20px;
+    }
+
+    .user-avatar {
+      width: 34px;
+      height: 34px;
+      font-size: 0.82rem;
+    }
+  }
 </style>
 
 <div class="users-hero">
@@ -200,13 +259,13 @@
   </div>
 </div>
 
-<div class="container my-5">
+<div class="container my-4 my-md-5">
   <p id="searchCount"></p>
 
   <div class="row g-2" id="usersGrid">
     {% for user in users %}
       {% if user not in profiles %}
-        <div class="col-md-4 col-sm-6 user-item"
+        <div class="col-12 col-sm-6 col-md-4 user-item"
              data-username="{{ user.username|lower }}"
              data-email="{{ user.email|lower }}">
           <a href="{% url 'user_info' user.id %}" class="user-card">

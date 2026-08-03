@@ -49,18 +49,16 @@
   }
 
   /* Review card */
- .review-card {
-  height: 100%;
-  max-width: 300px; /* new — stops the poster from ballooning when the grid has extra room */
-  margin: 0 auto;   /* new — centers the card within its column instead of stretching full-width */
-  background-color: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
-}
+  .review-card {
+    height: 100%;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+  }
 
   .review-card:hover {
     transform: translateY(-6px);
@@ -69,20 +67,20 @@
   }
 
   /* Poster */
-.review-poster-wrap {
-  position: relative;
-  overflow: hidden;
-  height: 180px; /* fixed compact height — poster stays visible, card fits on screen */
-}
+  .review-poster-wrap {
+    position: relative;
+    overflow: hidden;
+    height: 180px;
+  }
 
-.review-poster {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top; /* shows the top of the poster (faces/title) instead of center-cropping */
-  display: block;
-  transition: transform 400ms ease;
-}
+  .review-poster {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+    transition: transform 400ms ease;
+  }
 
   .review-card:hover .review-poster {
     transform: scale(1.04);
@@ -99,7 +97,6 @@
     pointer-events: none;
   }
 
-  /* Poster overlay link */
   .poster-link {
     position: absolute;
     inset: 0;
@@ -107,12 +104,12 @@
   }
 
   /* Card body */
-.review-body {
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-}
+  .review-body {
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
 
   .review-title {
     font-family: 'Playfair Display', serif;
@@ -168,7 +165,6 @@
     overflow: hidden;
   }
 
-  /* Divider */
   .review-divider {
     height: 1px;
     background: var(--border);
@@ -271,6 +267,65 @@
     color: #16130c;
     transform: translateY(-2px);
   }
+
+  /* ── Mobile tweaks ── */
+  @media (max-width: 575px) {
+    .reviews-section {
+      padding: 32px 0 60px;
+    }
+
+    .page-title {
+      font-size: 1.6rem;
+    }
+
+    /* On the smallest screens Bootstrap gives col-sm-6 two columns.
+       At ~320px that's ~148px per card — too tight. Force single column. */
+    .col-sm-6 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+
+    /* With a single full-width card, a taller poster looks better */
+    .review-poster-wrap {
+      height: 220px;
+    }
+
+    /* Buttons: stretch to fill width side by side */
+    .review-body .d-flex {
+      flex-wrap: wrap;
+    }
+
+    .review-body .action-btn {
+      flex: 1;
+      justify-content: center;
+      font-size: 0.78rem;
+      padding: 8px 10px;
+    }
+
+    /* Disable card hover lift on touch — it sticks after tap */
+    .review-card:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    .empty-state {
+      padding: 60px 20px;
+    }
+  }
+
+  /* Tablet: two columns (col-sm-6 default) — just make buttons wrap cleanly */
+  @media (min-width: 576px) and (max-width: 767px) {
+    .review-body .d-flex {
+      flex-wrap: wrap;
+    }
+
+    .review-body .action-btn {
+      flex: 1;
+      justify-content: center;
+      font-size: 0.76rem;
+      padding: 7px 8px;
+    }
+  }
 </style>
 
 <div class="reviews-section">
@@ -305,12 +360,10 @@
               <!-- Body -->
               <div class="review-body">
 
-                <!-- Title -->
                 <a href="{% url 'movie_detail' review.movie_id %}" class="review-title">
                   {{ review.title }}
                 </a>
 
-                <!-- Stars -->
                 <div class="stars-row">
                   <div class="stars">
                     {% for i in range %}
@@ -324,12 +377,10 @@
                   <span class="rating-label">{{ review.rating }} / 5</span>
                 </div>
 
-                <!-- Review text -->
                 <p class="review-content">{{ review.content }}</p>
 
                 <div class="review-divider"></div>
 
-                <!-- Actions -->
                 <div class="d-flex gap-2">
                   <a href="{% url 'review_update' review.movie_id %}" class="action-btn btn-edit">
                     <i class="fas fa-pen"></i> Edit
@@ -460,8 +511,7 @@
   function openDeleteModal(el) {
     document.getElementById('modal-movie-title').textContent = el.getAttribute('data-title');
     document.getElementById('modal-confirm-btn').href = el.getAttribute('data-url');
-    const modal = document.getElementById('delete-modal');
-    modal.style.display = 'flex';
+    document.getElementById('delete-modal').style.display = 'flex';
   }
 
   function closeDeleteModal() {

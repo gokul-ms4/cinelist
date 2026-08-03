@@ -20,6 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from myapp.views import *
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from django.views.generic import TemplateView
 
 
 urlpatterns = [
@@ -62,5 +63,7 @@ urlpatterns = [
     path('notifications/mark-read/', MarkNotificationsReadView.as_view(), name='mark_notifications_read'),
     path('user/toggle_private_account',ToggleAcoountPrivacyView.as_view(),name='toggle_private_account'),
 
-    path('delete_account/',DeleteUserAccountView.as_view(),name="delete_account")
+    path('delete_account/',DeleteUserAccountView.as_view(),name="delete_account"),
+
+    path("sw.js", TemplateView.as_view(template_name="sw.js",content_type="application/javascript"), name="sw"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

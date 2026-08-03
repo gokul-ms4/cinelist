@@ -13,6 +13,7 @@
       var(--ink);
   }
 
+  /* ── Avatar ── */
   .avatar-wrapper {
     position: relative;
     width: 108px;
@@ -43,6 +44,14 @@
     opacity: 1;
   }
 
+  /* Always-visible on touch devices (no hover) */
+  @media (hover: none) {
+    .avatar-overlay {
+      opacity: 1;
+      background: rgba(0, 0, 0, 0.4);
+    }
+  }
+
   .overlay-btn {
     display: flex;
     align-items: center;
@@ -64,6 +73,7 @@
     color: #16130c;
   }
 
+  /* ── Profile card ── */
   .profile-card {
     background-color: var(--surface);
     border: 1px solid var(--border);
@@ -97,14 +107,13 @@
     height: 260px;
     opacity: 0.45;
     pointer-events: none;
-    clip-path: inset(0 0 0 0 round 0);
   }
 
   /* ── Settings button ── */
   .profile-settings-btn {
     position: absolute;
-    top: 18px;
-    right: 18px;
+    top: 14px;
+    right: 14px;
     width: 36px;
     height: 36px;
     border-radius: 50%;
@@ -119,6 +128,9 @@
     z-index: 5;
     transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
     font-size: 16px;
+    /* Good tap target */
+    min-width: 36px;
+    min-height: 36px;
   }
 
   .profile-settings-btn:hover,
@@ -137,7 +149,7 @@
     transform: rotate(45deg);
   }
 
-  /* ── Settings dropdown — fixed position, outside all containers ── */
+  /* ── Settings dropdown ── */
   .settings-dropdown {
     position: fixed;
     background: var(--surface);
@@ -185,6 +197,8 @@
     background: transparent;
     width: 100%;
     text-align: left;
+    /* Comfortable touch height */
+    min-height: 40px;
   }
 
   .settings-menu-item:hover {
@@ -200,17 +214,9 @@
     text-align: center;
   }
 
-  .settings-menu-item.danger {
-    color: #e05050;
-  }
-
-  .settings-menu-item.danger i {
-    color: #e05050;
-  }
-
-  .settings-menu-item.danger:hover {
-    background: rgba(224, 80, 80, 0.08);
-  }
+  .settings-menu-item.danger { color: #e05050; }
+  .settings-menu-item.danger i { color: #e05050; }
+  .settings-menu-item.danger:hover { background: rgba(224, 80, 80, 0.08); }
 
   .settings-menu-sep {
     height: 1px;
@@ -228,11 +234,10 @@
     cursor: pointer;
     transition: background 0.13s ease;
     gap: 10px;
+    min-height: 40px;
   }
 
-  .settings-toggle-row:hover {
-    background: var(--surface-raised);
-  }
+  .settings-toggle-row:hover { background: var(--surface-raised); }
 
   .settings-toggle-left {
     display: flex;
@@ -275,9 +280,7 @@
     padding: 0;
   }
 
-  .toggle-switch.on {
-    background: var(--gold);
-  }
+  .toggle-switch.on { background: var(--gold); }
 
   .toggle-switch::after {
     content: '';
@@ -292,11 +295,9 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   }
 
-  .toggle-switch.on::after {
-    transform: translateX(16px);
-  }
+  .toggle-switch.on::after { transform: translateX(16px); }
 
-  /* ── Shared modal styles ── */
+  /* ── Modals ── */
   .modal-overlay {
     position: fixed;
     inset: 0;
@@ -370,9 +371,7 @@
     margin: 0 0 22px;
   }
 
-  .modal-input-group {
-    margin-bottom: 14px;
-  }
+  .modal-input-group { margin-bottom: 14px; }
 
   .modal-input-group label {
     display: block;
@@ -396,6 +395,8 @@
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
     font-family: inherit;
     box-sizing: border-box;
+    /* Prevent iOS zoom on focus (font-size must be ≥16px) */
+    font-size: 16px;
   }
 
   .modal-input-group input:focus {
@@ -404,11 +405,6 @@
   }
 
   .modal-input-group input.error {
-    border-color: #e05050;
-    box-shadow: 0 0 0 3px rgba(224, 80, 80, 0.12);
-  }
-
-  .modal-input-group input.error:focus {
     border-color: #e05050;
     box-shadow: 0 0 0 3px rgba(224, 80, 80, 0.12);
   }
@@ -447,14 +443,11 @@
     line-height: 1.55;
   }
 
-  .modal-actions {
-    display: flex;
-    gap: 8px;
-  }
+  .modal-actions { display: flex; gap: 8px; }
 
   .modal-btn-cancel {
     flex: 1;
-    padding: 10px;
+    padding: 12px;
     border-radius: 10px;
     border: 1px solid var(--border);
     background: transparent;
@@ -463,6 +456,7 @@
     cursor: pointer;
     font-family: inherit;
     transition: background 0.13s ease, color 0.13s ease;
+    min-height: 44px;
   }
 
   .modal-btn-cancel:hover {
@@ -472,7 +466,7 @@
 
   .modal-btn-confirm {
     flex: 1;
-    padding: 10px;
+    padding: 12px;
     border-radius: 10px;
     border: none;
     font-size: 0.875rem;
@@ -480,21 +474,12 @@
     cursor: pointer;
     font-family: inherit;
     transition: opacity 0.13s ease;
+    min-height: 44px;
   }
 
-  .modal-btn-confirm.gold {
-    background: var(--gold);
-    color: #16130c;
-  }
-
-  .modal-btn-confirm.danger {
-    background: #e05050;
-    color: #fff;
-  }
-
-  .modal-btn-confirm:hover {
-    opacity: 0.88;
-  }
+  .modal-btn-confirm.gold { background: var(--gold); color: #16130c; }
+  .modal-btn-confirm.danger { background: #e05050; color: #fff; }
+  .modal-btn-confirm:hover { opacity: 0.88; }
 
   /* ── Profile body ── */
   .profile-body {
@@ -540,6 +525,8 @@
     color: var(--text);
     margin: 10px 0 0;
     text-transform: uppercase;
+    word-break: break-word;
+    max-width: 100%;
   }
 
   .profile-joined {
@@ -578,13 +565,15 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    white-space: nowrap;
+    word-break: break-all;
+    max-width: 100%;
   }
 
   .profile-meta span i {
     color: var(--gold);
     width: 14px;
     text-align: center;
+    flex-shrink: 0;
   }
 
   .profile-stats {
@@ -627,6 +616,7 @@
     margin: 0;
   }
 
+  /* ── Favorites ── */
   .favorites-section {
     max-width: 900px;
     margin: 44px auto 0;
@@ -651,12 +641,19 @@
     gap: 14px;
     overflow-x: auto;
     padding-bottom: 8px;
+    /* Smooth momentum scroll on iOS */
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
   }
 
   .favorites-strip::-webkit-scrollbar { height: 6px; }
   .favorites-strip::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
 
-  .fav-poster { flex: 0 0 auto; width: 110px; }
+  .fav-poster {
+    flex: 0 0 auto;
+    width: 110px;
+    scroll-snap-align: start;
+  }
 
   .fav-poster img {
     width: 110px;
@@ -700,6 +697,7 @@
     margin-bottom: 8px;
   }
 
+  /* ── Activity ── */
   .activity-section {
     max-width: 900px;
     margin: 44px auto 0;
@@ -759,9 +757,130 @@
     border-radius: 999px;
   }
 
+  /* ─────────────────────────────────────────
+     MOBILE RESPONSIVE
+     ───────────────────────────────────────── */
   @media (max-width: 576px) {
-    .profile-body { padding: 0 20px 30px; }
-    .profile-meta { gap: 8px 16px; }
+    .profile-hero {
+      padding: 20px 12px 16px;
+    }
+
+    .profile-cover {
+      height: 120px;
+    }
+
+    /* Reel decoration clips on small covers */
+    .profile-cover .reel {
+      width: 200px;
+      height: 200px;
+      right: -40px;
+    }
+
+    .profile-body {
+      padding: 0 18px 28px;
+    }
+
+    .profile-top {
+      margin-top: -44px;
+    }
+
+    /* Smaller avatar */
+    .avatar-wrapper,
+    .avatar-wrapper .profile-avatar,
+    .profile-avatar {
+      width: 88px;
+      height: 88px;
+    }
+
+    .profile-avatar {
+      font-size: 2rem;
+    }
+
+    .profile-username {
+      font-size: 1.25rem;
+    }
+
+    .profile-bio {
+      font-size: 0.85rem;
+    }
+
+    /* Meta stacks vertically on small screens */
+    .profile-meta {
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+      font-size: 0.82rem;
+    }
+
+    /* 2-column stat grid */
+    .profile-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .stat-box {
+      padding: 12px 10px;
+      min-width: unset;
+      width: 100%;
+    }
+
+    .stat-box .stat-count { font-size: 1.15rem; }
+
+    /* Sections */
+    .favorites-section,
+    .activity-section {
+      margin-top: 28px;
+      padding: 0 12px;
+    }
+
+    .activity-panel {
+      padding: 20px 18px;
+    }
+
+    .activity-panel h4 {
+      font-size: 0.95rem;
+      white-space: normal;
+    }
+
+    /* Dropdown: ensure it doesn't go off the left edge on small screens */
+    .settings-dropdown {
+      min-width: 200px;
+      max-width: calc(100vw - 24px);
+    }
+
+    /* Modal box fills the screen bottom-sheet style on phones */
+    .modal-overlay {
+      align-items: flex-end;
+      padding: 0;
+    }
+
+    .modal-box {
+      border-radius: 20px 20px 0 0;
+      max-width: 100%;
+      padding: 28px 22px 32px;
+      /* Account for home indicator on iOS */
+      padding-bottom: max(32px, env(safe-area-inset-bottom));
+    }
+  }
+
+  @media (max-width: 380px) {
+    .profile-username { font-size: 1.1rem; }
+    .stat-box .stat-count { font-size: 1rem; }
+
+    .avatar-wrapper,
+    .avatar-wrapper .profile-avatar,
+    .profile-avatar {
+      width: 78px;
+      height: 78px;
+    }
+
+    .profile-avatar { font-size: 1.75rem; }
+    .profile-top { margin-top: -39px; }
+
+    .fav-poster { width: 90px; }
+    .fav-poster img { width: 90px; height: 132px; }
   }
 </style>
 
@@ -863,7 +982,6 @@
           <p class="stat-count">{{ watchlist|length|default:"0" }}</p>
         </a>
       </div>
-
     </div>
   </div>
 </div>
@@ -919,16 +1037,14 @@
   </div>
 </div>
 
-<!-- Dropdown -->
+<!-- Settings dropdown -->
 <div class="settings-dropdown" id="profileSettingsDropdown" role="menu">
   <div class="settings-menu-label">Account</div>
   <a class="settings-menu-item" href="{% url 'update' %}" role="menuitem">
-    <i class="fa-regular fa-pen-to-square"></i>
-    Edit profile
+    <i class="fa-regular fa-pen-to-square"></i>Edit profile
   </a>
   <a class="settings-menu-item" href="{% url 'current_password' %}" role="menuitem">
-    <i class="fa-solid fa-key"></i>
-    Reset password
+    <i class="fa-solid fa-key"></i>Reset password
   </a>
   <div class="settings-menu-sep"></div>
   <div class="settings-menu-label">Privacy</div>
@@ -954,13 +1070,11 @@
   <div class="settings-menu-sep"></div>
   <div class="settings-menu-label">Danger zone</div>
   <button class="settings-menu-item danger" id="deleteAccountBtn" type="button" role="menuitem">
-    <i class="fa-solid fa-trash-can"></i>
-    Delete account
+    <i class="fa-solid fa-trash-can"></i>Delete account
   </button>
   <div class="settings-menu-sep"></div>
   <a class="settings-menu-item danger" href="{% url 'logout' %}" role="menuitem">
-    <i class="fa-solid fa-right-from-bracket"></i>
-    Sign out
+    <i class="fa-solid fa-right-from-bracket"></i>Sign out
   </a>
 </div>
 
@@ -972,23 +1086,14 @@
     </div>
     <h3 id="privateModalTitle">Enable private account</h3>
     <p>Confirm your current password to make this account private. Only your followers will be able to see your watchlist and reviews.</p>
-
     <div class="modal-input-group">
       <label for="privateConfirmPwd">Current password</label>
-      <input
-        type="password"
-        id="privateConfirmPwd"
-        name="password"
-        placeholder="Enter your password"
-        autocomplete="current-password"
-      />
+      <input type="password" id="privateConfirmPwd" name="password" placeholder="Enter your password" autocomplete="current-password"/>
     </div>
-
     <div class="modal-notice gold">
       <i class="fa-solid fa-circle-info"></i>
       <span>Existing followers won't be removed. New follow requests will need your approval.</span>
     </div>
-
     <div class="modal-actions">
       <button class="modal-btn-cancel" id="privateModalCancel" type="button">Cancel</button>
       <button class="modal-btn-confirm gold" id="privateModalConfirm" type="button">Make private</button>
@@ -1004,23 +1109,14 @@
     </div>
     <h3 id="deleteModalTitle">Delete account</h3>
     <p>This will permanently erase your profile, watchlist, reviews, and all activity. This action cannot be undone.</p>
-
     <div class="modal-input-group">
       <label for="deleteConfirmPwd">Confirm your password</label>
-      <input
-        type="password"
-        id="deleteConfirmPwd"
-        name="password"
-        placeholder="Enter your password"
-        autocomplete="current-password"
-      />
+      <input type="password" id="deleteConfirmPwd" name="password" placeholder="Enter your password" autocomplete="current-password"/>
     </div>
-
     <div class="modal-notice danger">
       <i class="fa-solid fa-circle-exclamation"></i>
       <span>Your account and all associated data will be permanently deleted and cannot be recovered.</span>
     </div>
-
     <div class="modal-actions">
       <button class="modal-btn-cancel" id="deleteModalCancel" type="button">Cancel</button>
       <button class="modal-btn-confirm danger" id="deleteModalConfirm" type="button">Delete account</button>
@@ -1032,8 +1128,6 @@
 document.addEventListener('DOMContentLoaded', function () {
   const settingsBtn    = document.getElementById('profileSettingsBtn');
   const dropdown       = document.getElementById('profileSettingsDropdown');
-
-  // Private account elements
   const toggleRow      = document.getElementById('privateToggleRow');
   const toggleSwitch   = document.getElementById('privateToggleSwitch');
   const toggleSubLabel = document.getElementById('toggleSubLabel');
@@ -1041,8 +1135,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const privateCancel  = document.getElementById('privateModalCancel');
   const privateConfirm = document.getElementById('privateModalConfirm');
   const privatePwd     = document.getElementById('privateConfirmPwd');
-
-  // Delete account elements
   const deleteBtn      = document.getElementById('deleteAccountBtn');
   const deleteOverlay  = document.getElementById('deleteModalOverlay');
   const deleteCancel   = document.getElementById('deleteModalCancel');
@@ -1051,11 +1143,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
   let isPrivate = toggleSwitch.classList.contains('on');
 
-  // ── Dropdown open / close ──
+  // ── Dropdown ──
   function openDropdown() {
     const rect = settingsBtn.getBoundingClientRect();
+    // On very small screens keep dropdown inside viewport
+    const rightOffset = window.innerWidth - rect.right;
     dropdown.style.top   = (rect.bottom + window.scrollY + 8) + 'px';
-    dropdown.style.right = (window.innerWidth - rect.right) + 'px';
+    dropdown.style.right = Math.max(8, rightOffset) + 'px';
     dropdown.style.display = 'block';
     setTimeout(() => dropdown.classList.add('visible'), 10);
     settingsBtn.classList.add('open');
@@ -1066,7 +1160,7 @@ document.addEventListener('DOMContentLoaded', function () {
     dropdown.classList.remove('visible');
     settingsBtn.classList.remove('open');
     settingsBtn.setAttribute('aria-expanded', 'false');
-    setTimeout(() => dropdown.style.display = 'none', 160);
+    setTimeout(() => { dropdown.style.display = 'none'; }, 160);
   }
 
   settingsBtn.addEventListener('click', (e) => {
@@ -1075,26 +1169,18 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   document.addEventListener('click', (e) => {
-    if (!settingsBtn.contains(e.target) && !dropdown.contains(e.target)) {
-      closeDropdown();
-    }
+    if (!settingsBtn.contains(e.target) && !dropdown.contains(e.target)) closeDropdown();
   });
 
   // ── Private toggle ──
   function handleToggle(e) {
     e.stopPropagation();
-    if (!isPrivate) {
-      closeDropdown();
-      openPrivateModal();
-    } else {
-      submitPrivacyChange(false, '');
-    }
+    if (!isPrivate) { closeDropdown(); openPrivateModal(); }
+    else { submitPrivacyChange(false, ''); }
   }
 
   toggleSwitch.addEventListener('click', handleToggle);
-  toggleRow.addEventListener('click', (e) => {
-    if (e.target !== toggleSwitch) handleToggle(e);
-  });
+  toggleRow.addEventListener('click', (e) => { if (e.target !== toggleSwitch) handleToggle(e); });
 
   function openPrivateModal() {
     privateOverlay.classList.add('visible');
@@ -1109,26 +1195,17 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   privateCancel.addEventListener('click', closePrivateModal);
-  privateOverlay.addEventListener('click', (e) => {
-    if (e.target === privateOverlay) closePrivateModal();
-  });
+  privateOverlay.addEventListener('click', (e) => { if (e.target === privateOverlay) closePrivateModal(); });
 
   privateConfirm.addEventListener('click', () => {
-    if (!privatePwd.value.trim()) {
-      privatePwd.classList.add('error');
-      privatePwd.focus();
-      return;
-    }
+    if (!privatePwd.value.trim()) { privatePwd.classList.add('error'); privatePwd.focus(); return; }
     submitPrivacyChange(true, privatePwd.value);
   });
 
   privatePwd.addEventListener('input', () => privatePwd.classList.remove('error'));
 
   // ── Delete account ──
-  deleteBtn.addEventListener('click', () => {
-    closeDropdown();
-    openDeleteModal();
-  });
+  deleteBtn.addEventListener('click', () => { closeDropdown(); openDeleteModal(); });
 
   function openDeleteModal() {
     deleteOverlay.classList.add('visible');
@@ -1143,45 +1220,32 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   deleteCancel.addEventListener('click', closeDeleteModal);
-  deleteOverlay.addEventListener('click', (e) => {
-    if (e.target === deleteOverlay) closeDeleteModal();
-  });
+  deleteOverlay.addEventListener('click', (e) => { if (e.target === deleteOverlay) closeDeleteModal(); });
 
   deleteConfirm.addEventListener('click', () => {
-    if (!deletePwd.value.trim()) {
-      deletePwd.classList.add('error');
-      deletePwd.focus();
-      return;
-    }
+    if (!deletePwd.value.trim()) { deletePwd.classList.add('error'); deletePwd.focus(); return; }
     submitDeleteAccount(deletePwd.value);
   });
 
   deletePwd.addEventListener('input', () => deletePwd.classList.remove('error'));
 
-  // ── Global Escape key ──
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      closePrivateModal();
-      closeDeleteModal();
-    }
+    if (e.key === 'Escape') { closePrivateModal(); closeDeleteModal(); }
   });
 
-  // ── CSRF helper ──
   function getCookie(name) {
     const val = document.cookie.split('; ').find(r => r.startsWith(name + '='));
     return val ? decodeURIComponent(val.split('=')[1]) : null;
   }
 
-  // ── Privacy fetch ──
   function submitPrivacyChange(makePrivate, password) {
     const body = new FormData();
     body.append('is_private', makePrivate ? '1' : '0');
     if (password) body.append('password', password);
-
     fetch("{% url 'toggle_private_account' %}", {
       method: 'POST',
       headers: { 'X-CSRFToken': getCookie('csrftoken') },
-      body: body,
+      body,
     })
     .then(r => r.json())
     .then(data => {
@@ -1189,9 +1253,7 @@ document.addEventListener('DOMContentLoaded', function () {
         isPrivate = makePrivate;
         toggleSwitch.classList.toggle('on', isPrivate);
         toggleSwitch.setAttribute('aria-checked', isPrivate ? 'true' : 'false');
-        toggleSubLabel.textContent = isPrivate
-          ? 'Your account is private'
-          : 'Only followers see your activity';
+        toggleSubLabel.textContent = isPrivate ? 'Your account is private' : 'Only followers see your activity';
         closePrivateModal();
       } else {
         privatePwd.classList.add('error');
@@ -1200,38 +1262,28 @@ document.addEventListener('DOMContentLoaded', function () {
         privatePwd.placeholder = data.error || 'Incorrect password';
       }
     })
-    .catch(() => {
-      privatePwd.classList.add('error');
-      privatePwd.placeholder = 'Something went wrong, try again';
-    });
+    .catch(() => { privatePwd.classList.add('error'); privatePwd.placeholder = 'Something went wrong, try again'; });
   }
 
-  // ── Delete account fetch ──
   function submitDeleteAccount(password) {
     const body = new FormData();
     body.append('password', password);
-
-    fetch("{% url 'delete_account'  %}", {
+    fetch("{% url 'delete_account' %}", {
       method: 'POST',
       headers: { 'X-CSRFToken': getCookie('csrftoken') },
-      body: body,
+      body,
     })
     .then(r => r.json())
     .then(data => {
-      if (data.success) {
-        // Redirect after successful deletion
-        window.location.href = data.redirect || '/';
-      } else {
+      if (data.success) { window.location.href = data.redirect || '/'; }
+      else {
         deletePwd.classList.add('error');
         deletePwd.focus();
         deletePwd.value = '';
         deletePwd.placeholder = data.error || 'Incorrect password';
       }
     })
-    .catch(() => {
-      deletePwd.classList.add('error');
-      deletePwd.placeholder = 'Something went wrong, try again';
-    });
+    .catch(() => { deletePwd.classList.add('error'); deletePwd.placeholder = 'Something went wrong, try again'; });
   }
 });
 </script>

@@ -29,8 +29,8 @@ html, body {
 
 body {
   position: relative;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
+  overflow-x: hidden;
   background:
     radial-gradient(ellipse 900px 700px at 78% 30%, rgba(201,162,75,0.09), transparent 60%),
     radial-gradient(ellipse 1000px 800px at 10% 80%, rgba(201,162,75,0.05), transparent 55%),
@@ -43,7 +43,7 @@ body {
 
 body::after {
   content: "";
-  position: absolute;
+  position: fixed;
   inset: 0;
   pointer-events: none;
   opacity: 0.35;
@@ -51,6 +51,7 @@ body::after {
   background-size: 3px 3px;
 }
 
+/* ── Film rail (desktop only) ── */
 .film-rail {
   position: fixed;
   top: 0; left: 0;
@@ -72,6 +73,7 @@ body::after {
   opacity: 0.55;
 }
 
+/* ── Card ── */
 .login-card {
   width: 780px;
   max-width: 100%;
@@ -97,6 +99,7 @@ body::after {
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* ── Poster panel (desktop) ── */
 .poster {
   position: relative;
   width: 42%;
@@ -162,6 +165,7 @@ body::after {
   line-height: 1.5;
 }
 
+/* ── Form section ── */
 .form-section {
   width: 58%;
   padding: 40px 42px;
@@ -225,7 +229,7 @@ body::after {
   font-size: 0.8rem;
 }
 
-/* Single-line message styles — no box */
+/* Single-line message styles */
 .auth-message {
   font-size: 0.82rem;
   font-weight: 500;
@@ -251,6 +255,8 @@ body::after {
   letter-spacing: 0.03em;
   margin-bottom: 20px;
   transition: color 160ms ease;
+  /* Bigger tap target on mobile */
+  padding: 4px 0;
 }
 
 .back-link:hover { color: var(--gold); }
@@ -299,11 +305,146 @@ body::after {
   outline-offset: 3px;
 }
 
-@media (max-width: 576px) {
+/* ── Mobile header bar (replaces hidden poster) ── */
+.mobile-header {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.mobile-header .mobile-eyebrow {
+  font-size: 0.62rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--gold-bright);
+  font-weight: 600;
+  margin: 0;
+}
+
+.mobile-header .mobile-reel {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+/* ── Responsive breakpoints ── */
+
+/* Tablet — tighten padding, shrink card a bit */
+@media (max-width: 768px) {
+  body {
+    padding: 16px;
+    align-items: flex-start;
+    padding-top: 32px;
+  }
+
   .film-rail { display: none; }
-  .login-card { margin-left: 0; flex-direction: column; min-height: auto; }
+
+  .login-card {
+    margin-left: 0;
+    width: 100%;
+    min-height: auto;
+  }
+
+  .poster {
+    width: 38%;
+    padding: 22px 18px;
+  }
+
+  .poster-title {
+    font-size: 1.55rem;
+  }
+
+  .form-section {
+    width: 62%;
+    padding: 32px 28px;
+  }
+}
+
+/* Mobile — single column, no poster */
+@media (max-width: 576px) {
+  body {
+    padding: 12px;
+    padding-top: 20px;
+    align-items: flex-start;
+    min-height: 100dvh;
+  }
+
+  .film-rail { display: none; }
+
+  .login-card {
+    margin-left: 0;
+    flex-direction: column;
+    min-height: auto;
+    border-radius: 14px;
+    width: 100%;
+  }
+
+  /* Hide desktop poster, show mobile header instead */
   .poster { display: none; }
-  .form-section { width: 100%; padding: 32px 26px; }
+
+  .mobile-header { display: flex; }
+
+  .form-section {
+    width: 100%;
+    padding: 28px 22px 32px;
+    justify-content: flex-start;
+  }
+
+  .form-section h2 {
+    font-size: 1.45rem;
+    margin-bottom: 6px;
+  }
+
+  .form-section .subtext {
+    font-size: 0.82rem;
+    margin-bottom: 20px;
+  }
+
+  /* Bigger OTP input for thumbs */
+  .form-section form input {
+    padding: 14px 12px;
+    font-size: 1.25rem;
+    letter-spacing: 0.45em;
+    border-radius: 10px;
+    /* Prevent iOS zoom on focus (needs font-size ≥ 16px) */
+    font-size: 16px;
+  }
+
+  /* Larger tap target for verify button */
+  .btn-danger {
+    padding: 14px 0;
+    font-size: 0.95rem;
+  }
+
+  .back-link {
+    margin-bottom: 18px;
+    font-size: 0.82rem;
+    /* Extra tap area */
+    padding: 6px 0;
+    margin-left: -2px;
+  }
+
+  .resend-row {
+    margin-top: 20px;
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  .auth-message {
+    font-size: 0.84rem;
+    margin-bottom: 14px;
+  }
+}
+
+/* Very small phones (SE, Galaxy A series) */
+@media (max-width: 360px) {
+  body { padding: 8px; padding-top: 16px; }
+
+  .form-section { padding: 22px 18px 28px; }
+
+  .form-section h2 { font-size: 1.3rem; }
 }
 </style>
 {% endblock %}
@@ -337,6 +478,19 @@ body::after {
   </div>
 
   <div class="form-section">
+
+    <!-- Mobile-only brand header (replaces the hidden poster) -->
+    <div class="mobile-header" aria-hidden="true">
+      <svg class="mobile-reel" viewBox="0 0 400 400" fill="none">
+        <circle cx="200" cy="200" r="190" stroke="#c9a24b" stroke-width="6" opacity="0.25"/>
+        <circle cx="200" cy="200" r="46"  stroke="#c9a24b" stroke-width="6" opacity="0.3"/>
+        <circle cx="200" cy="90"  r="26"  stroke="#c9a24b" stroke-width="5" opacity="0.25"/>
+        <circle cx="310" cy="200" r="26"  stroke="#c9a24b" stroke-width="5" opacity="0.25"/>
+        <circle cx="200" cy="310" r="26"  stroke="#c9a24b" stroke-width="5" opacity="0.25"/>
+        <circle cx="90"  cy="200" r="26"  stroke="#c9a24b" stroke-width="5" opacity="0.25"/>
+      </svg>
+      <p class="mobile-eyebrow">Cinelist</p>
+    </div>
 
     <!-- Back arrow -->
     <a href="{% url 'signup' %}" class="back-link">

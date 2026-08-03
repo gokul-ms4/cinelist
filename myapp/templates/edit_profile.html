@@ -5,136 +5,247 @@
 {% endblock %}
 
 {% block content %}
-<div class="container my-5">
-  <div class="mx-auto" style="max-width: 600px;">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
 
-    <!-- Header -->
-    <div class="mb-4">
-      <p style="font-size:0.72rem; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); font-weight:600; margin-bottom:6px;">
-        <i class="fas fa-user-pen me-1"></i> Account
-      </p>
-      <h2 style="font-family:'Playfair Display',serif; font-weight:600; font-size:1.9rem; color:var(--text); margin:0 0 4px;">
-        Edit Profile
-      </h2>
-      <p style="font-size:0.88rem; color:var(--text-muted); margin:0;">
-        Update your personal information below.
-      </p>
-    </div>
+  /* ── Page wrapper ─────────────────────────────────────────── */
+  .edit-page {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 32px 16px 80px;
+  }
 
-    <!-- Card -->
-    <div style="
-      background: linear-gradient(160deg, var(--surface-raised) 0%, var(--surface) 100%);
-      border: 1px solid rgba(201,162,75,0.18);
-      border-radius: 18px;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(201,162,75,0.06);
-      overflow: hidden;
-      position: relative;
-    ">
-      <!-- Gold top accent -->
-      <div style="height:2px; background:linear-gradient(90deg, transparent, var(--gold), transparent); opacity:0.5;"></div>
+  /* ── Header ───────────────────────────────────────────────── */
+  .edit-eyebrow {
+    font-size: clamp(0.65rem, 2.5vw, 0.72rem);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
 
-      <div class="p-4 p-md-5">
-        <form action="" method="post" class="w-100">
-          {% csrf_token %}
+  .edit-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: clamp(1.5rem, 6vw, 1.9rem);
+    color: var(--text);
+    margin: 0 0 4px;
+  }
 
-          <!-- Style raw Django form output -->
-          <style>
-            #edit-profile-form p { margin-bottom: 18px; }
+  .edit-subtitle {
+    font-size: clamp(0.82rem, 3vw, 0.88rem);
+    color: var(--text-muted);
+    margin: 0 0 24px;
+    line-height: 1.5;
+  }
 
-            #edit-profile-form label {
-              display: block;
-              font-size: 0.75rem;
-              letter-spacing: 0.08em;
-              text-transform: uppercase;
-              color: var(--text-muted);
-              font-weight: 600;
-              margin-bottom: 7px;
-            }
+  /* ── Card ─────────────────────────────────────────────────── */
+  .edit-card {
+    background: linear-gradient(160deg, var(--surface-raised) 0%, var(--surface) 100%);
+    border: 1px solid rgba(201,162,75,0.18);
+    border-radius: 18px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(201,162,75,0.06);
+    overflow: hidden;
+    position: relative;
+  }
 
-            #edit-profile-form input,
-            #edit-profile-form select,
-            #edit-profile-form textarea {
-              width: 100%;
-              background-color: var(--ink);
-              border: 1px solid var(--border);
-              color: var(--text);
-              border-radius: 9px;
-              padding: 11px 14px;
-              font-size: 0.92rem;
-              font-family: 'Inter', sans-serif;
-              transition: border-color 160ms ease, box-shadow 160ms ease;
-            }
+  .edit-card-accent {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0.5;
+  }
 
-            #edit-profile-form input:focus,
-            #edit-profile-form select:focus,
-            #edit-profile-form textarea:focus {
-              outline: none;
-              border-color: var(--gold);
-              box-shadow: 0 0 0 3px rgba(201,162,75,0.15);
-            }
+  .edit-card-body {
+    padding: clamp(20px, 5vw, 40px);
+  }
 
-            #edit-profile-form ul.errorlist {
-              list-style: none;
-              padding: 0;
-              margin: 6px 0 0;
-              color: #e07a7a;
-              font-size: 0.8rem;
-            }
-          </style>
+  /* ── Form fields ──────────────────────────────────────────── */
+  #edit-profile-form p { margin-bottom: 18px; }
 
-          <div id="edit-profile-form">
-            {{ form.as_p }}
-          </div>
+  #edit-profile-form label {
+    display: block;
+    font-size: clamp(0.68rem, 2.5vw, 0.75rem);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 7px;
+  }
 
-          <!-- Divider -->
-          <div style="height:1px; background:var(--border); margin: 28px 0 24px;"></div>
+  #edit-profile-form input,
+  #edit-profile-form select,
+  #edit-profile-form textarea {
+    width: 100%;
+    background-color: var(--ink);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 9px;
+    padding: 12px 14px;
+    font-size: clamp(0.88rem, 3.5vw, 0.92rem);
+    font-family: 'Inter', sans-serif;
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+    -webkit-appearance: none;
+    appearance: none;
+  }
 
-          <!-- Actions -->
-          <div class="d-flex gap-3">
-            <button type="submit" style="
-              flex: 1;
-              background-color: var(--gold);
-              border: none;
-              color: #16130c;
-              font-weight: 600;
-              font-size: 0.92rem;
-              letter-spacing: 0.02em;
-              padding: 11px 0;
-              border-radius: 999px;
-              transition: transform 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
-              box-shadow: 0 6px 24px rgba(201,162,75,0.22);
-              cursor: pointer;
-            "
-            onmouseover="this.style.backgroundColor='var(--gold-bright)'; this.style.transform='translateY(-2px)';"
-            onmouseout="this.style.backgroundColor='var(--gold)'; this.style.transform='translateY(0)';">
-              <i class="fas fa-check me-2"></i>Save Changes
-            </button>
+  /* Prevent iOS zoom on focus */
+  @media (max-width: 480px) {
+    #edit-profile-form input,
+    #edit-profile-form select,
+    #edit-profile-form textarea {
+      font-size: 16px;
+    }
+  }
 
-            <a href="{% url 'user_profile' %}" style="flex:1; text-decoration:none;">
-              <button type="button" style="
-                width: 100%;
-                background-color: transparent;
-                border: 1px solid var(--border);
-                color: var(--text-muted);
-                font-weight: 600;
-                font-size: 0.92rem;
-                letter-spacing: 0.02em;
-                padding: 11px 0;
-                border-radius: 999px;
-                transition: border-color 180ms ease, color 180ms ease;
-                cursor: pointer;
-              "
-              onmouseover="this.style.borderColor='var(--gold)'; this.style.color='var(--gold-bright)';"
-              onmouseout="this.style.borderColor='var(--border)'; this.style.color='var(--text-muted)';">
-                <i class="fas fa-arrow-left me-2"></i>Cancel
-              </button>
-            </a>
-          </div>
+  #edit-profile-form textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
 
-        </form>
-      </div>
-    </div>
+  /* Re-add arrow for select on mobile after appearance:none */
+  #edit-profile-form select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23888' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
 
+  #edit-profile-form input:focus,
+  #edit-profile-form select:focus,
+  #edit-profile-form textarea:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201,162,75,0.15);
+  }
+
+  #edit-profile-form ul.errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 6px 0 0;
+    color: #e07a7a;
+    font-size: clamp(0.75rem, 2.8vw, 0.8rem);
+  }
+
+  /* ── Divider ──────────────────────────────────────────────── */
+  .edit-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 28px 0 24px;
+  }
+
+  /* ── Action buttons ───────────────────────────────────────── */
+  .edit-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .edit-btn-submit,
+  .edit-btn-cancel {
+    flex: 1;
+    min-width: 120px;
+    font-weight: 600;
+    font-size: clamp(0.85rem, 3.5vw, 0.92rem);
+    letter-spacing: 0.02em;
+    padding: 13px 0;
+    border-radius: 999px;
+    cursor: pointer;
+    border: none;
+    transition: transform 180ms ease, background-color 180ms ease,
+                box-shadow 180ms ease, border-color 180ms ease, color 180ms ease;
+    -webkit-tap-highlight-color: transparent;
+    text-align: center;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .edit-btn-submit {
+    background-color: var(--gold);
+    color: #16130c;
+    box-shadow: 0 6px 24px rgba(201,162,75,0.22);
+  }
+
+  @media (hover: hover) {
+    .edit-btn-submit:hover {
+      background-color: var(--gold-bright);
+      transform: translateY(-2px);
+    }
+  }
+
+  .edit-btn-submit:active {
+    background-color: var(--gold-bright);
+    transform: translateY(0);
+  }
+
+  .edit-btn-cancel {
+    background-color: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+
+  @media (hover: hover) {
+    .edit-btn-cancel:hover {
+      border-color: var(--gold);
+      color: var(--gold-bright);
+    }
+  }
+
+  .edit-btn-cancel:active {
+    border-color: var(--gold);
+    color: var(--gold-bright);
+  }
+
+  /* ── Extra-small phones ───────────────────────────────────── */
+  @media (max-width: 360px) {
+    .edit-page { padding: 20px 10px 80px; }
+    .edit-card-body { padding: 16px; }
+    .edit-actions { flex-direction: column; }
+    .edit-btn-submit,
+    .edit-btn-cancel { width: 100%; }
+  }
+</style>
+
+<div class="edit-page">
+
+  <!-- Header -->
+  <div>
+    <p class="edit-eyebrow"><i class="fas fa-user-pen me-1"></i> Account</p>
+    <h2 class="edit-title">Edit Profile</h2>
+    <p class="edit-subtitle">Update your personal information below.</p>
   </div>
+
+  <!-- Card -->
+  <div class="edit-card">
+    <div class="edit-card-accent"></div>
+
+    <div class="edit-card-body">
+      <form action="" method="post">
+        {% csrf_token %}
+
+        <div id="edit-profile-form">
+          {{ form.as_p }}
+        </div>
+
+        <div class="edit-divider"></div>
+
+        <!-- Actions -->
+        <div class="edit-actions">
+          <button type="submit" class="edit-btn-submit">
+            <i class="fas fa-check"></i> Save Changes
+          </button>
+          <a href="{% url 'user_profile' %}" class="edit-btn-cancel">
+            <i class="fas fa-arrow-left"></i> Cancel
+          </a>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
 </div>
 {% endblock %}

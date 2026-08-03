@@ -8,17 +8,16 @@
   {% endblock %}
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
         integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
   {% load static %}
 
-  <!-- Fonts: Playfair Display for the cinematic quote, Inter for UI -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -34,26 +33,27 @@
       --text-muted: #a49c8a;
     }
 
-    * { box-sizing: border-box; }
+    *, *::before, *::after { box-sizing: border-box; }
 
     html, body {
       margin: 0;
-      height: 100%;
+      /* min-height instead of height so content never clips on short screens */
+      min-height: 100%;
       background-color: var(--ink);
       font-family: 'Inter', sans-serif;
     }
 
     body {
       position: relative;
-      height: 100vh;
-      overflow: hidden;
+      min-height: 100vh;
+      /* removed overflow:hidden — lets page scroll on small phones */
       background:
         radial-gradient(ellipse 900px 700px at 68% 42%, rgba(201,162,75,0.10), transparent 60%),
         radial-gradient(ellipse 1200px 900px at 15% 60%, rgba(201,162,75,0.05), transparent 55%),
         var(--ink);
     }
 
-    /* faint film grain for texture */
+    /* film grain texture */
     body::after {
       content: "";
       position: absolute;
@@ -64,7 +64,7 @@
       background-size: 3px 3px;
     }
 
-    /* signature element: film-strip rail with sprocket holes down the left edge */
+    /* ── Film rail ─────────────────────────────────────────── */
     .film-rail {
       position: fixed;
       top: 0;
@@ -88,9 +88,9 @@
       opacity: 0.55;
     }
 
-    /* ghosted film-reel graphic, echoes the rail's sprocket holes, replaces the stock photo */
+    /* ── Reel graphic ──────────────────────────────────────── */
     .reel {
-      position: absolute;
+      position: fixed;           /* fixed so it doesn't push layout */
       top: 50%;
       right: -12%;
       transform: translateY(-50%);
@@ -101,17 +101,22 @@
       z-index: 1;
     }
 
+    /* ── Overlay / centering wrapper ───────────────────────── */
     .overlay {
-      height: 100%;
+      min-height: 100vh;
       width: 100%;
       position: relative;
       z-index: 10;
-      padding-left: 34px; /* clear the film rail */
+      padding-left: 34px;        /* clear film rail */
       display: flex;
       align-items: center;
       justify-content: center;
+      /* vertical breathing room on small screens */
+      padding-top: max(40px, env(safe-area-inset-top));
+      padding-bottom: max(40px, env(safe-area-inset-bottom));
     }
 
+    /* ── Content ───────────────────────────────────────────── */
     .content-box {
       color: var(--text);
       max-width: 640px;
@@ -129,17 +134,8 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    .logo-mark {
-      width: 88px;
-      height: 88px;
-      object-fit: contain;
-      border-radius: 12px;
-      filter: drop-shadow(0 4px 18px rgba(201,162,75,0.25));
-    }
-
     .eyebrow {
-      font-family: 'Inter', sans-serif;
-      font-size: 0.72rem;
+      font-size: clamp(0.65rem, 2.5vw, 0.72rem);
       letter-spacing: 0.28em;
       text-transform: uppercase;
       color: var(--gold);
@@ -148,8 +144,7 @@
     }
 
     .tagline {
-      font-family: 'Inter', sans-serif;
-      font-size: 0.85rem;
+      font-size: clamp(0.8rem, 3vw, 0.85rem);
       color: var(--text-muted);
       margin: 0 0 22px;
       letter-spacing: 0.01em;
@@ -158,14 +153,13 @@
     .quote {
       font-family: 'Playfair Display', serif;
       font-weight: 500;
-      font-size: clamp(1.5rem, 2.8vw, 2.2rem);
+      font-size: clamp(1.25rem, 4.5vw, 2.2rem);
       line-height: 1.38;
       color: var(--text);
       margin: 0 0 24px;
       position: relative;
     }
 
-    /* large translucent watermark quotation mark, sits behind the text, not a boxed span */
     .quote::before {
       content: "\201C";
       position: absolute;
@@ -198,9 +192,8 @@
     }
 
     .author {
-      font-family: 'Inter', sans-serif;
       font-style: normal;
-      font-size: 0.92rem;
+      font-size: clamp(0.82rem, 3vw, 0.92rem);
       letter-spacing: 0.03em;
       color: var(--text-muted);
       margin: 0;
@@ -211,14 +204,21 @@
       font-weight: 600;
     }
 
+    /* ── Buttons ───────────────────────────────────────────── */
     .btn-custom {
-      padding: 11px 34px;
-      font-size: 0.95rem;
+      padding: 13px 34px;        /* taller for fingers */
+      font-size: clamp(0.88rem, 3.5vw, 0.95rem);
       font-weight: 600;
       letter-spacing: 0.02em;
       border-radius: 999px;
       border: 1px solid transparent;
-      transition: transform 180ms ease, background-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
+      transition: transform 180ms ease, background-color 180ms ease,
+                  color 180ms ease, box-shadow 180ms ease;
+      -webkit-tap-highlight-color: transparent;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .btn-register {
@@ -227,11 +227,18 @@
       box-shadow: 0 6px 24px rgba(201,162,75,0.25);
     }
 
-    .btn-register:hover {
+    @media (hover: hover) {
+      .btn-register:hover {
+        background-color: var(--gold-bright);
+        color: #16130c;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 28px rgba(201,162,75,0.35);
+      }
+    }
+
+    .btn-register:active {
       background-color: var(--gold-bright);
       color: #16130c;
-      transform: translateY(-2px);
-      box-shadow: 0 10px 28px rgba(201,162,75,0.35);
     }
 
     .btn-login {
@@ -240,10 +247,17 @@
       border-color: rgba(242,236,221,0.35);
     }
 
-    .btn-login:hover {
+    @media (hover: hover) {
+      .btn-login:hover {
+        border-color: var(--gold);
+        color: var(--gold-bright);
+        transform: translateY(-2px);
+      }
+    }
+
+    .btn-login:active {
       border-color: var(--gold);
       color: var(--gold-bright);
-      transform: translateY(-2px);
     }
 
     .btn-custom:focus-visible {
@@ -251,19 +265,53 @@
       outline-offset: 3px;
     }
 
+    /* ── Tablet ────────────────────────────────────────────── */
     @media (max-width: 768px) {
       .reel { opacity: 0.5; right: -30%; }
     }
 
-    @media (max-width: 576px) {
+    /* ── Mobile (≤ 600px) ──────────────────────────────────── */
+    @media (max-width: 600px) {
       .film-rail { display: none; }
-      .overlay { padding-left: 0; }
-      .content-box { text-align: center; margin: 0 auto; }
+
+      .overlay {
+        padding-left: 0;
+        align-items: flex-start;
+        padding-top: max(48px, env(safe-area-inset-top));
+      }
+
+      .content-box {
+        text-align: center;
+        padding: 0 20px;
+      }
+
       .divider { justify-content: center; }
-      .quote::before { left: 50%; transform: translateX(-50%); top: -0.6em; }
+
+      .quote::before {
+        left: 50%;
+        transform: translateX(-50%);
+        top: -0.6em;
+      }
+
       .reel { display: none; }
+
+      /* full-width buttons stacked on small screens */
+      .cta-group {
+        flex-direction: column;
+        gap: 12px !important;
+      }
+
+      .btn-custom {
+        width: 100%;
+      }
+    }
+
+    /* ── Extra-small (≤ 360px) ─────────────────────────────── */
+    @media (max-width: 360px) {
+      .content-box { padding: 0 14px; }
     }
   </style>
+  {% endblock %}
 </head>
 <body>
 
@@ -286,8 +334,6 @@
   <circle cx="130" cy="130" r="18" stroke="#c9a24b" stroke-width="1" opacity="0.13"/>
 </svg>
 
-{% endblock %}
-
 {% block cards %}
 {% if messages %}
   {% for message in messages %}
@@ -297,7 +343,7 @@
 
 <div class="overlay">
   <div class="content-box">
-        <p class="eyebrow">Cinelist</p>
+    <p class="eyebrow">Cinelist</p>
     <p class="tagline">Discover. Watch. Inspire.</p>
     <p class="quote">
       Once you overcome the one-inch tall barrier of subtitles, you will be introduced to so many more <em>amazing films</em>.
@@ -306,14 +352,14 @@
       <span class="line"></span>
       <p class="author">&mdash; <strong>Bong Joon-ho</strong></p>
     </div>
-    <div class="d-flex gap-3 flex-wrap">
+    <div class="d-flex gap-3 flex-wrap cta-group">
       <a href="{% url 'signup' %}" class="btn btn-custom btn-register">Register</a>
       <a href="{% url 'login' %}" class="btn btn-custom btn-login">Login</a>
     </div>
   </div>
 </div>
 
+{% endblock %}
+
 </body>
 </html>
-
-{% endblock %}

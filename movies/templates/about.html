@@ -4,6 +4,8 @@
   <title>About — CineList</title>
 {% endblock %}
 
+{% load static %}
+
 {% block style %}
 <style>
 
@@ -207,20 +209,26 @@
     flex-wrap: wrap;
   }
 
+  /* Photo avatar */
   .dev-avatar {
-    width: 80px;
-    height: 80px;
+    width: 96px;
+    height: 96px;
     border-radius: 50%;
-    background: rgba(201,162,75,0.1);
-    border: 2px solid rgba(201,162,75,0.35);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    font-weight: 600;
-    color: var(--gold);
+    border: 2px solid rgba(201,162,75,0.5);
+    box-shadow:
+      0 0 0 4px rgba(201,162,75,0.1),
+      0 8px 24px rgba(0,0,0,0.4);
+    overflow: hidden;
     flex-shrink: 0;
+    background: var(--surface);
+  }
+
+  .dev-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
   }
 
   .dev-info { flex: 1; min-width: 200px; }
@@ -317,6 +325,61 @@
   }
 
   .tmdb-text a:hover { color: var(--gold-bright); }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .about-hero { padding: 60px 20px 50px; }
+    .about-body  { padding: 44px 0 60px; }
+    .gold-rule   { margin: 40px 0; }
+
+    .dev-card {
+      padding: 28px 24px;
+      gap: 24px;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .about-hero { padding: 44px 16px 36px; }
+    .about-hero-sub { font-size: 0.92rem; }
+
+    .feature-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .feat-card { padding: 18px 16px; gap: 10px; }
+    .feat-icon { width: 36px; height: 36px; font-size: 0.88rem; }
+    .feat-title { font-size: 0.85rem; }
+    .feat-desc  { font-size: 0.78rem; }
+
+    /* Dev card: stack vertically, center photo */
+    .dev-card {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 28px 20px;
+      gap: 20px;
+    }
+
+    .dev-avatar {
+      width: 110px;
+      height: 110px;
+    }
+
+    .dev-info { min-width: unset; width: 100%; }
+
+    .dev-links { justify-content: center; }
+
+    .tmdb-credit { flex-direction: column; text-align: center; gap: 12px; }
+    .tmdb-icon   { margin: 0 auto; }
+
+    .about-body { padding: 32px 0 48px; }
+    .gold-rule  { margin: 32px 0; }
+  }
+
+  @media (max-width: 400px) {
+    .feature-grid { grid-template-columns: 1fr; }
+  }
 
 </style>
 {% endblock %}
@@ -421,7 +484,9 @@
     <h2 class="section-title">The person behind it</h2>
 
     <div class="dev-card">
-      <div class="dev-avatar">G</div>
+      <div class="dev-avatar">
+        <img src="{% static 'images/gokul_pfp.jpg' %}" alt="Gokul">
+      </div>
       <div class="dev-info">
         <p class="dev-name">Gokul</p>
         <p class="dev-role">Python · Django · Full-Stack Developer</p>
@@ -430,10 +495,10 @@
           CineList was built to combine a love of cinema with the craft of building great web experiences — from API integration to polished UI.
         </p>
         <div class="dev-links">
-          <a href="https://www.linkedin.com/in/YOUR-USERNAME" target="_blank" class="dev-link">
+          <a href="https://www.linkedin.com/in/gokul-ms-3540b3342" target="_blank" class="dev-link">
             <i class="fab fa-linkedin"></i> LinkedIn
           </a>
-          <a href="https://github.com/YOUR-GITHUB" target="_blank" class="dev-link">
+          <a href="https://github.com/gokul-ms4" target="_blank" class="dev-link">
             <i class="fab fa-github"></i> GitHub
           </a>
         </div>

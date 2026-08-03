@@ -8,26 +8,31 @@
 
 {% block content %}
 <style>
+  /* ── Reset & base ─────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; }
+
   .following-wrapper {
     max-width: 640px;
     margin: 0 auto;
-    padding: 0 16px 60px;
+    padding: 0 16px 80px;
+    width: 100%;
   }
 
-  /* Top bar */
+  /* ── Top bar ──────────────────────────────────────────────── */
   .top-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 0 18px;
+    padding: 16px 0 16px;
     margin-bottom: 8px;
     border-bottom: 1px solid var(--border);
     position: relative;
+    min-height: 56px;           /* touch-friendly tap zone */
   }
 
   .top-bar-back {
-    width: 36px;
-    height: 36px;
+    width: 40px;                /* slightly larger for fingers */
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -37,9 +42,11 @@
     text-decoration: none;
     transition: border-color 160ms ease, color 160ms ease, background-color 160ms ease;
     flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  .top-bar-back:hover {
+  .top-bar-back:hover,
+  .top-bar-back:active {
     border-color: var(--gold);
     color: var(--gold-bright);
     background-color: rgba(201,162,75,0.08);
@@ -52,45 +59,64 @@
     margin: 0;
     font-family: 'Playfair Display', serif;
     font-weight: 600;
-    font-size: 1.2rem;
+    font-size: clamp(1rem, 4vw, 1.2rem);   /* scales with screen */
     color: var(--text);
     white-space: nowrap;
+    pointer-events: none;
   }
 
-  /* Section label */
+  /* ── Section label ────────────────────────────────────────── */
   .section-label {
-    font-size: 0.72rem;
-    letter-spacing: 0.18em;
+    font-size: clamp(0.65rem, 2.5vw, 0.72rem);
+    letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--gold);
     font-weight: 600;
-    margin: 20px 0 14px;
+    margin: 18px 0 12px;
+    /* prevent overflow on tiny screens */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  /* User rows */
+  /* ── User rows ────────────────────────────────────────────── */
   .user-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 18px;
+    padding: 14px 14px;         /* slightly less horizontal on mobile */
     background-color: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
     margin-bottom: 8px;
     transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
     text-decoration: none;
+    /* ensure row fills full width */
+    width: 100%;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  .user-row:hover {
+  /* disable hover transform on touch devices (feels laggy) */
+  @media (hover: hover) {
+    .user-row:hover {
+      border-color: rgba(201,162,75,0.35);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      transform: translateY(-2px);
+    }
+  }
+
+  /* active state for touch */
+  .user-row:active {
     border-color: rgba(201,162,75,0.35);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-    transform: translateY(-2px);
+    background-color: rgba(201,162,75,0.04);
   }
 
   .user-row-left {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
+    min-width: 0;               /* allow text truncation */
+    flex: 1;
   }
 
   .user-avatar {
@@ -108,37 +134,47 @@
   }
 
   .user-name {
-    font-size: 0.95rem;
+    font-size: clamp(0.88rem, 3.5vw, 0.95rem);
     font-weight: 600;
     color: var(--text);
+    /* truncate very long usernames */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 180px;
   }
 
   .user-badge {
-    font-size: 0.7rem;
+    font-size: clamp(0.62rem, 2.2vw, 0.7rem);
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--gold);
     background: rgba(201,162,75,0.1);
     border: 1px solid rgba(201,162,75,0.2);
     border-radius: 999px;
-    padding: 2px 10px;
+    padding: 2px 8px;
+    flex-shrink: 0;             /* never collapse the badge */
   }
 
   .user-row-arrow {
     color: var(--text-muted);
     font-size: 0.75rem;
     transition: color 160ms ease, transform 160ms ease;
+    margin-left: 8px;
+    flex-shrink: 0;
   }
 
-  .user-row:hover .user-row-arrow {
-    color: var(--gold);
-    transform: translateX(3px);
+  @media (hover: hover) {
+    .user-row:hover .user-row-arrow {
+      color: var(--gold);
+      transform: translateX(3px);
+    }
   }
 
-  /* Empty state */
+  /* ── Empty state ──────────────────────────────────────────── */
   .empty-state {
     text-align: center;
-    padding: 80px 20px;
+    padding: 60px 20px;
   }
 
   .empty-icon {
@@ -158,14 +194,36 @@
 
   .empty-title {
     font-family: 'Playfair Display', serif;
-    font-size: 1.3rem;
+    font-size: clamp(1.1rem, 4.5vw, 1.3rem);
     color: var(--text);
     margin-bottom: 8px;
   }
 
   .empty-sub {
-    font-size: 0.88rem;
+    font-size: clamp(0.82rem, 3vw, 0.88rem);
     color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* ── Small phone adjustments (≤ 380 px) ──────────────────── */
+  @media (max-width: 380px) {
+    .following-wrapper {
+      padding: 0 10px 80px;
+    }
+
+    .user-row {
+      padding: 12px 10px;
+      border-radius: 10px;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+    }
+
+    .user-name {
+      max-width: 140px;
+    }
   }
 </style>
 
@@ -173,11 +231,11 @@
 
   <!-- Top bar -->
   <div class="top-bar">
-    <a href="{% url 'user_info' user.id %}" class="top-bar-back">
+    <a href="{% url 'user_info' user.id %}" class="top-bar-back" aria-label="Back">
       <i class="fas fa-arrow-left"></i>
     </a>
     <h5>Following</h5>
-    <div style="width:36px;"></div>
+    <div style="width:40px;"></div>
   </div>
 
   <!-- Section label -->

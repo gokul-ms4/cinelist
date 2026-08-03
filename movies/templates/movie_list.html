@@ -61,6 +61,7 @@
     color: var(--text);
     border-radius: 999px;
     transition: border-color 160ms ease, box-shadow 160ms ease;
+    min-width: 0; /* prevent flex overflow */
   }
 
   .search-input::placeholder { color: var(--text-muted); opacity: 0.7; }
@@ -86,6 +87,7 @@
     gap: 8px;
     transition: background-color 180ms ease, transform 180ms ease;
     white-space: nowrap;
+    flex-shrink: 0;
   }
 
   .search-btn:hover {
@@ -178,7 +180,7 @@
     color: var(--gold);
   }
 
-  /* ===== Hover overlay ===== */
+  /* ===== Hover overlay (desktop only) ===== */
   .movie-overlay {
     position: absolute;
     inset: 0;
@@ -356,6 +358,127 @@
     pointer-events: none;
     z-index: 2;
   }
+
+  /* ===== Touch quick-info bar (mobile only) ===== */
+  /* Shows score + date under the poster on touch devices instead of hover overlay */
+  .mobile-quick-info {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px 0;
+  }
+
+  .mobile-quick-score {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--gold);
+  }
+
+  .mobile-quick-score i { font-size: 0.6rem; }
+
+  .mobile-quick-year {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+  }
+
+  /* ===== Responsive ===== */
+
+  /* Tablet */
+  @media (max-width: 768px) {
+    .movies-hero { padding-top: 36px; }
+
+    .page-title { font-size: 1.65rem; margin-bottom: 20px; }
+
+    .search-wrap { margin-bottom: 28px; }
+
+    .movie-grid {
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 14px;
+    }
+  }
+
+  /* Mobile */
+  @media (max-width: 576px) {
+    .movies-hero { padding-top: 28px; }
+
+    .page-eyebrow { font-size: 0.68rem; }
+    .page-title { font-size: 1.4rem; margin-bottom: 16px; }
+
+    /* Search stacks vertically */
+    .search-wrap { margin-bottom: 22px; }
+
+    .search-form {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+      max-width: 100%;
+    }
+
+    .search-input {
+      width: 100%;
+      /* Prevent iOS zoom */
+      font-size: 16px;
+      height: 48px;
+    }
+
+    .search-btn {
+      width: 100%;
+      height: 48px;
+      justify-content: center;
+      font-size: 0.92rem;
+    }
+
+    /* 2-column grid on mobile */
+    .movie-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      padding-bottom: 40px;
+    }
+
+    /* Disable hover overlay on touch screens */
+    .movie-overlay { display: none; }
+
+    /* Disable poster zoom (feels glitchy on tap) */
+    .movie-card:hover .movie-poster { transform: none; }
+    .movie-card:hover {
+      transform: none;
+      border-color: var(--border);
+      box-shadow: none;
+    }
+
+    /* Show inline quick-info instead */
+    .mobile-quick-info { display: flex; }
+
+    .movie-caption {
+      padding: 6px 8px 10px;
+    }
+
+    .movie-caption .movie-title {
+      font-size: 0.78rem;
+    }
+
+    .caption-score { font-size: 0.68rem; }
+
+    /* Slightly smaller badges to not crowd tiny cards */
+    .poster-lang-badge {
+      font-size: 0.55rem;
+      padding: 2px 5px;
+      top: 6px;
+      right: 6px;
+    }
+  }
+
+  /* Very small phones */
+  @media (max-width: 360px) {
+    .movie-grid { gap: 8px; }
+
+    .movie-caption { padding: 5px 7px 8px; }
+
+    .movie-caption .movie-title { font-size: 0.72rem; }
+  }
 </style>
 
 <div class="movies-hero">
@@ -370,7 +493,8 @@
         <input type="text" name="query"
                value="{{ request.GET.query }}"
                placeholder="Search movies, directors, genres…"
-               class="search-input">
+               class="search-input"
+               autocomplete="off">
         <button type="submit" class="search-btn">
           <i class="fas fa-search"></i> Search
         </button>
@@ -385,14 +509,15 @@
           <!-- Poster -->
           <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}"
                alt="{{ movie.title }}"
-               class="movie-poster">
+               class="movie-poster"
+               loading="lazy">
 
           <!-- Language badge top-right -->
           {% if movie.original_language %}
             <span class="poster-lang-badge">{{ movie.original_language }}</span>
           {% endif %}
 
-          <!-- Hover overlay -->
+          <!-- Hover overlay (desktop) -->
           <div class="movie-overlay">
             <p class="overlay-title">{{ movie.title }}</p>
 
@@ -402,7 +527,7 @@
               <span class="overlay-score-denom">/ 10</span>
             </div>
 
-            <!-- Stars (out of 5, vote_average is out of 10) -->
+            <!-- Stars -->
             <div class="overlay-stars">
               {% with score=movie.vote_average %}
                 {% if score >= 2 %}<i class="fas fa-star"></i>{% else %}<i class="fas fa-star empty"></i>{% endif %}
@@ -438,6 +563,17 @@
 
             <span class="overlay-cta">
               <i class="fas fa-play"></i> View Details
+            </span>
+          </div>
+
+          <!-- Mobile quick-info (score + year) -->
+          <div class="mobile-quick-info">
+            <div class="mobile-quick-score">
+              <i class="fas fa-star"></i>
+              {{ movie.vote_average|floatformat:1 }}
+            </div>
+            <span class="mobile-quick-year">
+              {{ movie.release_date|slice:":4"|default:"—" }}
             </span>
           </div>
 

@@ -195,6 +195,44 @@
     color: #e07a7a;
     font-size: 0.8rem;
   }
+
+  /* ── Mobile tweaks ── */
+  @media (max-width: 639px) {
+    .edit-hero {
+      padding: 36px 0 0;
+    }
+
+    .page-title {
+      font-size: 1.45rem;
+    }
+
+    .page-sub {
+      margin-bottom: 24px;
+    }
+
+    .review-form-card {
+      padding: 24px 20px;
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .star-btn {
+      font-size: 2.1rem;
+      padding: 6px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      justify-content: center;
+      padding: 13px 0;
+    }
+
+    /* Prevent iOS auto-zoom on focus (requires font-size >= 16px) */
+    .review-form-card textarea {
+      font-size: 1rem;
+      min-height: 140px;
+    }
+  }
 </style>
 
 <div class="edit-hero">
@@ -215,10 +253,7 @@
         <!-- Rating -->
         <div class="form-section">
           <label class="review-form-label">Rating</label>
-
-          <!-- hidden input submitted to Django — stars write to this -->
           <input type="hidden" name="rating" id="rating-value" value="">
-
           <div class="star-picker" id="star-picker" role="radiogroup" aria-label="Rating">
             <button type="button" class="star-btn" data-value="1" aria-label="1 star" title="1 star — Poor"><i class="fas fa-star"></i></button>
             <button type="button" class="star-btn" data-value="2" aria-label="2 stars" title="2 stars — Fair"><i class="fas fa-star"></i></button>
@@ -226,7 +261,6 @@
             <button type="button" class="star-btn" data-value="4" aria-label="4 stars" title="4 stars — Great"><i class="fas fa-star"></i></button>
             <button type="button" class="star-btn" data-value="5" aria-label="5 stars" title="5 stars — Excellent"><i class="fas fa-star"></i></button>
           </div>
-
           <p class="form-hint" id="rating-hint">Click a star to rate this film.</p>
           <p class="rating-error" id="rating-error" style="display:none;">Please select a rating before submitting.</p>
         </div>
@@ -290,7 +324,6 @@
     });
   });
 
-  // block submit if no star selected
   document.querySelector('form').addEventListener('submit', function(e) {
     if (!ratingInput.value) {
       e.preventDefault();

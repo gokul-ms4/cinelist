@@ -10,7 +10,6 @@
     padding: 48px 0 80px;
   }
 
-  /* Page header */
   .page-eyebrow {
     font-size: 0.72rem;
     letter-spacing: 0.22em;
@@ -97,7 +96,6 @@
     background-color: rgba(201,162,75,0.03);
   }
 
-  /* Poster */
   .poster-img {
     width: 52px;
     height: 78px;
@@ -107,23 +105,21 @@
     display: block;
   }
 
-  /* Movie title */
-.movie-link {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text);
-  text-decoration: none;
-  border-bottom: 1px dashed rgba(201,162,75,0.4);
-  padding-bottom: 2px;
-  transition: color 160ms ease, border-color 160ms ease;
-}
+  .movie-link {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    text-decoration: none;
+    border-bottom: 1px dashed rgba(201,162,75,0.4);
+    padding-bottom: 2px;
+    transition: color 160ms ease, border-color 160ms ease;
+  }
 
-.movie-link:hover {
-  color: var(--gold-bright);
-  border-color: var(--gold-bright);
-}
+  .movie-link:hover {
+    color: var(--gold-bright);
+    border-color: var(--gold-bright);
+  }
 
-  /* Date */
   .date-text {
     font-size: 0.82rem;
     color: var(--text-muted);
@@ -272,28 +268,141 @@
   }
 
   [data-tooltip] {
-  position: relative;
-  cursor: pointer;
-}
+    position: relative;
+    cursor: pointer;
+  }
 
-[data-tooltip]:hover::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--surface-raised);
-  border: 1px solid rgba(201,162,75,0.25);
-  color: var(--text-muted);
-  font-size: 0.75rem;
-  font-weight: 500;
-  padding: 6px 12px;
-  border-radius: 8px;
-  white-space: nowrap;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-  z-index: 10;
-  pointer-events: none;
-}
+  [data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--surface-raised);
+    border: 1px solid rgba(201,162,75,0.25);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 8px;
+    white-space: nowrap;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  /* ── Mobile card layout ── */
+  @media (max-width: 639px) {
+    .watchlist-section {
+      padding: 32px 0 60px;
+    }
+
+    .page-title {
+      font-size: 1.6rem;
+    }
+
+    .table-card thead {
+      display: none;
+    }
+
+    .table-card table,
+    .table-card tbody {
+      display: block;
+      width: 100%;
+    }
+
+    /* Each row: poster left, content right */
+    .table-card tbody tr {
+      display: grid;
+      grid-template-columns: 60px 1fr;
+      grid-template-rows: auto auto auto;
+      column-gap: 14px;
+      row-gap: 8px;
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .table-card tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    /* All tds block by default, then positioned via grid-column/row */
+    .table-card td {
+      display: block;
+      padding: 0;
+      border: none;
+    }
+
+    /* Poster: left column, spans all rows */
+    .td-poster {
+      grid-column: 1;
+      grid-row: 1 / 4;
+    }
+
+    .poster-img {
+      width: 60px;
+      height: 90px;
+    }
+
+    /* Title: right column, row 1 */
+    .td-title {
+      grid-column: 2;
+      grid-row: 1;
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .movie-link {
+      font-size: 0.95rem;
+      line-height: 1.35;
+    }
+
+    /* Date: right column, row 2 */
+    .td-date {
+      grid-column: 2;
+      grid-row: 2;
+    }
+
+    /* Status + actions: right column, row 3 */
+    .td-status {
+      grid-column: 2;
+      grid-row: 3;
+    }
+
+    .status-actions {
+      gap: 8px;
+    }
+
+    /* Remove button: hidden as its own cell; shown inside status cell */
+    .td-remove {
+      display: none;
+    }
+
+    /* Mobile remove button (injected inside status td) */
+    .mobile-remove {
+      display: inline-flex;
+    }
+
+    .action-btn {
+      font-size: 0.76rem;
+      padding: 6px 12px;
+    }
+
+    .status-badge {
+      font-size: 0.75rem;
+      padding: 5px 11px;
+    }
+
+    /* Disable tooltip on touch — it fires on tap and stays stuck */
+    [data-tooltip]:hover::after {
+      display: none;
+    }
+  }
+
+  /* Desktop: hide the mobile-only remove button */
+  .mobile-remove {
+    display: none;
+  }
 </style>
 
 <div class="watchlist-section">
@@ -330,30 +439,30 @@
           <tr>
 
             <!-- Poster -->
-            <td>
-               <a href="{% url 'movie_detail' item.movie_id %}">
-    <img src="https://image.tmdb.org/t/p/w92{{ item.poster_path }}"
-         alt="{{ item.title }}" class="poster-img">
-  </a>
+            <td class="td-poster">
+              <a href="{% url 'movie_detail' item.movie_id %}">
+                <img src="https://image.tmdb.org/t/p/w92{{ item.poster_path }}"
+                     alt="{{ item.title }}" class="poster-img">
+              </a>
             </td>
 
             <!-- Title -->
-            <td>
+            <td class="td-title">
               <a href="{% url 'movie_detail' item.movie_id %}" class="movie-link">
                 {{ item.title }}
               </a>
             </td>
 
             <!-- Date -->
-            <td>
+            <td class="td-date">
               <span class="date-text">
                 <i class="fas fa-calendar-alt me-1" style="color:var(--gold); opacity:0.6;"></i>
                 {{ item.created_date }}
               </span>
             </td>
 
-            <!-- Status -->
-            <td>
+            <!-- Status + inline mobile remove -->
+            <td class="td-status">
               {% if item.watch_status %}
                 <div class="status-actions">
                   <span class="status-badge status-watched">
@@ -368,23 +477,39 @@
                       <i class="fas fa-pen"></i> Add Review
                     </a>
                   {% endif %}
+                  <!-- Mobile-only remove -->
+                  <a href="#" class="action-btn btn-remove mobile-remove"
+                     data-url="{% url 'watchlist_delete' item.movie_id %}"
+                     data-title="{{ item.title }}"
+                     onclick="openDeleteModal(this); return false;">
+                    <i class="fas fa-trash-alt"></i> Remove
+                  </a>
                 </div>
               {% else %}
-                <a href="{% url 'watchlist_update' item.movie_id %}" class="status-badge status-pending"
-   data-tooltip="Click to mark as Watched">
-  <i class="fas fa-clock"></i> Not Watched
-</a>
+                <div class="status-actions">
+                  <a href="{% url 'watchlist_update' item.movie_id %}" class="status-badge status-pending"
+                     data-tooltip="Click to mark as Watched">
+                    <i class="fas fa-clock"></i> Not Watched
+                  </a>
+                  <!-- Mobile-only remove -->
+                  <a href="#" class="action-btn btn-remove mobile-remove"
+                     data-url="{% url 'watchlist_delete' item.movie_id %}"
+                     data-title="{{ item.title }}"
+                     onclick="openDeleteModal(this); return false;">
+                    <i class="fas fa-trash-alt"></i> Remove
+                  </a>
+                </div>
               {% endif %}
             </td>
 
-            <!-- Remove -->
-            <td>
+            <!-- Remove (desktop only) -->
+            <td class="td-remove">
               <a href="#" class="action-btn btn-remove"
-   data-url="{% url 'watchlist_delete' item.movie_id %}"
-   data-title="{{ item.title }}"
-   onclick="openDeleteModal(this); return false;">
-  <i class="fas fa-trash-alt"></i> Remove
-</a>
+                 data-url="{% url 'watchlist_delete' item.movie_id %}"
+                 data-title="{{ item.title }}"
+                 onclick="openDeleteModal(this); return false;">
+                <i class="fas fa-trash-alt"></i> Remove
+              </a>
             </td>
 
           </tr>
@@ -418,7 +543,6 @@
   align-items: center;
   justify-content: center;
 ">
-  <!-- Backdrop -->
   <div onclick="closeDeleteModal()" style="
     position: absolute;
     inset: 0;
@@ -426,7 +550,6 @@
     backdrop-filter: blur(4px);
   "></div>
 
-  <!-- Modal card -->
   <div style="
     position: relative;
     z-index: 1;
@@ -440,12 +563,10 @@
     box-shadow: 0 32px 80px rgba(0,0,0,0.6);
     animation: modalRise 250ms ease-out both;
   ">
-    <!-- Gold top accent -->
     <div style="height:2px; background:linear-gradient(90deg, transparent, var(--gold), transparent); opacity:0.6;"></div>
 
     <div style="padding: 32px 32px 28px;">
 
-      <!-- Icon -->
       <div style="
         width: 52px;
         height: 52px;
@@ -462,7 +583,6 @@
         <i class="fas fa-trash-alt"></i>
       </div>
 
-      <!-- Text -->
       <h5 style="
         font-family: 'Playfair Display', serif;
         font-weight: 600;
@@ -489,10 +609,8 @@
         border-radius: 8px;
       "></p>
 
-      <!-- Divider -->
       <div style="height:1px; background:var(--border); margin-bottom:24px;"></div>
 
-      <!-- Buttons -->
       <div style="display:flex; gap:12px;">
         <button onclick="closeDeleteModal()" style="
           flex: 1;
@@ -547,19 +665,18 @@
 
 <script>
   function openDeleteModal(el) {
-  const url = el.getAttribute('data-url');
-  const title = el.getAttribute('data-title');
-  document.getElementById('modal-movie-title').textContent = title;
-  document.getElementById('modal-confirm-btn').href = url;
-  const modal = document.getElementById('delete-modal');
-  modal.style.display = 'flex';
-}
+    const url = el.getAttribute('data-url');
+    const title = el.getAttribute('data-title');
+    document.getElementById('modal-movie-title').textContent = title;
+    document.getElementById('modal-confirm-btn').href = url;
+    const modal = document.getElementById('delete-modal');
+    modal.style.display = 'flex';
+  }
 
   function closeDeleteModal() {
     document.getElementById('delete-modal').style.display = 'none';
   }
 
-  // Close on Escape key
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closeDeleteModal();
   });

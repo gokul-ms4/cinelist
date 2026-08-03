@@ -79,10 +79,10 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    max-width: 200px;
-    margin: 0 auto;
+    /* removed max-width/margin:auto — Bootstrap column handles width */
     transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
     text-decoration: none;
+    height: 100%;
   }
 
   .movie-card:hover {
@@ -94,7 +94,9 @@
   .movie-poster-wrap {
     position: relative;
     overflow: hidden;
-    height: 180px;
+    /* aspect-ratio poster instead of fixed px height —
+       scales correctly at any column width */
+    aspect-ratio: 2 / 3;
   }
 
   .movie-poster-wrap img {
@@ -187,6 +189,46 @@
     color: var(--text-muted);
     margin: 0;
   }
+
+  /* ===== Mobile tweaks ===== */
+  @media (max-width: 639px) {
+    .watchlist-hero {
+      padding: 36px 0 0;
+    }
+
+    .page-title {
+      font-size: 1.6rem;
+    }
+
+    .page-sub {
+      margin-bottom: 24px;
+    }
+
+    /* Tighten card body on narrow columns */
+    .movie-card-body {
+      padding: 10px 10px 12px;
+      gap: 6px;
+    }
+
+    .movie-card-title {
+      font-size: 0.82rem;
+    }
+
+    .watched-badge {
+      font-size: 0.68rem;
+      padding: 2px 8px;
+    }
+
+    /* Disable hover lift on touch */
+    .movie-card:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    .empty-state {
+      padding: 60px 20px;
+    }
+  }
 </style>
 
 <div class="watchlist-hero">
@@ -206,7 +248,7 @@
         {{ watchlist|length }} film{{ watchlist|length|pluralize }}
       </span>
 
-      <div class="row g-4">
+      <div class="row g-3">
         {% for item in watchlist %}
           <div class="col-lg-2 col-md-3 col-sm-4 col-6">
             <a href="{% url 'movie_detail' item.movie_id %}" class="movie-card">

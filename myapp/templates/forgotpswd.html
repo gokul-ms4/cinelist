@@ -23,7 +23,7 @@
   --border: #2a2732;
 }
 
-* { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: border-box; }
 
 html, body {
   margin: 0;
@@ -33,8 +33,7 @@ html, body {
 
 body {
   position: relative;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;           /* min- so content never clips on small screens */
   background:
     radial-gradient(ellipse 900px 700px at 78% 30%, rgba(201,162,75,0.09), transparent 60%),
     radial-gradient(ellipse 1000px 800px at 10% 80%, rgba(201,162,75,0.05), transparent 55%),
@@ -42,7 +41,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: 24px 16px;          /* horizontal padding on mobile */
 }
 
 body::after {
@@ -55,6 +54,7 @@ body::after {
   background-size: 3px 3px;
 }
 
+/* ── Film rail ────────────────────────────────────────────── */
 .film-rail {
   position: fixed;
   top: 0;
@@ -78,10 +78,10 @@ body::after {
   opacity: 0.55;
 }
 
+/* ── Login card ───────────────────────────────────────────── */
 .login-card {
   width: 780px;
   max-width: 100%;
-  min-height: 440px;
   display: flex;
   background-color: var(--surface);
   border: 1px solid var(--border);
@@ -103,6 +103,7 @@ body::after {
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* ── Poster (left panel) ──────────────────────────────────── */
 .poster {
   position: relative;
   width: 42%;
@@ -174,9 +175,10 @@ body::after {
   line-height: 1.5;
 }
 
+/* ── Form section (right panel) ───────────────────────────── */
 .form-section {
   width: 58%;
-  padding: 40px 42px;
+  padding: clamp(28px, 6vw, 42px);
   color: var(--text);
   display: flex;
   flex-direction: column;
@@ -186,13 +188,13 @@ body::after {
 .form-section h2 {
   font-family: 'Playfair Display', serif;
   font-weight: 600;
-  font-size: 1.7rem;
+  font-size: clamp(1.4rem, 5vw, 1.7rem);
   margin: 0 0 4px;
   color: var(--text);
 }
 
 .form-section .subtext {
-  font-size: 0.85rem;
+  font-size: clamp(0.8rem, 3vw, 0.85rem);
   color: var(--text-muted);
   margin: 0 0 26px;
   line-height: 1.5;
@@ -200,7 +202,7 @@ body::after {
 
 .form-section form label {
   display: block;
-  font-size: 0.78rem;
+  font-size: clamp(0.68rem, 2.5vw, 0.78rem);
   letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--text-muted);
@@ -215,10 +217,17 @@ body::after {
   color: var(--text);
   border-radius: 8px;
   padding: 12px 14px;
-  font-size: 0.95rem;
+  font-size: clamp(0.88rem, 3.5vw, 0.95rem);
   font-family: 'Inter', sans-serif;
   transition: border-color 160ms ease, box-shadow 160ms ease;
   margin-bottom: 14px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Prevent iOS zoom on focus */
+@media (max-width: 480px) {
+  .form-section form input { font-size: 16px; }
 }
 
 .form-section form input:focus {
@@ -232,26 +241,38 @@ body::after {
   padding: 0;
   margin: -8px 0 14px;
   color: #e07a7a;
-  font-size: 0.8rem;
+  font-size: clamp(0.75rem, 2.8vw, 0.8rem);
 }
 
+/* ── Submit button ────────────────────────────────────────── */
 .btn-danger {
   background-color: var(--gold);
   border: none;
   color: #16130c;
   font-weight: 600;
+  font-size: clamp(0.88rem, 3.5vw, 0.95rem);
   letter-spacing: 0.02em;
-  padding: 11px 0;
+  padding: 13px 0;            /* taller for fingers */
   border-radius: 999px;
   transition: transform 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
   box-shadow: 0 6px 24px rgba(201,162,75,0.22);
+  cursor: pointer;
+  width: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.btn-danger:hover {
+@media (hover: hover) {
+  .btn-danger:hover {
+    background-color: var(--gold-bright);
+    color: #16130c;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(201,162,75,0.32);
+  }
+}
+
+.btn-danger:active {
   background-color: var(--gold-bright);
-  color: #16130c;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(201,162,75,0.32);
+  transform: translateY(0);
 }
 
 .btn-danger:focus-visible {
@@ -259,14 +280,36 @@ body::after {
   outline-offset: 3px;
 }
 
-@media (max-width: 576px) {
+/* ── Mobile overrides (≤ 600px) ───────────────────────────── */
+@media (max-width: 600px) {
+  body {
+    padding: 16px;
+    align-items: flex-start;   /* let card sit near top, not dead-center */
+    padding-top: max(32px, env(safe-area-inset-top)); /* notch-safe */
+  }
+
   .film-rail { display: none; }
-  .login-card { margin-left: 0; flex-direction: column; min-height: auto; }
+
+  .login-card {
+    margin-left: 0;
+    flex-direction: column;
+    width: 100%;
+    border-radius: 16px;
+  }
+
   .poster { display: none; }
-  .form-section { width: 100%; padding: 32px 26px; }
+
+  .form-section {
+    width: 100%;
+    padding: 32px 24px 36px;
+  }
+}
+
+/* ── Extra-small phones (≤ 360px) ────────────────────────── */
+@media (max-width: 360px) {
+  .form-section { padding: 24px 16px 28px; }
 }
 </style>
-
 {% endblock %}
 
 {% block cards %}
@@ -277,6 +320,7 @@ body::after {
 </div>
 
 <div class="login-card">
+  <!-- Poster panel — hidden on mobile -->
   <div class="poster d-none d-md-flex">
     <svg class="reel" viewBox="0 0 400 400" fill="none" aria-hidden="true">
       <circle cx="200" cy="200" r="190" stroke="#c9a24b" stroke-width="1.2" opacity="0.16"/>
@@ -296,6 +340,8 @@ body::after {
       <p>We'll send a one-time code to verify it's really you.</p>
     </div>
   </div>
+
+  <!-- Form panel -->
   <div class="form-section">
     <h2>Enter Email</h2>
     <p class="subtext">Enter your registered email address and we'll send you a verification code.</p>
@@ -303,7 +349,7 @@ body::after {
     <form method="POST" action="">
       {% csrf_token %}
       {{ form }}
-      <button type="submit" class="btn btn-danger w-100 mt-3">Get OTP</button>
+      <button type="submit" class="btn btn-danger mt-3">Get OTP</button>
     </form>
   </div>
 </div>

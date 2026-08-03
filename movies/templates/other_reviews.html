@@ -74,8 +74,7 @@
   /* ===== Review card ===== */
   .review-card {
     height: 100%;
-    max-width: 300px;
-    margin: 0 auto;
+    /* removed max-width/margin:auto — Bootstrap column handles sizing */
     background-color: var(--surface);
     border: 1px solid var(--border);
     border-radius: 16px;
@@ -94,7 +93,9 @@
   .review-poster-wrap {
     position: relative;
     overflow: hidden;
-    height: 180px;
+    /* aspect-ratio scales correctly at any column width */
+    aspect-ratio: 2 / 3;
+    max-height: 260px; /* cap on wide desktop columns */
   }
 
   .review-poster {
@@ -210,6 +211,42 @@
     font-size: 0.88rem;
     color: var(--text-muted);
     margin: 0;
+  }
+
+  /* ===== Mobile tweaks ===== */
+  @media (max-width: 575px) {
+    .reviews-hero {
+      padding: 36px 0 0;
+    }
+
+    .page-title {
+      font-size: 1.6rem;
+    }
+
+    .page-sub {
+      margin-bottom: 24px;
+    }
+
+    /* Force single column — two review cards at 160px is too tight */
+    .col-sm-6 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+
+    /* Taller poster on full-width card */
+    .review-poster-wrap {
+      max-height: 320px;
+    }
+
+    /* Disable sticky hover lift on touch */
+    .review-card:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    .empty-state {
+      padding: 60px 20px;
+    }
   }
 </style>
 

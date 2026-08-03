@@ -25,6 +25,8 @@
     justify-content: space-between;
     padding: 18px 20px;
     border-bottom: 1px solid var(--border);
+    /* Prevent bar from shrinking on tiny screens */
+    flex-shrink: 0;
   }
 
   .top-bar a {
@@ -37,6 +39,8 @@
     color: var(--text-muted);
     text-decoration: none;
     transition: color 160ms ease, background-color 160ms ease;
+    /* Prevent tap target from collapsing */
+    flex-shrink: 0;
   }
 
   .top-bar a:hover {
@@ -54,19 +58,23 @@
   }
 
   .top-bar .spacer {
-    width: 38px; /* balances the back-arrow width so the title stays visually centered */
+    width: 38px;
+    flex-shrink: 0;
   }
 
+  /* ── Page body ──
+     Use padding-based layout rather than flex centering so
+     the list starts from the top on mobile (no awkward gap). */
   .page-body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    padding-bottom: 60px;
+    padding: 28px 0 80px;
   }
 
   .list-heading {
     max-width: 640px;
+    width: 100%;
     margin: 0 auto 14px;
     padding: 0 20px;
     font-size: 0.7rem;
@@ -79,8 +87,9 @@
 
   .follower-list {
     max-width: 640px;
+    width: 100%;
     margin: 0 auto;
-    padding: 0 20px 40px;
+    padding: 0 16px 40px;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -107,7 +116,9 @@
     align-items: center;
     gap: 12px;
     text-decoration: none;
+    /* Allow name to truncate without pushing Remove off-screen */
     min-width: 0;
+    flex: 1;
   }
 
   .follower-avatar {
@@ -145,6 +156,10 @@
     border-radius: 999px;
     text-decoration: none;
     transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+    /* Comfortable tap target */
+    min-height: 36px;
+    display: flex;
+    align-items: center;
   }
 
   .remove-btn:hover {
@@ -155,8 +170,13 @@
   }
 
   .no-following {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
-    padding: 0 20px;
+    padding: 60px 20px;
     color: var(--text-muted);
   }
 
@@ -170,6 +190,59 @@
   .no-following p {
     font-size: 1.05rem;
     margin: 0;
+  }
+
+  /* ── Mobile tweaks ── */
+  @media (max-width: 480px) {
+    .top-bar {
+      padding: 14px 16px;
+    }
+
+    .top-bar h5 {
+      font-size: 1rem;
+    }
+
+    .follower-list {
+      padding: 0 12px 40px;
+      gap: 8px;
+    }
+
+    .follower-row {
+      padding: 10px 14px;
+    }
+
+    .follower-avatar {
+      width: 36px;
+      height: 36px;
+      font-size: 0.9rem;
+    }
+
+    .follower-name {
+      font-size: 0.88rem;
+    }
+
+    .remove-btn {
+      font-size: 0.75rem;
+      padding: 6px 12px;
+    }
+
+    .page-body {
+      padding-top: 20px;
+    }
+  }
+
+  /* Very small phones */
+  @media (max-width: 360px) {
+    .remove-btn {
+      padding: 6px 10px;
+      font-size: 0.72rem;
+    }
+
+    .follower-avatar {
+      width: 32px;
+      height: 32px;
+      font-size: 0.8rem;
+    }
   }
 </style>
 

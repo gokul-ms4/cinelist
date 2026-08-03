@@ -37,24 +37,30 @@
     border: 1px solid rgba(201, 162, 75, 0.22);
     border-radius: 12px;
     padding: 11px 16px;
+    flex-wrap: wrap;
   }
 
   .follow-request-pill-left {
     display: flex;
     align-items: center;
     gap: 10px;
+    min-width: 0;
   }
 
   .follow-request-pill-left i {
     color: var(--gold);
     font-size: 0.85rem;
     opacity: 0.8;
+    flex-shrink: 0;
   }
 
   .follow-request-pill-text {
     font-size: 0.84rem;
     color: var(--text-muted);
     margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .follow-request-pill-text strong {
@@ -79,6 +85,7 @@
     padding: 5px 16px;
     cursor: pointer;
     transition: background-color 150ms ease, transform 150ms ease;
+    min-height: 32px;
   }
 
   .req-btn-confirm:hover {
@@ -96,6 +103,7 @@
     padding: 5px 16px;
     cursor: pointer;
     transition: color 150ms ease, border-color 150ms ease, transform 150ms ease;
+    min-height: 32px;
   }
 
   .req-btn-delete:hover {
@@ -104,6 +112,7 @@
     transform: translateY(-1px);
   }
 
+  /* ===== Profile Hero ===== */
   .profile-hero {
     padding: 16px 20px 20px;
     background:
@@ -152,19 +161,20 @@
 
   .follow-toggle {
     position: absolute;
-    top: 18px;
-    right: 18px;
+    top: 14px;
+    right: 14px;
     z-index: 5;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 18px;
+    gap: 6px;
+    padding: 7px 16px;
     border-radius: 999px;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-weight: 600;
     text-decoration: none;
     backdrop-filter: blur(4px);
     transition: transform 180ms ease, background-color 180ms ease, border-color 180ms ease;
+    white-space: nowrap;
   }
 
   .follow-toggle:hover { transform: translateY(-2px); }
@@ -188,7 +198,6 @@
     border-color: var(--gold-bright);
   }
 
-  /* Requested — not a link, just a label */
   .follow-toggle.is-requested {
     background-color: rgba(11, 10, 12, 0.55);
     border: 1px solid rgba(201, 162, 75, 0.35);
@@ -197,6 +206,7 @@
     pointer-events: none;
   }
 
+  /* ===== Profile Body ===== */
   .profile-body {
     padding: 0 40px 36px;
     position: relative;
@@ -237,6 +247,9 @@
     color: var(--text);
     margin: 10px 0 0;
     text-transform: uppercase;
+    /* Prevent very long usernames from overflowing */
+    word-break: break-word;
+    max-width: 100%;
   }
 
   .private-badge {
@@ -299,13 +312,16 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    white-space: nowrap;
+    /* Allow long emails to break */
+    word-break: break-all;
+    max-width: 100%;
   }
 
   .profile-meta span i {
     color: var(--gold);
     width: 14px;
     text-align: center;
+    flex-shrink: 0;
   }
 
   .profile-stats {
@@ -350,6 +366,7 @@
     margin: 0;
   }
 
+  /* ===== Activity Section ===== */
   .activity-section {
     max-width: 900px;
     margin: 44px auto 0;
@@ -418,9 +435,116 @@
     border-radius: 999px;
   }
 
+  /* ─────────────────────────────────────────
+     MOBILE RESPONSIVE
+     ───────────────────────────────────────── */
   @media (max-width: 576px) {
-    .profile-body { padding: 0 20px 30px; }
-    .profile-meta { gap: 8px 16px; }
+    .back-nav {
+      padding: 16px 16px 0;
+    }
+
+    /* Follow request pill wraps on very small screens */
+    .follow-request-pill {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 14px;
+    }
+
+    .follow-request-actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+
+    .profile-hero {
+      padding: 12px 12px 16px;
+    }
+
+    .profile-body {
+      padding: 0 18px 28px;
+    }
+
+    .profile-cover {
+      height: 120px;
+    }
+
+    /* Scale the avatar down slightly so it doesn't overlap the cover too much */
+    .profile-avatar {
+      width: 88px;
+      height: 88px;
+      font-size: 2rem;
+    }
+
+    .profile-top {
+      margin-top: -44px;
+    }
+
+    .profile-username {
+      font-size: 1.25rem;
+    }
+
+    /* Stack meta items vertically so long emails don't crowd */
+    .profile-meta {
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+      font-size: 0.82rem;
+    }
+
+    /* Stat boxes: 2-up grid instead of a single row */
+    .profile-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .stat-box {
+      padding: 12px 10px;
+      min-width: unset;
+      width: 100%;
+    }
+
+    .stat-box .stat-count {
+      font-size: 1.15rem;
+    }
+
+    /* Activity panels stack full-width (Bootstrap col-md-6 already handles this,
+       but tighten the outer padding) */
+    .activity-section {
+      margin-top: 28px;
+      padding: 0 12px;
+    }
+
+    .activity-panel {
+      padding: 20px 20px;
+    }
+
+    .activity-panel h4 {
+      font-size: 0.95rem;
+      white-space: normal;
+    }
+
+    /* Follow button in cover — smaller on mobile */
+    .follow-toggle {
+      font-size: 0.76rem;
+      padding: 6px 13px;
+      gap: 5px;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .profile-username { font-size: 1.1rem; }
+
+    .stat-box .stat-count { font-size: 1rem; }
+
+    .profile-avatar {
+      width: 78px;
+      height: 78px;
+      font-size: 1.75rem;
+    }
+
+    .profile-top { margin-top: -39px; }
   }
 </style>
 
@@ -432,20 +556,22 @@
 
 <!-- Follow Request Bar -->
 {% if follow_request and not follow_request.accept and not follow_request.reject %}
-<div style="max-width:760px; margin: 10px auto 0; padding: 0 20px;">
-  <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; background:rgba(201,162,75,0.05); border:1px solid rgba(201,162,75,0.18); border-radius:8px; padding:7px 12px;">
-    <p style="font-size:0.78rem; color:var(--text-muted); margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-      <i class="fa-solid fa-user-clock" style="color:var(--gold); margin-right:5px; font-size:0.72rem;"></i>
-      <strong style="color:var(--text);">{{ details.username }}</strong> wants to follow you
-    </p>
-    <div style="display:flex; gap:6px; flex-shrink:0;">
+<div class="follow-request-bar">
+  <div class="follow-request-pill">
+    <div class="follow-request-pill-left">
+      <i class="fa-solid fa-user-clock"></i>
+      <p class="follow-request-pill-text">
+        <strong>{{ details.username }}</strong> wants to follow you
+      </p>
+    </div>
+    <div class="follow-request-actions">
       <form action="{% url 'accept_request' details.id %}" method="post">
         {% csrf_token %}
-        <button type="submit" style="font-size:0.72rem; font-weight:600; color:#16130c; background:var(--gold); border:none; border-radius:999px; padding:3px 12px; cursor:pointer;">Confirm</button>
+        <button type="submit" class="req-btn-confirm">Confirm</button>
       </form>
       <form action="{% url 'reject_request' details.id %}" method="post">
         {% csrf_token %}
-        <button type="submit" style="font-size:0.72rem; font-weight:500; color:var(--text-muted); background:transparent; border:1px solid var(--border); border-radius:999px; padding:3px 12px; cursor:pointer;">Delete</button>
+        <button type="submit" class="req-btn-delete">Delete</button>
       </form>
     </div>
   </div>
@@ -454,55 +580,51 @@
 
 <div class="profile-hero">
   <div class="profile-card">
-<div class="profile-cover">
-  <svg class="reel" viewBox="0 0 400 400" fill="none" aria-hidden="true">
-    <circle cx="200" cy="200" r="190" stroke="#c9a24b" stroke-width="1.2" opacity="0.18"/>
-    <circle cx="200" cy="200" r="150" stroke="#c9a24b" stroke-width="1" opacity="0.15"/>
-    <circle cx="200" cy="200" r="46" stroke="#c9a24b" stroke-width="1.4" opacity="0.22"/>
-    <circle cx="200" cy="90" r="26" stroke="#c9a24b" stroke-width="1.2" opacity="0.18"/>
-    <circle cx="310" cy="200" r="26" stroke="#c9a24b" stroke-width="1.2" opacity="0.18"/>
-    <circle cx="200" cy="310" r="26" stroke="#c9a24b" stroke-width="1.2" opacity="0.18"/>
-    <circle cx="90" cy="200" r="26" stroke="#c9a24b" stroke-width="1.2" opacity="0.18"/>
-  </svg>
+    <div class="profile-cover">
+      <svg class="reel" viewBox="0 0 400 400" fill="none" aria-hidden="true">
+        <circle cx="200" cy="200" r="190" stroke="#c9a24b" stroke-width="1.2" opacity="0.18"/>
+        <circle cx="200" cy="200" r="150" stroke="#c9a24b" stroke-width="1" opacity="0.15"/>
+        <circle cx="200" cy="200" r="46" stroke="#c9a24b" stroke-width="1.4" opacity="0.22"/>
+        <circle cx="200" cy="90" r="26" stroke="#c9a24b" stroke-width="1.2" opacity="0.18"/>
+        <circle cx="310" cy="200" r="26" stroke="#c9a24b" stroke-width="1.2" opacity="0.18"/>
+        <circle cx="200" cy="310" r="26" stroke="#c9a24b" stroke-width="1.2" opacity="0.18"/>
+        <circle cx="90" cy="200" r="26" stroke="#c9a24b" stroke-width="1.2" opacity="0.18"/>
+      </svg>
 
-  {% if not details.is_private %}
-    {# ===== PUBLIC ACCOUNT ===== #}
-    {% if is_following_user %}
-      <a href="{% url 'following_removal' details.id %}" class="follow-toggle is-following" title="Unfollow">
-        <i class="fa-solid fa-circle-check"></i> Following
-      </a>
-    {% elif is_following_back %}
-      <a href="{% url 'follower' details.id %}" class="follow-toggle is-follow-back" title="Follow Back">
-        <i class="fa-solid fa-user-plus"></i> Follow Back
-      </a>
-    {% else %}
-      <a href="{% url 'follower' details.id %}" class="follow-toggle is-follow-back" title="Follow">
-        <i class="fa-solid fa-user-plus"></i> Follow
-      </a>
-    {% endif %}
-
-  {% else %}
-    {# ===== PRIVATE ACCOUNT ===== #}
-    {% if is_following_user %}
-    <a href="{% url 'following_removal' details.id %}" class="follow-toggle is-following" title="Unfollow">
-      <i class="fa-solid fa-circle-check"></i> Following
-    </a>
-  {% elif follow_back_request and not follow_back_request.accept and not follow_back_request.reject %}
-    <span class="follow-toggle is-requested">
-      <i class="fa-solid fa-clock"></i> Requested
-    </span>
-  {% elif is_following_back %}
-    <a href="{% url 'follower' details.id %}" class="follow-toggle is-follow-back" title="Follow Back">
-      <i class="fa-solid fa-user-plus"></i> Follow Back
-    </a>
-  {% else %}
-    <a href="{% url 'follower' details.id %}" class="follow-toggle is-follow-back" title="Follow">
-      <i class="fa-solid fa-user-plus"></i> Follow
-    </a>
-  {% endif %}
-
-  {% endif %}
-</div>
+      {% if not details.is_private %}
+        {% if is_following_user %}
+          <a href="{% url 'following_removal' details.id %}" class="follow-toggle is-following" title="Unfollow">
+            <i class="fa-solid fa-circle-check"></i> Following
+          </a>
+        {% elif is_following_back %}
+          <a href="{% url 'follower' details.id %}" class="follow-toggle is-follow-back" title="Follow Back">
+            <i class="fa-solid fa-user-plus"></i> Follow Back
+          </a>
+        {% else %}
+          <a href="{% url 'follower' details.id %}" class="follow-toggle is-follow-back" title="Follow">
+            <i class="fa-solid fa-user-plus"></i> Follow
+          </a>
+        {% endif %}
+      {% else %}
+        {% if is_following_user %}
+          <a href="{% url 'following_removal' details.id %}" class="follow-toggle is-following" title="Unfollow">
+            <i class="fa-solid fa-circle-check"></i> Following
+          </a>
+        {% elif follow_back_request and not follow_back_request.accept and not follow_back_request.reject %}
+          <span class="follow-toggle is-requested">
+            <i class="fa-solid fa-clock"></i> Requested
+          </span>
+        {% elif is_following_back %}
+          <a href="{% url 'follower' details.id %}" class="follow-toggle is-follow-back" title="Follow Back">
+            <i class="fa-solid fa-user-plus"></i> Follow Back
+          </a>
+        {% else %}
+          <a href="{% url 'follower' details.id %}" class="follow-toggle is-follow-back" title="Follow">
+            <i class="fa-solid fa-user-plus"></i> Follow
+          </a>
+        {% endif %}
+      {% endif %}
+    </div>
 
     <div class="profile-body">
       <div class="profile-top">
@@ -577,7 +699,6 @@
           <p>This account is private. Follow this user to see their reviews and watchlist.</p>
         </div>
       {% endif %}
-
     </div>
   </div>
 </div>

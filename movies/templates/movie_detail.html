@@ -110,7 +110,7 @@
     .movie-title {
       font-family: 'Playfair Display', serif;
       font-weight: 600;
-      font-size: clamp(1.9rem, 4vw, 2.9rem);
+      font-size: clamp(1.6rem, 5vw, 2.9rem);
       color: var(--text);
       line-height: 1.15;
       margin-bottom: 16px;
@@ -181,6 +181,7 @@
     .action-btn {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
       font-size: 0.88rem;
       font-weight: 600;
@@ -228,7 +229,6 @@
       color: var(--gold-bright);
     }
 
-    /* Already-added redirect buttons */
     .btn-goto-watchlist {
       background-color: rgba(201,162,75,0.1);
       border-color: rgba(201,162,75,0.4);
@@ -251,18 +251,27 @@
       color: #f0a0b8;
     }
 
-    /* submit button reset so it inherits action-btn styles */
     button.action-btn {
       font-family: inherit;
       line-height: 1;
     }
 
+    /* Action button row */
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
     /* ── Cast ── */
-    .cast-grid {
+    .cast-scroll {
+      /* Horizontal scroll on mobile, wraps on desktop */
       display: flex;
       flex-wrap: wrap;
       gap: 14px;
     }
+
     .cast-card {
       width: 90px;
       flex-shrink: 0;
@@ -312,6 +321,124 @@
     .detail-layout {
       padding: 40px 0 70px;
     }
+
+    /* ── Mobile poster header (score pill shown in row on mobile) ── */
+    .mobile-score-row {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .mobile-score-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--gold);
+      background: rgba(201,162,75,0.1);
+      border: 1px solid rgba(201,162,75,0.3);
+      border-radius: 999px;
+      padding: 4px 12px;
+    }
+
+    /* ===== RESPONSIVE ===== */
+
+    /* Tablet */
+    @media (max-width: 768px) {
+      .detail-hero { padding: 24px 0 0; }
+
+      .movie-title { margin-bottom: 12px; }
+
+      .action-btn {
+        font-size: 0.83rem;
+        padding: 10px 18px;
+      }
+    }
+
+    /* Mobile */
+    @media (max-width: 576px) {
+      .detail-hero { padding: 20px 0 0; }
+
+      /* Poster: narrower, centered */
+      .poster-col {
+        max-width: 200px;
+        margin: 0 auto 24px;
+      }
+
+      .poster-badge {
+        font-size: 0.7rem;
+        padding: 4px 10px;
+      }
+
+      .movie-eyebrow { margin-bottom: 6px; }
+
+      .movie-title {
+        font-size: 1.5rem;
+        margin-bottom: 12px;
+      }
+
+      .overview-text { font-size: 0.9rem; }
+
+      .gold-divider { margin: 20px 0; }
+
+      /* Action buttons: full-width stack */
+      .action-row {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .action-row .action-btn,
+      .action-row form,
+      .action-row form .action-btn {
+        width: 100%;
+      }
+
+      /* Cast: horizontal scroll instead of wrap */
+      .cast-scroll {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 8px;
+        /* hide scrollbar visually but keep functional */
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .cast-scroll::-webkit-scrollbar { height: 4px; }
+      .cast-scroll::-webkit-scrollbar-track { background: transparent; }
+      .cast-scroll::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 999px;
+      }
+
+      .cast-card {
+        width: 76px;
+      }
+      .cast-card img,
+      .cast-placeholder {
+        width: 76px;
+        height: 110px;
+      }
+
+      .cast-name { font-size: 0.7rem; }
+      .cast-role { font-size: 0.65rem; }
+
+      .detail-layout { padding: 28px 0 50px; }
+    }
+
+    /* Very small phones */
+    @media (max-width: 360px) {
+      .poster-col { max-width: 160px; }
+
+      .movie-title { font-size: 1.3rem; }
+
+      .action-btn { font-size: 0.8rem; padding: 10px 14px; }
+
+      .cast-card { width: 68px; }
+      .cast-card img,
+      .cast-placeholder { width: 68px; height: 98px; }
+    }
   </style>
 </head>
 
@@ -324,10 +451,10 @@
         <i class="fas fa-arrow-left"></i> Back to Films
       </a>
 
-      <div class="row g-5 mt-2 pb-5 align-items-start">
+      <div class="row g-4 g-md-5 mt-2 pb-5 align-items-start">
 
         <!-- Poster -->
-        <div class="col-lg-3 col-md-4 col-sm-6 mx-auto mx-md-0">
+        <div class="col-lg-3 col-md-4 col-12 poster-col">
           <div class="poster-wrap">
             <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="{{ movie.title }}">
             <span class="poster-badge"><i class="fas fa-star me-1"></i>{{ movie.vote_average|floatformat:1 }}</span>
@@ -335,7 +462,7 @@
         </div>
 
         <!-- Info -->
-        <div class="col-lg-9 col-md-8">
+        <div class="col-lg-9 col-md-8 col-12">
 
           <p class="movie-eyebrow">Film Detail</p>
           <h1 class="movie-title">{{ movie.title }}</h1>
@@ -363,7 +490,7 @@
           <hr class="gold-divider">
 
           <!-- Action buttons -->
-          <div class="d-flex flex-wrap gap-3 align-items-center">
+          <div class="action-row">
 
             <!-- Watchlist -->
             {% if is_watchlist %}
@@ -371,7 +498,7 @@
                 <i class="fas fa-bookmark"></i> Go to Watchlist
               </a>
             {% else %}
-              <form action="{% url 'watchlist_add' movie.id %}" method="post" class="d-inline">
+              <form action="{% url 'watchlist_add' movie.id %}" method="post">
                 {% csrf_token %}
                 <button type="submit" class="action-btn btn-watchlist">
                   <i class="fas fa-bookmark"></i> Add to Watchlist
@@ -385,7 +512,7 @@
                 <i class="fas fa-heart"></i> Go to Wishlist
               </a>
             {% else %}
-              <form action="{% url 'wishlist_add' movie.id %}" method="post" class="d-inline">
+              <form action="{% url 'wishlist_add' movie.id %}" method="post">
                 {% csrf_token %}
                 <button type="submit" class="action-btn btn-wishlist">
                   <i class="fas fa-heart"></i> Add to Wishlist
@@ -410,11 +537,13 @@
   <div class="detail-layout">
     <div class="container">
       <p class="section-label"><i class="fas fa-users me-2"></i>Top Cast</p>
-      <div class="cast-grid">
+      <div class="cast-scroll">
         {% for actor in cast.cast|slice:":10" %}
           <div class="cast-card">
             {% if actor.profile_path %}
-              <img src="https://image.tmdb.org/t/p/w185{{ actor.profile_path }}" alt="{{ actor.name }}">
+              <img src="https://image.tmdb.org/t/p/w185{{ actor.profile_path }}"
+                   alt="{{ actor.name }}"
+                   loading="lazy">
             {% else %}
               <div class="cast-placeholder">
                 <i class="fas fa-user"></i>
