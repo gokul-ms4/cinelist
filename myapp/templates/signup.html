@@ -1,430 +1,284 @@
 {% extends 'home.html' %}
 
 {% block title %}
-  <title>Cinelist - sign up</title>
+  <title>Cinelist - Sign Up</title>
 {% endblock %}
 
 {% load static %}
 
 {% block style %}
 <style>
-:root {
-  --ink: #0b0a0c;
-  --surface: #14131a;
-  --surface-raised: #1a1822;
-  --gold: #c9a24b;
-  --gold-bright: #e8c87a;
-  --text: #f2ecdd;
-  --text-muted: #9c9788;
-  --border: #2a2732;
-}
-
-* { box-sizing: border-box; }
-
-html, body {
-  margin: 0;
-  min-height: 100%;
-  font-family: 'Inter', sans-serif;
-}
-
-body {
-  position: relative;
-  min-height: 100vh;
-  overflow-x: hidden;
-  overflow-y: auto;
-  background:
-    radial-gradient(ellipse 900px 700px at 78% 30%, rgba(201,162,75,0.09), transparent 60%),
-    radial-gradient(ellipse 1000px 800px at 10% 80%, rgba(201,162,75,0.05), transparent 55%),
-    var(--ink);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
-
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.35;
-  background-image: radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px);
-  background-size: 3px 3px;
-  z-index: 0;
-}
-
-.film-rail {
-  position: fixed;
-  top: 0; left: 0;
-  height: 100%;
-  width: 34px;
-  background: linear-gradient(180deg, #1a1710, #0b0a0c);
-  border-right: 1px solid rgba(201,162,75,0.35);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  align-items: center;
-  z-index: 20;
-}
-
-.film-rail span {
-  width: 9px; height: 9px;
-  border-radius: 2px;
-  background: var(--gold);
-  opacity: 0.55;
-}
-
-.login-card {
-  width: 780px;
-  max-width: 100%;
-  min-height: 480px;
-  display: flex;
-  background-color: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  overflow: hidden;
-  box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,162,75,0.06);
-  margin-left: 34px;
-  position: relative;
-  z-index: 10;
-  animation: rise 700ms ease-out both;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .login-card { animation: none; }
-}
-
-@keyframes rise {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ── Poster panel ── */
-.poster {
-  position: relative;
-  width: 42%;
-  background:
-    radial-gradient(ellipse 420px 420px at 30% 20%, rgba(201,162,75,0.10), transparent 60%),
-    linear-gradient(160deg, #1a1710 0%, #0b0a0c 75%);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 28px 24px;
-  overflow: hidden;
-  border-right: 1px solid rgba(201,162,75,0.12);
-}
-
-.poster .reel {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  width: 220px; height: 220px;
-  opacity: 0.5;
-  pointer-events: none;
-}
-
-.poster-top .eyebrow {
-  font-size: 0.65rem;
-  letter-spacing: 0.26em;
-  text-transform: uppercase;
-  color: var(--gold-bright);
-  font-weight: 600;
-  margin: 0;
-}
-
-.poster-title {
-  position: relative;
-  z-index: 2;
-  font-family: 'Playfair Display', serif;
-  font-weight: 600;
-  font-size: 2rem;
-  line-height: 1.15;
-  color: var(--text);
-  margin: 0;
-}
-
-.poster-title span {
-  display: block;
-  color: var(--gold);
-  font-style: italic;
-  font-weight: 500;
-}
-
-.poster-bottom { position: relative; z-index: 2; }
-
-.poster-bottom .rule {
-  width: 40px; height: 1px;
-  background: linear-gradient(90deg, var(--gold), transparent);
-  margin-bottom: 10px;
-}
-
-.poster-bottom p {
-  font-size: 0.82rem;
-  color: var(--text-muted);
-  margin: 0;
-  line-height: 1.5;
-}
-
-/* ── Form panel ── */
-.form-section {
-  width: 58%;
-  padding: 40px 42px;
-  color: var(--text);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.form-section h2 {
-  font-family: 'Playfair Display', serif;
-  font-weight: 600;
-  font-size: 1.7rem;
-  margin: 0 0 4px;
-  color: var(--text);
-}
-
-.form-section .subtext {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin: 0 0 22px;
-}
-
-.form-section form p {
-  margin: 0 0 14px;
-  position: relative;
-}
-
-.form-section form label {
-  display: block;
-  font-size: 0.78rem;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-  font-weight: 600;
-}
-
-.form-section form input {
-  width: 100%;
-  background-color: var(--surface-raised);
-  border: 1px solid var(--border);
-  color: var(--text);
-  border-radius: 8px;
-  padding: 10px 40px 10px 12px;
-  font-size: 0.92rem;
-  font-family: 'Inter', sans-serif;
-  transition: border-color 160ms ease, box-shadow 160ms ease;
-}
-
-.form-section form input:focus {
-  outline: none;
-  border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(201,162,75,0.15);
-}
-
-.form-section form ul.errorlist {
-  list-style: none;
-  padding: 0;
-  margin: 4px 0 0;
-  color: #e07a7a;
-  font-size: 0.8rem;
-}
-
-/* ── Password toggle ── */
-.pwd-wrapper {
-  position: relative;
-  display: block;
-}
-
-.pwd-toggle-btn {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--text-muted);
-  font-size: 15px;
-  padding: 4px;
-  line-height: 1;
-  transition: color 150ms ease;
-  z-index: 2;
-}
-
-.pwd-toggle-btn:hover { color: var(--gold); }
-
-.btn-danger {
-  background-color: var(--gold);
-  border: none;
-  color: #16130c;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  padding: 11px 0;
-  border-radius: 999px;
-  transition: transform 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
-  box-shadow: 0 6px 24px rgba(201,162,75,0.22);
-}
-
-.btn-danger:hover {
-  background-color: var(--gold-bright);
-  color: #16130c;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(201,162,75,0.32);
-}
-
-.btn-danger:focus-visible {
-  outline: 2px solid var(--gold-bright);
-  outline-offset: 3px;
-}
-
-.form-link {
-  color: var(--text-muted);
-  text-decoration: none;
-  font-size: 0.88rem;
-  transition: color 160ms ease;
-}
-
-.form-link:hover { color: var(--gold-bright); }
-
-.highlight {
-  color: var(--gold);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.highlight:hover { color: var(--gold-bright); }
-
-/* ─────────────────────────────────────────
-   MOBILE RESPONSIVE
-   ───────────────────────────────────────── */
-@media (max-width: 640px) {
-  body {
-    padding: 16px 14px;
-    align-items: flex-start;
-    padding-top: max(24px, env(safe-area-inset-top));
-    padding-bottom: max(24px, env(safe-area-inset-bottom));
+  :root {
+    --ink: #0b0a0c;
+    --surface: #14131a;
+    --surface-raised: #1a1822;
+    --gold: #c9a24b;
+    --gold-bright: #e8c87a;
+    --text: #f2ecdd;
+    --text-muted: #9c9788;
+    --border: #2a2732;
   }
 
-  .film-rail { display: none; }
+  *, *::before, *::after { box-sizing: border-box; }
 
-  .login-card {
-    margin-left: 0;
-    flex-direction: column;
-    min-height: auto;
-    border-radius: 16px;
-    width: 100%;
-    overflow: hidden;
-  }
-
-  /* Compact horizontal banner — same pattern as OTP page */
-  .poster {
-    display: flex;
-    width: 100%;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    padding: 18px 20px;
-    border-right: none;
-    border-bottom: 1px solid rgba(201,162,75,0.12);
-    min-height: unset;
-  }
-
-  .poster .reel { display: none; }
-
-  .poster > .poster-top {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-  }
-
-  .poster-top .eyebrow {
-    font-size: 0.7rem;
-    letter-spacing: 0.22em;
-  }
-
-  .poster-title {
-    font-size: 1.05rem;
-    line-height: 1.2;
+  html, body {
     margin: 0;
-    white-space: nowrap;
+    min-height: 100%;
+    font-family: 'Inter', sans-serif;
   }
 
-  .poster-title span {
-    display: inline;
-    font-size: 0.9rem;
+  body {
+    position: relative;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background:
+      radial-gradient(ellipse 900px 700px at 78% 30%, rgba(201,162,75,0.09), transparent 60%),
+      radial-gradient(ellipse 1000px 800px at 10% 80%, rgba(201,162,75,0.05), transparent 55%),
+      var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* centered padding on all sides */
+    padding: max(32px, env(safe-area-inset-top)) 16px max(32px, env(safe-area-inset-bottom));
   }
 
-  .poster-bottom { display: none; }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    background-image: radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 3px 3px;
+    z-index: 0;
+  }
 
-  .form-section {
+  /* ── Card ──────────────────────────────────────────────── */
+  .signup-card {
     width: 100%;
-    padding: 28px 22px 32px;
+    max-width: 480px;          /* single-column, no poster panel */
+    background-color: var(--surface);
+    border: 1px solid rgba(201,162,75,0.18);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,162,75,0.06);
+    position: relative;
+    z-index: 10;
+    animation: rise 700ms ease-out both;
   }
 
-  .form-section h2 { font-size: 1.45rem; }
-
-  .form-section form input {
-    font-size: 0.95rem;
-    padding: 11px 40px 11px 12px;
-  }
-}
-
-@media (max-width: 380px) {
-  .form-section {
-    padding: 24px 18px 28px;
+  @media (prefers-reduced-motion: reduce) {
+    .signup-card { animation: none; }
   }
 
-  .form-section h2 { font-size: 1.3rem; }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
-  .form-section .subtext { font-size: 0.8rem; }
+  /* ── Gold top accent ───────────────────────────────────── */
+  .card-accent {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0.5;
+  }
 
-  .poster { padding: 14px 16px; }
+  /* ── Card header ───────────────────────────────────────── */
+  .card-header-block {
+    padding: 28px 32px 0;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 20px;
+  }
 
-  .poster-title { font-size: 0.95rem; }
-}
+  .card-eyebrow {
+    font-size: clamp(0.65rem, 2.5vw, 0.72rem);
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin: 0 0 6px;
+  }
+
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: clamp(1.4rem, 5vw, 1.8rem);
+    color: var(--text);
+    margin: 0 0 4px;
+  }
+
+  .card-subtext {
+    font-size: clamp(0.8rem, 3vw, 0.85rem);
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* ── Form body ─────────────────────────────────────────── */
+  .card-body {
+    padding: clamp(20px, 5vw, 32px);
+  }
+
+  .card-body form p {
+    margin: 0 0 14px;
+    position: relative;
+  }
+
+  .card-body form label {
+    display: block;
+    font-size: clamp(0.68rem, 2.5vw, 0.75rem);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  .card-body form input {
+    width: 100%;
+    background-color: var(--surface-raised);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 12px 40px 12px 12px;
+    font-size: clamp(0.88rem, 3.5vw, 0.92rem);
+    font-family: 'Inter', sans-serif;
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  /* Prevent iOS zoom on focus */
+  @media (max-width: 480px) {
+    .card-body form input { font-size: 16px; }
+  }
+
+  .card-body form input:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201,162,75,0.15);
+  }
+
+  .card-body form ul.errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 4px 0 0;
+    color: #e07a7a;
+    font-size: clamp(0.72rem, 2.8vw, 0.78rem);
+  }
+
+  /* ── Password toggle ───────────────────────────────────── */
+  .pwd-wrapper {
+    position: relative;
+    display: block;
+  }
+
+  .pwd-toggle-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 15px;
+    padding: 8px;
+    line-height: 1;
+    transition: color 150ms ease;
+    z-index: 2;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .pwd-toggle-btn:hover,
+  .pwd-toggle-btn:active { color: var(--gold); }
+
+  /* ── Submit button ─────────────────────────────────────── */
+  .btn-signup {
+    width: 100%;
+    background-color: var(--gold);
+    border: none;
+    color: #16130c;
+    font-weight: 600;
+    font-size: clamp(0.88rem, 3.5vw, 0.95rem);
+    letter-spacing: 0.02em;
+    padding: 13px 0;
+    border-radius: 999px;
+    transition: transform 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+    box-shadow: 0 6px 24px rgba(201,162,75,0.22);
+    cursor: pointer;
+    margin-top: 8px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  @media (hover: hover) {
+    .btn-signup:hover {
+      background-color: var(--gold-bright);
+      color: #16130c;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(201,162,75,0.32);
+    }
+  }
+
+  .btn-signup:active {
+    background-color: var(--gold-bright);
+    transform: translateY(0);
+  }
+
+  .btn-signup:focus-visible {
+    outline: 2px solid var(--gold-bright);
+    outline-offset: 3px;
+  }
+
+  /* ── Footer link ───────────────────────────────────────── */
+  .card-footer-link {
+    text-align: center;
+    margin-top: 18px;
+    font-size: clamp(0.82rem, 3vw, 0.88rem);
+    color: var(--text-muted);
+  }
+
+  .highlight {
+    color: var(--gold);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 160ms ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  @media (hover: hover) {
+    .highlight:hover { color: var(--gold-bright); }
+  }
+
+  .highlight:active { color: var(--gold-bright); }
+
+  /* ── Extra-small (≤ 360px) ─────────────────────────────── */
+  @media (max-width: 360px) {
+    .card-header-block { padding: 20px 18px 16px; }
+    .card-body { padding: 16px 18px 20px; }
+  }
 </style>
 {% endblock %}
 
 {% block cards %}
 
-<div class="film-rail" aria-hidden="true">
-  <span></span><span></span><span></span><span></span><span></span>
-  <span></span><span></span><span></span><span></span><span></span>
-</div>
+<div class="signup-card">
+  <div class="card-accent"></div>
 
-<div class="login-card">
-  <div class="poster">
-    <svg class="reel" viewBox="0 0 400 400" fill="none" aria-hidden="true">
-      <circle cx="200" cy="200" r="190" stroke="#c9a24b" stroke-width="1.2" opacity="0.16"/>
-      <circle cx="200" cy="200" r="150" stroke="#c9a24b" stroke-width="1" opacity="0.14"/>
-      <circle cx="200" cy="200" r="46" stroke="#c9a24b" stroke-width="1.4" opacity="0.2"/>
-      <circle cx="200" cy="90" r="26" stroke="#c9a24b" stroke-width="1.2" opacity="0.18"/>
-      <circle cx="310" cy="200" r="26" stroke="#c9a24b" stroke-width="1.2" opacity="0.18"/>
-      <circle cx="200" cy="310" r="26" stroke="#c9a24b" stroke-width="1.2" opacity="0.18"/>
-      <circle cx="90" cy="200" r="26" stroke="#c9a24b" stroke-width="1.2" opacity="0.18"/>
-    </svg>
-    <div class="poster-top">
-      <p class="eyebrow">Cinelist</p>
-      <h3 class="poster-title">Every film<br>worth remembering.<span>Cataloged.</span></h3>
-    </div>
-    <div class="poster-bottom">
-      <div class="rule"></div>
-      <p>Rate, review and track everything you watch — one shared list for every film you've seen.</p>
-    </div>
+  <div class="card-header-block">
+    <p class="card-eyebrow"><i class="fas fa-film me-1"></i> Cinelist</p>
+    <h2 class="card-title">Join Cinelist</h2>
+    <p class="card-subtext">Create an account to start tracking, rating and reviewing films.</p>
   </div>
 
-  <div class="form-section">
-    <h2>Join Cinelist</h2>
-    <p class="subtext">Create an account to start tracking, rating and reviewing films.</p>
-
+  <div class="card-body">
     <form method="POST" action="">
       {% csrf_token %}
       {{ form.as_p }}
-      <button type="submit" class="btn btn-danger w-100 mt-2">Sign up</button>
+      <button type="submit" class="btn-signup">Sign up</button>
     </form>
 
-    <p class="text-center mt-3 form-link" style="margin-bottom:0;">
+    <p class="card-footer-link">
       Already have an account?
       <a href="{% url 'login' %}" class="highlight">Sign in</a>
     </p>
